@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>name</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+    <field>
+		<name>name</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>bundesland_fk</name>
+		<type>genericelement</type>
+		<element>bundesland</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+</editfields> 
+</ameisen-node>

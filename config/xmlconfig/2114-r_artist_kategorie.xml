@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>artist_fk,kategorie_fk</overview>
+	<pagetitle>#artist_fk#-#kategorie_fk#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>artist_fk</name>
+		<type>genericelement</type>
+		<element>artist</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>kategorie_fk</name>
+		<type>genericelement</type>
+		<element>kategorie</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+</editfields> 
+</ameisen-node>

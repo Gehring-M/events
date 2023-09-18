@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+	<config>
+		<listtype>fieldorder</listtype>
+		<orderfields>bezeichnung</orderfields>
+		<overview>beschreibung</overview>
+		<pagetitle>#bezeichnung#</pagetitle>
+		<permissions>none</permissions>
+		<mediatypes>medienarchiveintrag</mediatypes>
+		<uselocale>no</uselocale>
+	</config>
+	<editfields>
+		<!-- ################################################################### -->
+		<field>
+			<name>bezeichnung</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>beschreibung</name>
+			<type>textlong</type>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+</ameisen-node>

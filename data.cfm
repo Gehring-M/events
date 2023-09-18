@@ -1,0 +1,1 @@
+﻿<cfinclude template="ameisen/ameisenData.cfm">

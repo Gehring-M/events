@@ -1,0 +1,121 @@
+@charset "utf-8";
+/* ================================================================ 
+This copyright notice must be untouched at all times.
+
+The original version of this stylesheet and the associated (x)html
+is available at http://www.cssplay.co.uk/menus/final_drop.html
+Copyright (c) 2005-2008 Stu Nicholls. All rights reserved.
+This stylesheet and the associated (x)html may be modified in any 
+way to fit your requirements.
+=================================================================== */
+.mainNav {
+	/*width:745px;*/
+	height:26px;
+	position:relative;
+	z-index:100;
+	/*border-right:1px solid #000;*/
+	/*font-family:arial, sans-serif;*/
+}
+.mainNav ul { /* remove all the bullets, borders and padding from the default list styling */
+	padding:0;
+	margin:0;
+	list-style-type:none;
+}
+.mainNav ul ul {
+	width:200px;
+}
+.mainNav li { /* float the list to make it horizontal and a relative positon so that you can control the dropdown menu positon */
+	float:left;
+	/*width:149px;*/
+	min-width:30px;
+	width:auto !important;
+	width:30px;
+	position:relative;
+}
+.mainNav a, .mainNav a:visited { /* style the links for the top level */
+	display:block;
+	font-size:11px;
+	text-decoration:none;
+	color:#fff;
+	/*width:138px;*/
+	height:26px;
+	/*border:1px solid #000;*/
+	/*border-width:1px 0 1px 1px;*/
+	/*background:#09c;*/
+	padding-right:20px;
+	line-height:25px;
+	font-weight:bold;
+	white-space:nowrap;
+}
+.mainNav ul ul a.drop, .mainNav ul ul a.drop:visited { /* style the second level background */
+	background:#d4d8bd url(/img/grey-arrow.gif) no-repeat 190px center;
+}
+.mainNav ul ul a.drop:hover{ /* style the second level hover */
+	background:#c9ba65 url(/img/blue-arrow.gif) no-repeat 190px center;
+}
+.mainNav ul ul :hover > a.drop {
+	background:#c9ba65 url(/img/blue-arrow.gif) no-repeat 190px center;
+}
+.mainNav ul ul ul a, .mainNav ul ul ul a:visited { /* style the third level background */
+	background:#e2dfa8;
+}
+.mainNav ul ul ul a:hover { /* style the third level hover */
+	background:#b2ab9b;
+}
+.mainNav ul ul { /* hide the sub levels and give them a positon absolute so that they take up no room */
+	visibility:hidden;
+	position:absolute;
+	height:0;
+	top:26px;
+	left:0;
+	width:200px;
+	border-top:4px solid #E1E1E1;
+	/*border-top:1px solid #000;*/
+}
+.mainNav ul ul ul{ /* position the third level flyout menu */
+	left:200px;
+	top:-4px;
+	width:200px;
+}
+.mainNav ul ul ul.left { /* position the third level flyout menu for a left flyout */
+	left:-200px;
+}
+
+.mainNav table { /* style the table so that it takes no ppart in the layout - required for IE to work */
+	position:absolute;
+	top:0;
+	left:0;
+	border-collapse:collapse;
+}
+.mainNav ul ul a, .mainNav ul ul a:visited { /* style the second level links */
+	background:#E1E1E1;
+	color:#000;
+	font-weight:normal !important;
+	height:auto;
+	line-height:1em;
+	padding:5px 10px;
+	width:180px;
+	/*border-width:0 1px 1px 1px;*/
+}
+.mainNav a:hover{ /* style the top level hover */
+	/*color:#000;*/
+	background:url(/img/bg_menue.png);
+}	
+.mainNav ul ul a:hover{ /* style the top level hover */
+	/*color:#000;*/
+	background:#ECECEC;
+}	
+.mainNav :hover > a, .mainNav ul ul :hover > a {
+	/*color:#000;*/
+	/*background:#E1E1E1;*/
+}
+.mainNav ul li:hover ul, .mainNav ul a:hover ul{ /* make the second level visible when hover on first level list OR link */
+	visibility:visible;
+}
+
+.mainNav ul :hover ul ul{ /* keep the third level hidden when you hover on first level list OR link */
+	visibility:hidden;
+}
+.mainNav ul :hover ul :hover ul{ /* make the third level visible when you hover over second level list OR link */
+	visibility:visible;
+}

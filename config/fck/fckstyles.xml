@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+	<Styles>
+		<Style name="Standard Text" element="div">
+			<Attribute name="class" value="textStandard" />
+		</Style>
+	</Styles>
+	<!--
+		<Style name="tolle grüne Schrift" element="div">
+			<Attribute name="class" value="greenText" />
+		</Style>
+		<Style name="Title H3" element="h3" />
+		<Style name="Custom Ruler" element="hr">
+			<Attribute name="size" value="1" />
+			<Attribute name="color" value="#ff0000" />
+		</Style>
+		
+		Dokumentation:
+		http://docs.fckeditor.net/FCKeditor_2.x/Developers_Guide/Configuration/Styles
+		http://docs.fckeditor.net/FCKeditor_2.x/Developers_Guide/Configuration/Toolbar
+	-->

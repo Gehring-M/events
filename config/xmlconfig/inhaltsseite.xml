@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisentemplate>
+	<config>
+		<autopublish>yes</autopublish>
+	</config>
+	<editfields>
+		<!-- ################################################################### -->
+		<field>
+			<name>metadescription</name>
+			<type>textlong</type>
+			<meta>yes</meta>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>metakeywords</name>
+			<type>textlong</type>
+			<meta>yes</meta>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>inhalt</name>
+			<type>richtext</type>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+</ameisentemplate>

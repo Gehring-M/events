@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+	<ameisen-node>
+	<config>
+		<listtype>fieldorder</listtype>
+		<overview>titel</overview>
+		<orderfields>titel</orderfields>
+		<pagetitle>#titel#</pagetitle>
+	</config>
+	<editfields>
+		<!-- ################################################################### -->
+		<field>
+			<name>titel</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>beschreibung</name>
+			<type>textlong</type>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+</ameisen-node>

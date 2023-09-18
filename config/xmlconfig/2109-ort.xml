@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>name,bezirk_fk,plz,weitereplz</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>bezirk_fk</name>
+		<type>genericelement</type>
+		<element>bezirk</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>plz</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>name</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>weitereplz</name> 
+		<type>textlong</type>
+		<required>yes</required>
+	</field>
+</editfields> 
+</ameisen-node>

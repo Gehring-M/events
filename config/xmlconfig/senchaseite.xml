@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisentemplate>
+	<config>
+		<autopublish>yes</autopublish>
+	</config>
+	<editfields>
+		<!-- ################################################################### -->
+		<field>
+			<name>handlername</name>
+			<type>textshort</type>		
+			<meta>yes</meta>
+		</field>	
+		<!-- ################################################################### -->
+		<field>
+			<name>controller</name>
+			<type>textshort</type>		
+			<meta>yes</meta>
+		</field>	
+	</editfields>
+</ameisentemplate>

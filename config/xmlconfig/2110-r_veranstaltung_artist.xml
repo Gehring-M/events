@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>veranstaltung_fk,artist_fk</overview>
+	<pagetitle>#veranstaltung_fk#-#artist_fk#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>veranstaltung_fk</name>
+		<type>genericelement</type>
+		<element>veranstaltung</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>artist_fk</name>
+		<type>genericelement</type>
+		<element>artist</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>uhrzeitvon</name>
+		<type>datetime</type>
+	</field>
+	<field>
+		<name>uhrzeitbis</name>
+		<type>datetime</type>
+	</field>
+	<field>
+		<name>ort_fk</name>
+		<type>genericelement</type>
+		<element>ort</element>
+		<required>no</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>veranstaltungsort</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>adresse</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>plz</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>ort</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>latitude</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>longitude</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>beschreibung</name> 
+		<type>textlong</type>
+		<required>no</required>
+	</field>
+</editfields> 
+</ameisen-node>

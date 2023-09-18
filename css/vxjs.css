@@ -1,0 +1,105 @@
+﻿/* Query Popup */
+.queryPopupButton	{ width: 10em; }
+
+.queryPopup			{ border: solid 1px #808080; width: 20em; min-height: 5em; opacity: 0.9; filter: Alpha(opacity=90); opacity: 0.9; background: #fff; }
+.queryPopupHeader	{ border-bottom: solid 1px #808080; background: #8cf; padding: 0.25em; height: 2em; }
+.queryPopupCloser	{ float: right; color: #fff; width: 1.5em; text-align: center; font-weight: bold; height: 1.5em; cursor: pointer; }
+.queryPopupSearchSubmit,
+.queryPopupSearchInput { font-size: 0.9em; border: none; }
+.queryPopupSearchSubmit { font-weight: bold; border: solid 1px; margin-left: 0.5em; }
+.queryPopupInfo		{ padding: 0.25em; color: #6ae; }
+
+.queryPopup	select	{ width: 100%; border: none; color: #000; background: transparent; }
+.queryPopup option	{ padding: 0.125em 0.25em; font-size: 90%; } 
+
+/* Popup Calendar */
+.popupCalendar			{ position: absolute; opacity: 0.9; filter: Alpha(opacity=90); background: #6d6e71; }
+.popupCalendar div		{ padding: 2px; }
+.popupCalendar table	{ font-size: 90%; border-spacing: 2px; border-collapse: separate; }
+.popupCalendar th		{ padding: 0.125em 0.25em; text-align: center; background: #909090; color: #fff; vertical-align: middle; width: 1.75em; }
+.popupCalendar td		{ padding: 0.125em 0.25em; text-align: center; background: #d0d0d0; vertical-align: middle; }
+.popupCalendar input	{ width: 2.5em; font-size: 100%; background: #909090; border: solid 1px; border-color: #445 #ccd #ccd #445; color: #fff; padding: 0 0.25em; }
+.popupCalendar .vxJS_dateCell	{ cursor: pointer; background: #fff; }
+.popupCalendar .vxJS_weekCell	{ cursor: pointer; background: #ffc080; }
+.popupCalendar .vxJS_prevYear,
+.popupCalendar .vxJS_nextYear,
+.popupCalendar .vxJS_prevMon,
+.popupCalendar .vxJS_nextMon	{ width: 0.7em; font-size: 150%; cursor: pointer; }
+.popupCalendar .vxJS_dragBar	{ border-collapse: collapse; width: 100%; color: #fff; }
+.popupCalendar .vxJS_dragBar td	{ background: none; vertical-align: middle; text-align: center; }
+.popupCalendar .mon,
+.popupCalendar .year			{ width: 3em; }
+.popupCalendar .today			{ background: #f08080; }
+.popupCalendar .marked			{ background-color: #80ff80; }
+.popupCalendar .disabled		{ color: #808080; cursor: default; }
+
+/* sorTable */
+.vxJS_sorTable_header_asc	{ background: #afa; }
+.vxJS_sorTable_header_desc	{ background: #ffa; }
+
+/* selectInput */
+.vxJS_selectInput input		{ border: solid 2px #c0c0c0; background: #ffe; font-weight: bold; }
+
+/* autoSuggest */
+.vxJS_autoSuggest				{ background: white; border: 1px solid #404040; position: absolute; opacity: 0.9; filter: Alpha(opacity=90); }
+.vxJS_autoSuggest ul			{ margin: 0; padding: 0;  list-style-type: none; }
+.vxJS_autoSuggest li			{ cursor: pointer; margin: 0; padding: 0.125em 0; float: left; width: 100%; }
+.vxJS_autoSuggest li.current	{ background: #3377dd; color: white; }
+.vxJS_autoSuggest li span		{ padding: 0 0.5em; }
+
+
+.vxJS_autoSuggest .city			{ float: left; }
+.vxJS_autoSuggest .zip			{ float: right; color: #808080; text-align: right; }
+
+/* dualSelect */
+.vxJS_dualSelect_container	{ font-size: 80%; }
+.vxJS_dualSelect_src,
+.vxJS_dualSelect_dest		{ float: left; width: 12em; border: solid 1px #000; height: 10em; overflow: auto; background: #fff; }
+.vxJS_dualSelect_buttons	{ float: left; width: 4em; }
+.vxJS_dualSelect_src div,
+.vxJS_dualSelect_dest div	{ padding: 0.125em 0.25em; overflow: hidden; border-bottom: dotted 1px; cursor: default; } 
+
+.vxJS_dualSelect_buttons input	{ font-size: 100%; display: block; border: solid 1px #808080; background: #c0c0c0; padding: 0em; width: 1.5em; margin: 0.5em auto 0.5em auto; }
+
+/* XhrTree */
+
+.xhrTree		{ list-style-type: none; margin: 0px; padding: 0px; }
+.xhrTree table	{ border-collapse: collapse; margin: 0px; width: 100%; }
+.xhrTree li		{ margin: 0px; padding: 0px; }
+.xhrTree td		{ vertical-align: middle; }
+
+.xhrTree .withTrail,
+.xhrTree .withoutTrail		{ padding: 0; width: 24px; }
+.xhrTree .withTrail			{ background: url(../js/tree_guide.gif) repeat-y 0% 0%; }
+.xhrTree .checkbox			{ width: 20px; }
+.xhrTree .marked			{ font-weight: bold; color: #c00; }
+.xhrTree .text				{ cursor: pointer; }
+.xhrTree .disabled			{ opacity: 0.5; }
+
+/* Misc */
+.dragBar { width: auto !important; width: 100%; }
+#boundingBox p,
+#draglayer2 p	{ font-size: 80%; }
+
+.sortList		{ margin-left: 2em; padding: 0em; list-style-type: none; width: 30em; border: solid 2px; }
+.sortList li	{ position: relative; border: dotted 1px #808080; padding: 0.5em; background: #eee; }
+.sortList li img{ }
+.sortList li table	{ position: relative; border-collapse: collapse; }
+
+.sortSelect		{ margin-left: 2em; width: 20em; }
+.sortSelect option	{ position: relative; }
+
+.bbToolbar		{ }
+.bbPreview		{ width: 30em; height: 10em; overflow: auto; background: #cfc; color: #808080; margin-top: 1em; }
+
+.bbToolbar input	{ font-family: serif; border: solid 1px #808080; background: #e0e0e0; margin: 0.125em; padding: 0.125em; }
+.bbToolbar .button0	{ font-weight: bold; }
+.bbToolbar .button1	{ font-style: italic; }
+
+.ddTree				{ width: 12em; display: block; margin: 0 0 0.5em 0; }
+option.dd_level0	{ font-weight: bold; }
+option.dd_level1	{ font-style: italic; }
+option.dd_level2	{ font-size: 80%; }
+
+#error_general		{ border: solid 2px #f00; padding: 2em; font-weight: bold; color: #f00; margin: 1em 0em; }
+.ajaxForm .error	{ color: #f00; }

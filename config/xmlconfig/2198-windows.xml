@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>sort</listtype>
+	<overview>windowname,node_type</overview>
+	<pagetitle>#windowname#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+	<hide>false</hide>
+</config>
+<editfields> 
+	<field>
+		<name>windowname</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+    <field>
+		<name>node_type</name> 
+		<type>integer</type>
+		<required>no</required>
+	</field>
+</editfields> 
+</ameisen-node>
