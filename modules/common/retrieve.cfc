@@ -302,7 +302,7 @@
 		
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
-				v1.*, v2.name parentdoctitle
+				v1.*, v2.name parent_name
 			FROM 
 				veranstaltung v1
 				LEFT JOIN veranstaltung v2 on v1.parent_fk = v2.id
@@ -375,9 +375,6 @@
 
 --->
 							
-							
-						
-
 		<cfloop query="qData">
 			
 			<cfif qData.parent_fk EQ "">
@@ -391,7 +388,7 @@
 				<cfset tmpStruct["children"] = qSubData.recordcount>
 				<cfset tmpStruct["opened"] = 1>
 				<cfset tmpStruct["name"] = qData.name>
-				<cfset tmpStruct["parentdocument"] = qData.parentdoctitle>
+				<cfset tmpStruct["parent_name"] = qData.parent_name>
 				<cfset tmpStruct["von"] = qData.von>
 				<cfset tmpStruct["bis"] = qData.bis>
 				<cfset tmpStruct["uhrzeitvon"] = qData.uhrzeitvon>
@@ -420,7 +417,7 @@
 					<cfset tmpStruct["opened"] = 1>
 					<cfset tmpStruct["children"] = 0>
 					<cfset tmpStruct["name"] = qSubData.name>
-					<cfset tmpStruct["parentdocument"] = qSubData.parentdoctitle>
+					<cfset tmpStruct["parent_name"] = qSubData.parent_name>
 					<cfset tmpStruct["von"] = qSubData.von>
 					<cfset tmpStruct["bis"] = qSubData.bis>
 					<cfset tmpStruct["uhrzeitvon"] = qSubData.uhrzeitvon>
@@ -606,7 +603,7 @@
 		
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
-				a.*, rva.veranstaltung_fk, rva.artist_fk, rva.id rvaid
+				rva.*, a.name
 			FROM 
 				r_veranstaltung_artist rva
 				LEFT JOIN artist a on rva.artist_fk = a.id
@@ -615,22 +612,23 @@
 			ORDER BY 
 				a.name
 		</cfquery>
-			
+	
 		<cfloop query="qData">
 			<cfset tmpStruct = {}>
-			<cfset tmpStruct["recordid"] 	= qData.rvaid>
-			<cfset tmpStruct["user_fk"] 	= qData.user_fk>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["veranstaltung_fk"] 	= qData.veranstaltung_fk>
+			<cfset tmpStruct["artist_fk"] 	= qData.artist_fk>
+			<cfset tmpStruct["ort_fk"] 	= qData.ort_fk>
 			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["uhrzeitvon"] 	= qData.uhrzeitvon>
+			<cfset tmpStruct["uhrzeitbis"] 	= qData.uhrzeitbis>
+			<cfset tmpStruct["veranstaltungsort"] 	= qData.veranstaltungsort>
 			<cfset tmpStruct["adresse"] 	= qData.adresse>
 			<cfset tmpStruct["plz"] 	= qData.plz>
 			<cfset tmpStruct["ort"] 	= qData.ort>
 			<cfset tmpStruct["latitude"] 	= qData.latitude>
 			<cfset tmpStruct["longitude"] 	= qData.longitude>
-			<cfset tmpStruct["telefon"] 	= qData.telefon>
-			<cfset tmpStruct["email"] 	= qData.email>
-			<cfset tmpStruct["web"] 	= qData.web>
 			<cfset tmpStruct["beschreibung"] 	= qData.beschreibung>
-				
 			<cfset ArrayAppend(returnArray, tmpStruct)>
 		</cfloop>
 		
@@ -638,14 +636,82 @@
     <cfreturn returnArray>
     
 </cffunction>						
+<!--------------------------------------------------------------------------------->					
+<cffunction name="qTags" access="remote" returnFormat="json" output="no">
+	
+	<cfargument name="veranstaltung_fk" type="string" required="no">
+	<cfargument name="filterText" type="string" required="no" default="">
+	
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>	
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT 
+				t.*, rvt.id rvtid
+			FROM 
+				tag t
+				<cfif arguments.veranstaltung_fk NEQ "">
+					LEFT JOIN r_veranstaltung_tag rvt on rvt.tag_fk = t.id AND rvt.veranstaltung_fk = '#arguments.veranstaltung_fk#'
+				</cfif>
+			WHERE
+				1=1
+				<cfif arguments.filterText NEQ "">
+					AND t.name like '%#arguments.filterText#%'
+				</cfif>
+				
+			ORDER BY 
+				t.name
+		</cfquery>
+		
+		<cfloop query="qData">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["checked"] = 1>
+			<cfif qData.rvtid EQ "">	
+				<cfset tmpStruct["checked"] = 0>
+			</cfif>	
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>							
+<!--------------------------------------------------------------------------------->				
 					
-					
-					
-					
-					
-					
-					
-					
+<cffunction name="getBilder" access="remote" returnFormat="json" output="no">
+	
+	<cfargument name="veranstaltung_fk" type="string" required="no">
+	
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>	
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT bilder FROM veranstaltung WHERE id = "#session['vaid']#" 
+		</cfquery>
+		<cfset qBilder = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#")>
+			
+		<cfloop query="qBilder">
+			
+			<cfset myIMG = href("instance:"&qBilder.id)&"&dimensions=100x66&cropmode=cropcenter">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qBilder.id>
+			<cfset tmpStruct["vorschaubild"] = myIMG>
+			<cfset tmpStruct["createdwhen"] = qBilder.createdwhen>
+			<cfset tmpStruct["titel"] 		= qBilder.bezeichnung>
+			<cfset tmpStruct["beschreibung"] = qBilder.beschreibung>
+				
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+				
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>						
 					
 					
 					
@@ -908,25 +974,6 @@
     <cfreturn returnArray>
     
 </cffunction>							
-<!--------------------------------------------------------------------------------->
-<cffunction name="qTags" access="remote" returnFormat="json" output="no">
-	
-  	<cfset var returnArray = ArrayNew(1)>
-	<cfset var tmpStruct = StructNew()>
-   	
-	<cfif isAuth()>		
-		<cfset qData = getStructuredContent(nodetype=2106,orderclause="name")>
-		<cfloop query="qData">
-			<cfset tmpStruct = {}>
-			<cfset tmpStruct["recordid"] 	= qData.id>
-			<cfset tmpStruct["name"] 	= qData.name>
-			<cfset ArrayAppend(returnArray, tmpStruct)>
-		</cfloop>
-		
-	</cfif> 
-    <cfreturn returnArray>
-    
-</cffunction>				
 <!--------------------------------------------------------------------------------->
 <cffunction name="getSubkategorien" access="remote" returnFormat="json" output="no">
 	

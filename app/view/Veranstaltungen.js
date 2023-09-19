@@ -29,7 +29,6 @@
 				agShowDeleteButton: true,
 				agShowDuplicateButton: true,
 				nodeType:2102,
-		
 				viewConfig: {
             		enableTextSelection: true
 				},
@@ -77,10 +76,10 @@
 					{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Preis',  dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{
-						
 						xtype: 'componentcolumn', 
 						sortable: false,
 						menuDisabled: true,
+						dataIndex: 'button',
 						width: 190,
 						renderer: function(value,data,record) {
 							if (record.data.parent_fk == null) {
@@ -101,7 +100,18 @@
 					
 					
 					/*
-					{ text: 'Gehört zu',  dataIndex: 'parentdocument', flex: 2, menuDisabled: true},
+					
+					{ align: 'center' , width: 60, text: 'Login',
+						renderer: function(value,data,record) { 
+							data.tdCls = 'tdHover';
+							if (record.data.loginrequired) {
+								return'<img src="img/lock.png" title="Dokument scheint nur im eingeloggten Zustand auf." alt="Dokument scheint nur im eingeloggten Zustand auf.">';
+							} else {
+								return'<img src="img/unlock.png" title="Dokument scheint auch OHNE Login Zustand auf." alt="Dokument scheint auch OHNE Login Zustand auf.">';
+							}
+					 	} 
+					},
+					{ text: 'Gehört zu',  dataIndex: 'parent_name', flex: 2, menuDisabled: true},
 					{ text: 'Kategorie',  dataIndex: 'kategorienamen', flex: 2, menuDisabled: true, tdCls: 'tdKategorie'	},
 					{ text: 'Öffentliche Tags',  dataIndex: 'tagnamen', flex: 1, menuDisabled: true, tdCls: 'tdKategorie',
 						renderer: function(value, meta){
@@ -122,16 +132,7 @@
 							}
 					 	} 
 					},
-					{ align: 'center' , width: 60, text: 'Login',
-						renderer: function(value,data,record) { 
-							data.tdCls = 'tdHover';
-							if (record.data.loginrequired) {
-								return'<img src="img/lock.png" title="Dokument scheint nur im eingeloggten Zustand auf." alt="Dokument scheint nur im eingeloggten Zustand auf.">';
-							} else {
-								return'<img src="img/unlock.png" title="Dokument scheint auch OHNE Login Zustand auf." alt="Dokument scheint auch OHNE Login Zustand auf.">';
-							}
-					 	} 
-					},
+					
 					{ align: 'center' , width: 60,
 						renderer: function(value,data,record) { 
 							if (record.data.upload != null) {
@@ -198,7 +199,15 @@
 					name:'btnReset',
 					agAction:'reset',
 					margin:'0 0 0 5',
-					cls: 'btn-gray'
+					cls: 'btn-red'
+				},{
+					xtype: 'button',
+					text: 'Export',
+					name: 'btnExport',
+					width: 60,
+					height: 24,
+					margin:'0 0 0 5',
+					cls: 'btn-gray',
 				},{
 					xtype: 'displayfield',
 					width: 2,
@@ -215,9 +224,8 @@
 					windowWidth:'800px',
 					maxWindowHeight: '90%',
 					windowName:'veranstaltungen',
-					nodeType:2102,
+					nodeType:2102
 				}]
-				
 				
 			},{		
 				
@@ -227,6 +235,9 @@
 				region: 'south',
 				split: true,
 				margin:'0 0 0 0',
+					bodyStyle: {
+						backgroundColor: '#bcbbc3'
+					},
 				name:'veranstaltungsdetails',
 				items: [{
 					xtype: 'grid',
@@ -310,8 +321,8 @@
 					windowWidth:800,
 					windowHeight:'',
 					maxWindowHeight: 800,
-					windowName:'preise',
-					text:'Verknüpfung löschen',
+					windowName:'rveranstaltungartist',
+					text:'Details bearbeiten',
 					nodeType:2110,
 					agShowDeleteButton: true,
 					margin:'0 0 0 0',
@@ -372,32 +383,126 @@
 					}]
 					
 					
-				/*		
+				
 				},{ 
 					xtype: 'grid',
-					border: true,
+					name:'tagzuweisung',
 					flex: 1,
-					title:'Bilder',
-					store: 'Laender',
-					name: 'Preise',
-					windowWidth:800,
-					windowHeight:'',
-					maxWindowHeight: 800,
-					windowName:'preise',
-					text:'Preis bearbeiten / löschen',
-					nodeType:2134,
-					agShowDeleteButton: true,
-					margin:'0 0 0 0',
-					viewConfig: {
-						enableTextSelection: false,
-					},
-					columns: [
-						{ text: 'Preis vor Stichtag',  dataIndex: 'preis_earlybird', width: 150, align: 'center' },
-						{ text: 'Stichtag',  dataIndex: 'datum_earlybird', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
-						{ text: 'Preis nach Stichtag',  dataIndex: 'preis', width: 150, align: 'center' },
-						{ text: 'Beschreibung',  dataIndex: 'name', flex: 1 },
-					]
-					
+					split: true,
+					autoScroll: true,
+					title: 'Tags',
+					collapsible: true,
+					store: 'Tags',
+					plugins: [{
+						ptype: 'bufferedrenderer',
+						trailingBufferZone: 20, 
+						leadingBufferZone: 50  
+					}],	
+					columns: [{
+							width:28, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'checked', sortable: false,
+							renderer: function(value,data,record) {
+								data.tdCls ='tdPointer';
+								if (record.data.checked) {
+									return'<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 1px">';
+								} else {
+									return'<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 1px">';
+								}
+							}
+						},{ 
+							text: 'Tags', dataIndex: 'name', flex: 1, menuDisabled: true, sortable: false
+						}
+					],
+					bbar:[{
+						xtype: 'textfield',
+						labelSeparator: ' ',
+						labelWidth: 140,
+						width: 360,
+						name:'gridFilter',
+						margin:'0 0 0 0',
+						labelClsExtra: 'whiteBold',
+						emptyText: 'Schnellfilter nach Tags',
+						enableKeyEvents: true,
+						agSearchFields: 'name',
+						listeners: {
+							keyup: {
+								fn: function(el,event) {
+									if (event.getCharCode() == 27) {
+										el.setValue('');
+									}
+								}
+							}
+						}
+					},{		
+						xtype: 'button',
+						text: 'X',
+						width: 27,
+						height: 24,
+						name:'gridFilterReset',
+						margin:'0 0 0 0',
+						cls: 'btn-red'
+					},{	
+						xtype: 'displayfield',
+						flex: 1
+					},{	
+						xtype: 'button',
+						text: 'Neuen Tag hinzufügen',
+						height: 24,
+						margin:'0 5 0 0',
+						width: 200,
+						windowWidth:400,
+						windowHeight:'',
+						maxWindowHeight: 400,
+						windowName:'tag',
+						nodeType:2106,
+						cls: 'btn-orange'
+					}]
+				},{ 	
+					xtype: 'fieldcontainer',
+					layout: 'hbox',
+					margin: '0 0 0 5',
+					title: 'Bilder',
+					width: '100%',
+					height: '100%',
+					items: [{
+						xtype: 'grid',
+						border: true,
+						flex: 1,
+						store: 'Bilder',
+						name: 'Bilder',
+						height: '98%',
+						windowWidth:800,
+						windowHeight:'',
+						maxWindowHeight: 800,
+						windowName:'preise',
+						text:'Preis bearbeiten / löschen',
+						nodeType:2134,
+						agShowDeleteButton: true,
+						margin:'0 0 0 0',
+						viewConfig: {
+							enableTextSelection: false,
+						},
+						columns: [
+							
+							{ text: 'Vorschau',  dataIndex: 'vorschaubild', width: 110,
+								renderer: function(value){
+									return '<div class="video-thumbnail"><span></span><img src="' + value + '" class="vidprev"/></div>';
+								}
+							},
+							{ text: 'Hochgeladen am',  dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
+							{ text: 'Titel',  dataIndex: 'titel', flex: 1 },
+							{ text: 'Beschreibung',  dataIndex: 'beschreibung', flex: 1 },
+						]
+					},{
+						xtype: 'panel',
+						border: false,
+						height: 1000,
+						margin:'0 0 0 0',
+						padding:'0 0 0 0',
+						width: 480,
+						html: '<iframe src="/modules/multiupload.cfm?typ=bilder" width="490" height="1000"></iframe>'
+					}]
+
+				/*			
 				},{ 
 					
 					xtype: 'grid',
@@ -544,7 +649,7 @@
 				autoScroll: true,
 				title: 'Tags',
 				collapsible: true,
-				store: 'Tags',
+				store: 'Laender',
 				plugins: [{
 					ptype: 'bufferedrenderer',
 					trailingBufferZone: 20, 

@@ -3,6 +3,44 @@
 <cfinclude template="/modules/functions.cfm" >
 <cfoutput>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+<cffunction name="editTags" access="remote" returnFormat="json">
+	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
+	<cfargument name="tag_fk" type="numeric" required="yes">
+	<cfargument name="status" type="boolean" required="yes">
+	<cfset var result		= {}>
+    <cfset result["success"] = false>
+	<cfif isAuth()>
+		<cfif arguments.status>
+			<cfset myData = StructNew()>
+			<cfset myData['veranstaltung_fk'] = arguments.veranstaltung_fk>
+			<cfset myData['tag_fk'] = arguments.tag_fk>
+			<cfset saveStructuredContent(nodetype=2116,data=myData)>
+		<cfelse>
+			<cfquery datasource="#getConfig('DSN')#">
+				DELETE FROM r_veranstaltung_tag WHERE veranstaltung_fk = '#arguments.veranstaltung_fk#' AND tag_fk = '#arguments.tag_fk#'
+			</cfquery>
+		</cfif>
+		<cfset result["success"] = true>				
+	</cfif>
+	<cfreturn result>
+</cffunction>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="setVA" access="remote" returnFormat="json">
+	<cfargument name="id" type="numeric" required="yes">
+	<cfset var result		= {}>
+    <cfset result["success"] = false>
+	<cfif isAuth()>
+		<cfif !StructKeyExists(session,'vaid')>
+			<cfset session['vaid'] = 0>
+		</cfif>	
+		<cfset session['vaid'] = arguments.id>	
+	</cfif>
+	<cfreturn result>
+</cffunction>	
+	
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+	
 <cffunction name="lockunlock" access="remote" returnFormat="json">
 	<cfargument name="recordid" type="numeric" required="yes">
 	<cfargument name="loginrequired" type="numeric" required="yes">
@@ -86,62 +124,5 @@
 	<cfreturn result>
 </cffunction>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<cffunction name="editTags" access="remote" returnFormat="json">
-	<cfargument name="dokument_fk" type="numeric" required="yes">
-	<cfargument name="tag_fk" type="numeric" required="yes">
-	<cfargument name="status" type="boolean" required="yes">
-		
-	<cfset var result		= {}>
-    <cfset result["success"] = false>
-	<cfif isAuth()>
-			
-		<cfif arguments.status>
-			<cfset myData = StructNew()>
-			<cfset myData['dokument_fk'] = arguments.dokument_fk>
-			<cfset myData['tag_fk'] = arguments.tag_fk>
-			<cfset saveStructuredContent(nodetype=2107,data=myData)>
-		<cfelse>
-			<cfquery datasource="#getConfig('DSN')#">
-				DELETE FROM r_dokumente_tags WHERE dokument_fk = '#arguments.dokument_fk#' AND tag_fk = '#arguments.tag_fk#'
-			</cfquery>
-		</cfif>
-				
-		<cfquery name="qTags" datasource="#getConfig('DSN')#">
-			SELECT 
-				rdt.*, t.name
-			FROM 
-				r_dokumente_tags rdt
-				LEFT JOIN tags t on rdt.tag_fk = t.id
-			WHERE
-				rdt.dokument_fk = '#arguments.dokument_fk#'
-			ORDER BY
-				rdt.dokument_fk, t.name
-		</cfquery>		
-		
-		<cfset tagNamen = "">
-		<cfset tagIDs = "">
-			
-		<cfloop query="qTags">
-			<cfset tagNamen =  ListAppend(tagNamen,qTags.name)>
-			<cfset tagIDs = ListAppend(tagIDs,qTags.tag_fk)>
-		</cfloop>	
-				
-		<cfset result["tagNamen"] = Replace(tagNamen,",",", ","ALL")>	
-		<cfset result["tagIDs"] = tagIDs>	
-		<cfset result["success"] = true>				
-	</cfif>
-	<cfreturn result>
-</cffunction>
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<cffunction name="updateSOLR" access="remote" returnFormat="json" output="no">
-	<cfargument name="dokument_fk" required="yes" type="numeric">
-	<cfset var result		= {}>
-	<cfset result["success"] = true>
-	<cfset update = updateSOLRIndex(arguments.dokument_fk)>	
-	<cfif update NEQ "">
-		<cfset result["success"] = false>
-	</cfif>
-	<cfreturn result>
-</cffunction>		
 </cfoutput>
 </cfcomponent>

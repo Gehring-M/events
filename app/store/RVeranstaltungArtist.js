@@ -18,19 +18,11 @@
 	fields: [{
 		name: 'recordid'
 	},{ 
-		name: 'parent_fk'	
+		name: 'veranstaltung_fk'	
 	},{ 
-		name: 'opened'	
-	},{ 	
-		name: 'children'
-	},{ 	
-		name: 'name'
+		name: 'artist_fk'	
 	},{ 
-		name: 'von',
-		type: 'date'	
-	},{ 
-		name: 'bis',
-		type: 'date'	
+		name: 'name'	
 	},{ 
 		name: 'uhrzeitvon',
 		type: 'date'	
@@ -38,9 +30,9 @@
 		name: 'uhrzeitbis',
 		type: 'date'	
 	},{ 
-		name: 'veranstaltungsort'
+		name: 'ort_fk'
 	},{ 
-		name: 'adresse_display'
+		name: 'veranstaltungsort'
 	},{ 
 		name: 'adresse'
 	},{ 
@@ -53,9 +45,5 @@
 		name: 'longitude'
 	},{ 
 		name: 'beschreibung'
-	},{ 
-		name: 'preis'
-	},{ 
-		name: 'optionstyle'
 	}]
 });

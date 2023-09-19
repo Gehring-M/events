@@ -11,7 +11,7 @@
 		<cfset myData = StructNew()>
 		<cfset myData['name'] = arguments.tag>
 		<cfset myData['parent_fk'] = null>
-		<cfset saveAdmin = saveStructuredContent(nodetype=2101,data=myData)>
+		<cfset save = saveStructuredContent(nodetype=2101,data=myData)>
 		<cfset result["success"] = true>				
 	</cfif>
 	<cfreturn result>
@@ -26,8 +26,9 @@
 		<cfset myData = StructNew()>
 		<cfset myData['veranstaltung_fk'] = arguments.veranstaltung_fk>
 		<cfset myData['veranstalter_fk'] = arguments.veranstalter_fk>
-		<cfset saveAdmin = saveStructuredContent(nodetype=2111,data=myData)>
-		<cfset result["success"] = true>				
+		<cfset save = saveStructuredContent(nodetype=2111,data=myData)>
+		<cfset result["success"] = true>
+		<cfset result["recordid"] = save['instanceid']>
 	</cfif>
 	<cfreturn result>
 </cffunction>
@@ -43,8 +44,9 @@
 		<cfset myData['artist_fk'] = arguments.artist_fk>
 		<cfset myData['longitude'] = 0.0000000000>
 		<cfset myData['latitude'] = 0.0000000000>
-		<cfset saveAdmin = saveStructuredContent(nodetype=2110,data=myData)>
-		<cfset result["success"] = true>				
+		<cfset save = saveStructuredContent(nodetype=2110,data=myData)>
+		<cfset result["success"] = true>	
+		<cfset result["recordid"] = save['instanceid']>
 	</cfif>
 	<cfreturn result>
 </cffunction>

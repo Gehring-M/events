@@ -12,7 +12,9 @@
 		'Artist',
 		'Veranstalter',
 		'RVeranstaltungArtist',
-		'RVeranstaltungVeranstalter'
+		'RVeranstaltungVeranstalter',
+		'Tags',
+		'Bilder'
 	],
 	
 	refs: [{
@@ -278,49 +280,24 @@
 		}
 		
 	
-		if (gridview.up('grid').name == "tagzuweisung" && cellnumber == gridview.up('grid').columns.length-1) {
-					
-			var status = !rec.data.tagChecked,
-				myView = this.getDokumente(),
-				myDocGrid = myView.down('grid[name=dokumente]'),
-				myDocCPos = myDocGrid.getSelectionModel().getCurrentPosition();
+		if (gridview.up('grid').name == "tagzuweisung" && cellnumber == 0) {
 			
-				if (myDocCPos == undefined) {
-					Ext.Msg.alert('Systemnachricht','Bitte wählen Sie in der linken Tabelle ein Dokument aus.');
-				} else {
-					myDocRecord = myDocCPos.record;
-					myDokID = myDocRecord.data.recordid;
-					Ext.Ajax.request({
-						url: '/modules/common/services.cfc?method=editTags',
-						params: {
-							dokument_fk: myDokID,
-							tag_fk: rec.data.recordid,
-							status: status
-						},
-						success: function(response) {
-							var jsonParse = Ext.JSON.decode(response.responseText);
-							myDocRecord.set('tagnamen',jsonParse['tagNamen']);
-							myDocRecord.set('tagids',jsonParse['tagIDs']);
-							
-							Ext.Ajax.request({
-								url: '/modules/common/services.cfc?method=updateSOLR',
-								params: {
-									dokument_fk: myDokID,
-								},
-								success: function(response) {
-									var jsonParse = Ext.JSON.decode(response.responseText);
-									if (!jsonParse['success']) {
-										Ext.Msg.alert('Systemnachricht','Die Indizierung des Dokuments ist fehlgeschlagen!');
-									}
-								}
-							});
-							
-							
-						}
-					});
-					rec.set('tagChecked',status);
-					
+			var me = this,
+			status = !rec.data.checked,
+			myView = this.getVeranstaltungen();
+			
+			Ext.Ajax.request({
+				url: '/modules/common/services.cfc?method=editTags',
+				params: {
+					veranstaltung_fk: me.cVeranstaltung,
+					tag_fk: rec.data.recordid,
+					status: status
+				},
+				success: function(response) {
+					var jsonParse = Ext.JSON.decode(response.responseText);
 				}
+			});
+			rec.set('checked',status);
 
 		}
 		
@@ -401,6 +378,26 @@
         }
 	},
 	
+	loadStoreOnTabChange: function(el) {
+		
+		if (el.activeTab.xtype == "grid") {
+			el.activeTab.getStore().load({
+				params: {
+					veranstaltung_fk:  this.cVeranstaltung
+				}
+			});
+		} else {
+			myGrid = el.activeTab.down('grid');
+			myGrid.getStore().load({
+				params: {
+					veranstaltung_fk:  this.cVeranstaltung
+				}
+			});
+		}
+				
+	},
+	
+	
 	onSelectDateField: function(el) {
 		
 	},
@@ -459,11 +456,7 @@
 	onBlurCombobox: function(el,record) {
 		this.resetProxy(el);
 		me = this;
-		
-		console.log(el);
-		
 		if (el.queryMode=="remote" && isNaN(el.getValue())) {
-			
 			if (el.name == "addVeranstalter") {
 				tmpVal = el.getValue();
 				var myStore = el.getStore(),
@@ -504,7 +497,7 @@
 				
 			} else {
 				el.setValue();
-				Ext.Msg.alert('Details',"Bitte wählen Sie eine Option aus der Auswahlliste aus.");
+				Ext.Msg.alert('Details','Bitte suchen Sie mittels Texteingabe im Feld "'+el.agFieldLabel+'" bzw. wählen Sie dann eine Option aus der Auswahlliste aus.');
 			}
 			
 		}
@@ -525,6 +518,8 @@
 				}
 			});
 		}
+		
+		
 		/*
 		if (el.name == "filterKategorie" && record[0].data.parent_fk == null) {
 			el.setValue();
@@ -644,6 +639,7 @@
 								}
 							});
 						}
+						el.previousSibling().setValue();
 					}
 				});
 			}
@@ -652,7 +648,9 @@
 			if (this.cVeranstaltung == 0 || el.previousSibling().getValue() == null) {
 				Ext.Msg.alert('Systemnachricht','Bitte wählen Sie eine Veranstaltung sowie einen Künstler aus.');
 			} else {
-				var myStore = el.up('grid').getStore();
+				var myGrid = el.up('grid'),
+					myStore =myGrid.getStore();
+				
 				Ext.Ajax.request({
 					url: '/modules/common/create.cfc?method=addArtistToVeranstaltung',
 					params: {
@@ -667,17 +665,30 @@
 							myStore.load({
 								params: {
 									veranstaltung_fk:  me.cVeranstaltung,
+								},
+								callback: function(res) {
+									Ext.each(res, function(cRec,index) {
+										if (cRec.data.recordid == jsonParse['recordid']) {
+											myGrid.getView().select(index)
+											myRecord = cRec;
+										}
+									});
+									me.onDblClickGrid(myGrid.getView(),myRecord);
 								}
 							});
 						}
+						el.previousSibling().setValue();
 					}
 				});
 			}
 		}
 		
+		if (el.name=='btnExport') {
+			//Ext.Msg.alert('Systemnachricht','Der Export ist derzeit noch nicht verfügbar.');
+			this.exportVeranstaltungen();
+		}
+		
 	},
-	
-	
 	
 	setCheckboxes4Documents: function(record) {
 		
@@ -771,8 +782,20 @@
 	onGridRowSelected: function(el,record,row) {
 	   if (el.view.up('grid').name=="veranstaltungen") {
 		   	this.cVeranstaltung = record.data.recordid,
+			Ext.Ajax.request({
+				url: '/modules/common/services.cfc?method=setVA',
+				params: {
+					id: this.cVeranstaltung,
+				}
+			});
 		   	myTabPanel = el.view.up('grid').up('form').down('tabpanel');
-		   	myStore = myTabPanel.activeTab.getStore();
+		   
+		   	if (myTabPanel.activeTab.xtype == "grid") {
+			 	myStore = myTabPanel.activeTab.getStore();
+			} else {
+				myStore = myTabPanel.activeTab.down('grid').getStore()
+			}
+		   
 			myStore.load({
 				params: {
 					veranstaltung_fk:  this.cVeranstaltung,
@@ -876,5 +899,93 @@
 		this.application.setMainView(this.getTags());
 	},
 	*/
+	exportVeranstaltungen: function(){
+		var myView = this.getVeranstaltungen(),
+		me = this,
+		csvContent      = '',
+		noCsvSupport     = ( 'download' in document.createElement('a') ) ? false : true,
+        sdelimiter      = noCsvSupport ? "<td>"   : "",
+        edelimiter      = noCsvSupport ? "</td>"  : ";",
+        snewLine        = noCsvSupport ? "<tr>"   : "",
+        enewLine        = noCsvSupport ? "</tr>"  : "\r\n",
+        printableValue  = '',
+		myGrid 			= myView.down('grid[name=veranstaltungen]'),
+		myStore			= myGrid.getStore();
+		myVisibleColumns = [],
+		myColumnLabels={};
+		disabledColumns = "opened,checked,button";
+		
+		
+		csvContent += snewLine;
+
+		if (myStore.data.items.length < 1) {
+			Ext.Msg.alert('Systemnachricht','Die Ansicht entählt keine Daten und kann daher nicht exportiert werden.'+'<br /><br />');
+		} else {
+			// sichtbare spalten zuweisen    
+			
+			Ext.Array.push(myVisibleColumns,'recordid');
+			myColumnLabels['recordid'] = 'ID';
+			
+			Ext.Array.each(myGrid.columns,function(cCol) {
+				if (disabledColumns.indexOf(cCol.dataIndex) == -1) {
+					Ext.Array.push(myVisibleColumns,cCol.dataIndex);
+					myColumnLabels[cCol.dataIndex] = cCol.text;
+				}
+				
+			});
+			
+			Ext.Array.push(myVisibleColumns,'parent_name');
+			myColumnLabels['parent_name'] = 'Gehört zu';
+			Ext.Array.push(myVisibleColumns,'parent_fk');
+			myColumnLabels['parent_fk'] = 'Parent ID';
+			
+			Ext.Object.each(myStore.data.items[0].data, function(key) {
+				if (myVisibleColumns.indexOf(key) != -1) {
+					csvContent += sdelimiter +  myColumnLabels[key] + edelimiter;
+				}
+			});
+			csvContent += enewLine;
+			for (var i = 0; i < myStore.data.items.length; i++){
+				/* Put the record object in somma seperated format */
+				csvContent += snewLine;
+				Ext.Object.each(myStore.data.items[i].data, function(key, value) {
+					//csvContent += sdelimiter +  i + edelimiter;
+					if (myVisibleColumns.indexOf(key) != -1) {
+						printableValue = ((noCsvSupport) && value == '') ? '&nbsp;'  : value;
+						printableValue = String(printableValue).replace(/,/g , "");
+						printableValue = String(printableValue).replace(";",",");
+						printableValue = String(printableValue).replace("#","");
+						printableValue = String(printableValue).replace("\"","'");
+						printableValue = String(printableValue).replace(/(\r\n|\n|\r)/gm,"");
+						if (key == "von" || key == "bis" ) {
+							printableValue =  Ext.Date.format(value,'d.m.Y');
+						}
+						if (key == "uhrzeitvon" || key == "uhrzeitbis") {
+							printableValue =  Ext.Date.format(value,'H:i');
+						}
+						if (printableValue == "null") {
+							printableValue = "";
+						}
+						
+						csvContent += sdelimiter +  printableValue + edelimiter;
+					}
+				});
+				csvContent += enewLine;
+
+			}
+
+			if('download' in document.createElement('a')){
+				var mycsvlink = document.createElement("a");
+				mycsvlink.setAttribute("href", "data:text/csv;charset=utf-8,\uFEFF" + encodeURI(csvContent));
+				mycsvlink.setAttribute("download", "Veranstaltungen.csv");
+				document.body.appendChild(mycsvlink); 
+				mycsvlink.click();
+				document.body.removeChild(mycsvlink); 
+			} else {
+				var newWin = open('windowName',"_blank");
+				newWin.document.write('<table border=1>' + csvContent + '</table>');
+			}
+		}
+	}
 	
 });

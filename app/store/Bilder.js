@@ -1,7 +1,7 @@
-﻿Ext.define('oegb.store.Tags', {
+﻿Ext.define('oegb.store.Bilder', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
-	storeId: 'Tags',
+	storeId: 'Bilder',
 	proxy: {
 	type: 'ajax',
 	timeout: 300000,
@@ -9,7 +9,7 @@
     startParam: false, 
     limitParam: false,
 	noCache: true,
-	url: 'modules/common/retrieve.cfc?method=qTags',
+	url: 'modules/common/retrieve.cfc?method=getBilder',
 		reader: {
 			type: 'json'
 		}
@@ -19,6 +19,12 @@
 	},{
 		name: 'name'
 	},{
-		name: 'checked'
+		name: 'createdwhen'
+	},{
+		name: 'titel'
+	},{
+		name: 'beschreibung'
+	},{
+		name: 'vorschaubild'
 	}]
 });

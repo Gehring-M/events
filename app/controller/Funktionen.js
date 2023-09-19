@@ -191,12 +191,12 @@
 							layout: 'hbox',
 							name: cItem.data.name,
 							labelWidth: myWindow.agLabelWidth,
-							fieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
+							fieldLabel: cItem.data.fieldlabel,
 							disabled: (rec != undefined && rec[cItem.data.name+'_disabled'] != undefined && rec[cItem.data.name+'_disabled'] == true) ? true : false,
 							margin: '0 5 5 5',
 							items: [{
 								xtype: cItem.data.xtype,
-								//fieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
+								agFieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
 								name:cItem.data.name,
 								//emptyCls: (cItem.data.mandatory==1) ? 'errorBorder' : '',
 								emptyText: (cItem.data.mandatory==1) ? (cItem.data.emptytext!='') ? cItem.data.emptytext :'Pflichtfeld' : (cItem.data.emptytext!='') ? cItem.data.emptytext : '',
@@ -839,10 +839,6 @@
 		
 		myCommonController = oegb.app.getController('Common');
 		
-		if (el.windowName != "zahlung" || myWindow.down('combobox[name=zahlungsart]').getValue()!="Kreditkarte") {
-			myMask.show();
-		}
-
 		myForm = myWindow.down('form');
 		// objekt zum speichern der parameter erstellen
 		myParams = {};
@@ -852,7 +848,7 @@
 		myParams['instance'] = (record.data != undefined) ? record.data.recordid : 0;
 		// checken, ob neuer eintrag erstellt werden soll
 		if(mySaveButton.createNewEntry) {
-			myParams['instance'] = 0;
+			myParams['duplicate'] = 1;
 		}
 		// objekt für nicht ausgefüllte pflichtfelder erstellen
 		myMandatoryFields = [];
@@ -866,7 +862,7 @@
 
 				// nicht ausgefüllte pflichtfelder in objekt schreiben
 				if (
-						(element.agPflichtfeld && (myTempVal=='' || myTempVal==null))
+						(element.agPflichtfeld && (myTempVal==' ' || myTempVal=='' || myTempVal==null))
 					|| 
 						(element.agPflichtfeld && element.name=='email' && !me.checkMailadress(myTempVal))
 					|| 
@@ -923,6 +919,7 @@
 			reloadDetailGrid = true;
 		}
 		
+		
 		openedNodes = [];
 		
 		/*
@@ -940,11 +937,10 @@
 		}
 		*/
 		
-		
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
 			
-			mySaveButton.setDisabled(true);
+			// mySaveButton.setDisabled(true);
 			
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',
@@ -952,8 +948,7 @@
 				method: 'POST',
 				params: myParams,
 				success: function(form,action) {
-					var jsonParse = Ext.JSON.decode(action.response.responseText),
-						closeWindow = true;
+					var jsonParse = Ext.JSON.decode(action.response.responseText);
 					if (jsonParse.success) {
 						myReloadStore.reload({
 							callback: function(response) {
@@ -976,21 +971,24 @@
 										}
 									});
 								}
+								if (mySaveButton.createNewEntry) {
+									myWindow.close();
+									Ext.each(response, function(cRec,index) {
+										if (cRec.data.recordid == jsonParse['recordid']) {
+											myGrid.getView().select(index)
+											myRecord = cRec;
+										}
+									});
+									myCommonController.onDblClickGrid(myGrid.getView(),myRecord);
+									Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
+								}
 							}
 						});
-						Ext.Msg.alert('Systemnachricht',jsonParse.message);
-						if (closeWindow) {
-							if (!mySaveButton.createNewEntry) {
-								Ext.Msg.alert('Systemnachricht',jsonParse.message);
-								myWindow.close();
-							} else {
-								//myWindow.down('textfield').setValue();
-								window.setTimeout( function() {
-									myWindow.down('textfield').focus();
-								}, 250);
-								
-							}
-						}
+						if (!mySaveButton.createNewEntry) {
+							Ext.Msg.alert('Systemnachricht',jsonParse.message);
+							myWindow.close();
+						} 
+						
 					}
 					myMask.hide();
 					mySaveButton.setDisabled(false);

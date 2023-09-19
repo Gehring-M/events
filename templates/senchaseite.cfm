@@ -7,7 +7,7 @@
 <cfoutput>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>Frauenklinik - Intranet Verwaltungsclient</title>
+	<title>Veranstaltungen Schwaz - Intranet Verwaltungsclient</title>
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<script src="/include-theme.js"></script>
 	<script src="/ext-4.2.1.883/ext-all.js"></script>

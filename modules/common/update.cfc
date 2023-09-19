@@ -58,6 +58,12 @@
 				<cfset myData['latitude'] = "0.0000000000">
 				<cfset myData['longitude'] = "0.0000000000">
 			</cfcase>
+			<cfcase value="2110">
+				<cfif checkErrors.RecordCount EQ 0 AND myData['artist_fk'] EQ "">
+					<cfset QueryAddRow(checkErrors)>
+					<cfset QuerySetCell(checkErrors, "errormessage", 'Bitte wählen Sie einen Künstler. Suchen Sie dafür mittels Texteingabe im entsprechenden Feld und wählen Sie dann einen Künstler aus der Auswahlliste aus.')>
+				</cfif>
+			</cfcase>
 		</cfswitch>
 				
 		<!--- Bei Errors alle zum Ausgabe Array anhängen--->
@@ -76,9 +82,14 @@
 				<cfset StructDelete(myData,'teaserbild')>
 			</cfif>
 				
+			<cfset myInstance = arguments.instance>
+			<cfif StructKeyExists(form,'duplicate') AND form['duplicate'] EQ 1>
+				<cfset myInstance = 0>
+			</cfif>	
+				
 			<!--- Daten eintragen --->
 			<cfset result["success"] = true>
-			<cfset saveStruct = saveStructuredContent(nodetype=arguments.nodeType,instance=arguments.instance,data=myData)>
+			<cfset saveStruct = saveStructuredContent(nodetype=arguments.nodeType,instance=myInstance,data=myData)>
 				
 			<cfset result["message"] = "Die Daten wurden erfolgreich gespeichert.">
 			<cfset result["data"] = form>
@@ -87,11 +98,11 @@
 			
 			<cfset instanceid = saveStruct['instanceid']>
 			
-			<cfset specialDataUpdate = updateSpecialData(nodetype=arguments.nodeType,data=form,instanceid=instanceid)> 
+			<cfset specialDataUpdate = updateSpecialData(nodetype=arguments.nodeType,data=form,instanceid=instanceid)>
 			
 			<cfif specialDataUpdate['overWriteMessage'] NEQ "">
 				<cfset result["message"] = specialDataUpdate['overWriteMessage']>
-			</cfif>	
+			</cfif>	 
 				
 		</cfif>
     </cfif>

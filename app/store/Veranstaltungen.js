@@ -18,13 +18,15 @@
 	fields: [{
 		name: 'recordid'
 	},{ 
-		name: 'parent_fk'	
-	},{ 
 		name: 'opened'	
 	},{ 	
 		name: 'children'
 	},{ 	
 		name: 'name'
+	},{ 
+		name: 'parent_fk'	
+	},{ 
+		name: 'parent_name'	
 	},{ 
 		name: 'von',
 		type: 'date'	

@@ -7,7 +7,7 @@
 		align: 'stretch'
 	},
 	width: 500,
-	title: 'Frauenklinik - Intranet Verwaltungsclient',
+	title: 'Veranstaltungen Schwaz - Intranet Verwaltungsclient',
 	bodyPadding: '20 20 5 20',
 	frame: true,
 	
