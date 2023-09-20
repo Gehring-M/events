@@ -40,8 +40,47 @@
 					<cfset myData['beschreibung'] = qDuplicate.beschreibung>
 					<cfset save = saveStructuredContent(nodetype=2110,data=myData)>
 				</cfloop>	
+				<!--- Tag Verknüpfungen duplizieren --->
+				<cfset qDuplicate = getStructuredContent(nodetype=2116,whereclause="veranstaltung_fk = "&arguments.data.instance)>
+				<cfloop query="qDuplicate">
+					<cfset myData = StructNew()>
+					<cfset myData['veranstaltung_fk'] = arguments.instanceid>
+					<cfset myData['tag_fk'] = qDuplicate.tag_fk>
+					<cfset save = saveStructuredContent(nodetype=2116,data=myData)>
+				</cfloop>	
+				<!--- Bilder & Dokumente übernehmen --->
+				<cfquery name="qUpdate" datasource="#getConfig('DSN')#">
+					SELECT id, bilder, uploads FROM veranstaltung WHERE id = "#arguments.data.instance#"
+				</cfquery>
+				<cfquery  datasource="#getConfig('DSN')#">
+					UPDATE veranstaltung SET bilder = '#qUpdate.bilder#', uploads = '#qUpdate.uploads#' WHERE id = "#arguments.instanceid#"
+				</cfquery>		
+						
+						
+						<!---
+					<cfset dataStruct = StructNew() />
+				<cfset dataStruct['bezeichnung'] = "Titel muss noch ergänzt werden" />
+				<cfset saveStruct = saveStructuredContent(instance=sFile.instanceid,nodetype=nodetype,data=dataStruct) />	
+						--->
+						
 			</cfif>	
-			<cfdump var="#arguments.data#">
+			
+		</cfcase>
+		<cfcase value="2101">	
+			<cfif StructKeyExists(arguments.data,'vkid') AND arguments.data['vkid'] neq "">
+				<cfset myData = StructNew()>
+				<cfset myData['veranstaltung_fk'] = arguments.data['vkid']>
+				<cfset myData['veranstalter_fk'] = arguments.instanceid>
+				<cfset save = saveStructuredContent(nodetype=2111,data=myData)>
+			</cfif>
+		</cfcase>	
+		<cfcase value="1">
+			<cfquery datasource="#getConfig('DSN')#">
+				UPDATE ldata SET data = '#arguments.data['titel']#' WHERE instance_fk = "#arguments.data['instance']#" AND name = 'bezeichnung' and published = 1
+			</cfquery>
+			<cfquery datasource="#getConfig('DSN')#">
+				UPDATE ldata SET data = '#arguments.data['beschreibung']#' WHERE instance_fk = "#arguments.data['instance']#" AND name = 'beschreibung'and published = 1
+			</cfquery>	
 		</cfcase>	
 	</cfswitch>
 	<cfreturn result>

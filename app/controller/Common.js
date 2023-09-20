@@ -38,16 +38,50 @@
 	
 	init: function(){
 		var authStore = this.getAuthStore();
+		var myBilderStore = this.getBilderStore();
+		var myVAStore = this.getVeranstaltungenStore();
+		
+		
 		me = this,
 		this.myAuthStore = authStore
 		this.myFunctions = oegb.app.getController('Funktionen');
 		this.isAdministrator = (authStore.findExact('administrator',true)==0) ? true : false;
 		this.user_fk = authStore.getAt(0).data.user_fk;
 		this.cVeranstaltung = 0;
+		this.myTimeOut = 5000;
+		this.timerActive = false;
 		
 		if (this.inited) {
 			return;
 		}
+		
+		
+		// patienten store nach x sek neu laden
+		setInterval(function(){
+			var existingData = [];
+			if (me.timerActive) {
+				Ext.each(myBilderStore.data.items, function(cItem) {	
+					existingData.push(cItem.data.recordid);
+				});
+				
+				Ext.Ajax.request({
+					url: '/modules/common/services.cfc?method=checkNewData',
+					params: {
+						veranstaltung_fk: me.cVeranstaltung,
+						fieldname: 'bilder',
+						existing: existingData
+					},
+					success: function(response) {
+						var jsonParse = Ext.JSON.decode(response.responseText);
+						if (jsonParse['reload']) {
+							myBilderStore.reload();
+						}
+					}
+				});
+				
+			}
+		},this.myTimeOut);
+		
 		this.inited = true;
 		
 		this.control({
@@ -379,7 +413,8 @@
 	},
 	
 	loadStoreOnTabChange: function(el) {
-		
+		me=this;
+		this.timerActive = false;
 		if (el.activeTab.xtype == "grid") {
 			el.activeTab.getStore().load({
 				params: {
@@ -388,7 +423,11 @@
 			});
 		} else {
 			myGrid = el.activeTab.down('grid');
-			myGrid.getStore().load({
+			myStore = myGrid.getStore();
+			if (myStore.storeId=="Bilder") {
+				me.timerActive = true;
+			}
+			myStore.load({
 				params: {
 					veranstaltung_fk:  this.cVeranstaltung
 				},
@@ -403,7 +442,6 @@
 		}
 				
 	},
-	
 	
 	onSelectDateField: function(el) {
 		
@@ -478,6 +516,7 @@
 							myWindow = me.myFunctions.onOpenWindow(myFakeButton,'');
 							myWindow.down('textfield').setValue(tmpVal);
 							myWindow.down('textfield[name=adresse]').focus();
+							myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung);
 							el.setValue();
 						}
 					},this);
@@ -566,6 +605,10 @@
 			if (!el.hasOwnProperty('nameForeignKey') || myStore.data.length > 0) {
 				myWindow = this.myFunctions.onOpenWindow(el,record);
 				myWindow.down('textfield').focus();
+				
+				if (el.hasOwnProperty('agVerknuepfungErstellen')) {
+					myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung);
+				}
 				
 				if (el.hasOwnProperty('nameForeignKey')) {
 					myRecord = myGrid.getSelectionModel().getCurrentPosition().record.data,

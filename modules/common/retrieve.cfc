@@ -286,6 +286,7 @@
 		
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
+	<cfset var qSearch = QueryNew('id')>
 	<cfset var result = structNew() >
 
 	<!---	
@@ -300,6 +301,23 @@
 		
 	<cfif isAuth()>
 		
+		<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">
+			<cfquery name="qSearch" datasource="#getConfig('DSN')#">
+				SELECT *, if(parent_fk is null,id,parent_fk) as finalid 
+				FROM veranstaltung 
+				WHERE 
+					1=1
+					<cfif arguments.filterText NEQ "">
+						AND name like '%#arguments.filterText#%'
+					</cfif>
+					<cfif arguments.filterVon NEQ "">
+						AND von >= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterVon#">
+					</cfif>
+					<cfif arguments.filterBis NEQ "">
+						AND von <= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterBis#">
+					</cfif>
+			</cfquery>
+		</cfif>
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
 				v1.*, v2.name parent_name
@@ -308,20 +326,23 @@
 				LEFT JOIN veranstaltung v2 on v1.parent_fk = v2.id
 			WHERE
 				1=1
-				<cfif arguments.filterText NEQ "">
-					AND v1.titel like '%#arguments.filterText#%'
+				<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">	
+					<cfif qSearch.recordcount NEQ 0>
+						AND v1.id IN(#ValueList(qSearch.finalid)#) OR v1.parent_fk IN(#ValueList(qSearch.finalid)#)
+					<cfelse>
+						AND 1=2
+					</cfif>	
 				</cfif>	
 			ORDER BY 
 				v1.von, v1.uhrzeitvon
 		</cfquery>
-					
-					
-					
-					
-					
+			
+		
+	<!---	
+						
 					
 	
-<!---					
+					
 					<cfcontent type="text/html" reset="yes">
 					<cfdump var="#qData#">
 					<cfabort>

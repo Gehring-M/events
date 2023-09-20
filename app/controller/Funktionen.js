@@ -919,7 +919,6 @@
 			reloadDetailGrid = true;
 		}
 		
-		
 		openedNodes = [];
 		
 		/*
@@ -979,7 +978,7 @@
 											myRecord = cRec;
 										}
 									});
-									myCommonController.onDblClickGrid(myGrid.getView(),myRecord);
+									//myCommonController.onDblClickGrid(myGrid.getView(),myRecord);
 									Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
 								}
 							}

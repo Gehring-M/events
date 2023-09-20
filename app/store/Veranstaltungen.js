@@ -60,6 +60,10 @@
 	},{ 
 		name: 'link'
 	},{ 
+		name: 'bilder'
+	},{ 
+		name: 'uploads'
+	},{ 
 		name: 'optionstyle'
 	}]
 });

@@ -38,6 +38,24 @@
 	</cfif>
 	<cfreturn result>
 </cffunction>	
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="checkNewData" access="remote" returnFormat="json">
+	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
+	<cfargument name="fieldname" type="string" required="yes">
+	<cfargument name="existing" type="string" required="no" default="">
+		
+	<cfset var result		= {}>
+    <cfset result["reload"] = false>
+	<cfif isAuth()>
+		<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+			SELECT * FROM veranstaltung WHERE id = '#arguments.veranstaltung_fk#'
+		</cfquery>
+		<cfif ListLen(arguments.existing) NEQ ListLen(qCheck['#arguments.fieldname#'])>
+			 <cfset result["reload"] = true>
+		</cfif>	
+	</cfif>
+	<cfreturn result>
+</cffunction>	
 	
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 	

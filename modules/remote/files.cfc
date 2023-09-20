@@ -32,9 +32,9 @@
 				</cfif>
 				<!---Datei im MA speichern--->
 				<cfset sFile = uploadIntoMediaArchive(cKey,nodetype,categoryNodeId,"") />
-				
+					
 				<cfset dataStruct = StructNew() />
-				<cfset dataStruct['bezeichnung'] = "Titel muss noch ergänzt werden" />
+				<cfset dataStruct['beschreibung'] = "" />
 				<cfset saveStruct = saveStructuredContent(instance=sFile.instanceid,nodetype=nodetype,data=dataStruct) />
 				
 				<cfset cFile = getMediaArchiveItem(sFile.instanceid) />
@@ -43,7 +43,7 @@
 					SELECT bilder FROM veranstaltung WHERE id = "#session['vaid']#" 
 				</cfquery>
 				<cfset idstring = qBilder.bilder>	
-				<cfset idstring = ListRemoveDuplicates(ListAppend(idstring,saveStruct.instanceid))>	
+				<cfset idstring = ListRemoveDuplicates(ListAppend(idstring,sFile.instanceid))>	
 				<cfquery datasource="#getConfig('DSN')#">
 					UPDATE veranstaltung SET bilder = '#idstring#' WHERE id = "#session['vaid']#" 
 				</cfquery>
