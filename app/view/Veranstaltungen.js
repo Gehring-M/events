@@ -469,7 +469,7 @@
 						flex: 1,
 						store: 'Bilder',
 						name: 'Bilder',
-						height: '98%',
+						height: '100%',
 						windowWidth:800,
 						windowHeight:'',
 						maxWindowHeight: 800,
@@ -482,7 +482,6 @@
 							enableTextSelection: false,
 						},
 						columns: [
-							
 							{ text: 'Vorschau',  dataIndex: 'vorschaubild', width: 110,
 								renderer: function(value){
 									return '<div class="video-thumbnail"><span></span><img src="' + value + '" class="vidprev"/></div>';

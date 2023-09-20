@@ -680,37 +680,29 @@
     
 </cffunction>							
 <!--------------------------------------------------------------------------------->				
-					
 <cffunction name="getBilder" access="remote" returnFormat="json" output="no">
-	
 	<cfargument name="veranstaltung_fk" type="string" required="no">
-	
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
-   	
 	<cfif isAuth()>	
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
-			SELECT bilder FROM veranstaltung WHERE id = "#session['vaid']#" 
+			SELECT bilder FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
 		</cfquery>
-		<cfset qBilder = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#")>
-			
-		<cfloop query="qBilder">
-			
-			<cfset myIMG = href("instance:"&qBilder.id)&"&dimensions=100x66&cropmode=cropcenter">
-			<cfset tmpStruct = {}>
-			<cfset tmpStruct["recordid"] 	= qBilder.id>
-			<cfset tmpStruct["vorschaubild"] = myIMG>
-			<cfset tmpStruct["createdwhen"] = qBilder.createdwhen>
-			<cfset tmpStruct["titel"] 		= qBilder.bezeichnung>
-			<cfset tmpStruct["beschreibung"] = qBilder.beschreibung>
-				
-			<cfset ArrayAppend(returnArray, tmpStruct)>
-		</cfloop>
-				
-		
+		<cfif qData.bilder NEQ "">
+			<cfset qBilder = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#")>
+			<cfloop query="qBilder">
+				<cfset myIMG = href("instance:"&qBilder.id)&"&dimensions=100x66&cropmode=cropcenter">
+				<cfset tmpStruct = {}>
+				<cfset tmpStruct["recordid"] 	= qBilder.id>
+				<cfset tmpStruct["vorschaubild"] = myIMG>
+				<cfset tmpStruct["createdwhen"] = qBilder.createdwhen>
+				<cfset tmpStruct["titel"] 		= qBilder.bezeichnung>
+				<cfset tmpStruct["beschreibung"] = qBilder.beschreibung>
+				<cfset ArrayAppend(returnArray, tmpStruct)>
+			</cfloop>
+		</cfif>		
 	</cfif> 
     <cfreturn returnArray>
-    
 </cffunction>						
 					
 					
@@ -718,17 +710,7 @@
 					
 					
 					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+				
 					
 					
 					

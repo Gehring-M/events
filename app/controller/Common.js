@@ -391,7 +391,14 @@
 			myGrid.getStore().load({
 				params: {
 					veranstaltung_fk:  this.cVeranstaltung
-				}
+				},
+				callback: function(response) {
+					if (myStore.storeId=="Bilder") {
+						setTimeout(function(){
+							myGrid.headerCt.getGridColumns()[0].setWidth(110);
+						}, 250);
+					}
+				},scope: this
 			});
 		}
 				
@@ -792,14 +799,23 @@
 		   
 		   	if (myTabPanel.activeTab.xtype == "grid") {
 			 	myStore = myTabPanel.activeTab.getStore();
+				myGrid = myTabPanel.activeTab;
 			} else {
-				myStore = myTabPanel.activeTab.down('grid').getStore()
+				myStore = myTabPanel.activeTab.down('grid').getStore();
+				myGrid = myTabPanel.activeTab.down('grid');
 			}
 		   
 			myStore.load({
 				params: {
 					veranstaltung_fk:  this.cVeranstaltung,
-				}
+				},
+				callback: function(response) {
+					if (myStore.storeId=="Bilder") {
+						setTimeout(function(){
+							myGrid.headerCt.getGridColumns()[0].setWidth(110);
+						}, 250);
+					}
+				},scope: this
 			});
 	   }
 	},
