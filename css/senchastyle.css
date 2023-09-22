@@ -99,7 +99,6 @@
 }
 .tdHover div{
 	cursor: pointer;
-	height: 39px;
 }
 .btn-confirm {
 	background-color: #005400;
@@ -207,4 +206,5 @@ div[id^=messagebox].x-form-display-field{
 .tdKategorie {
 	line-height: 20px;
 }
+
 

@@ -1,6 +1,6 @@
-﻿Ext.define('oegb.view.Tags', {
+﻿Ext.define('oegb.view.Veranstalter', {
 	extend: 'Ext.form.Panel',
-	alias: 'widget.Tags',
+	alias: 'widget.Veranstalter',
 	layout: {
 		type: 'border'
 	},
@@ -12,30 +12,35 @@
 		myController = oegb.app.getController('Common');
 		Ext.applyIf(me, {
 			items: [{
-				
 				xtype: 'grid',
 				region: 'center',
-				name:'tags',
+				name:'veranstalter',
 				flex: 1,
 				split: true,
 				autoScroll: true,
-				title: 'Tags',
-				store: 'Tags',
+				title: 'Veranstalter',
+				store: 'Veranstalter',
 				agShowDeleteButton: true,
-				windowWidth:500,
+				windowWidth:800,
 				windowHeight:'',
-				maxWindowHeight: 400,
-				windowName:'tags',
-				text:'Tag ändern',
-				nodeType:2106,
+				maxWindowHeight: 800,
+				windowName:'veranstalter',
+				text:'Veranstalter ändern',
+				nodeType:2101,
 				plugins: [{
 					ptype: 'bufferedrenderer',
 					trailingBufferZone: 20, 
 					leadingBufferZone: 50  
 				}],	
-				columns: [{
-					text: 'Name',  dataIndex: 'name',  flex: 1
-				}],
+				columns: [
+					{ text: 'Veranstalter',  dataIndex: 'name', flex: 1 },
+					{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'Telefon',  dataIndex: 'telefon', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'Email',  dataIndex: 'email', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'Web',  dataIndex: 'web', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+				],
 				tools:[{
 					xtype: 'textfield',
 					labelSeparator: ' ',
@@ -44,7 +49,7 @@
 					padding: '0px 0px 0px 7px',
 					labelClsExtra: 'whiteBold',
 					emptyText: 'Suchbegriff hier eintragen ...',
-					agSearchFields: 'name',
+					agSearchFields: 'name,adresse,email,web,ort',
 					enableKeyEvents: true,
 					listeners: {
 						keyup: {
@@ -65,20 +70,18 @@
 					cls: 'btn-gray'
 				},{		
 					xtype: 'button',
-					text: 'Neuen Tag hinzufügen',
+					text: 'Neuen Veranstalter hinzufügen',
 					height: 24,
 					margin:'0 0 0 10',
 					cls: 'btn-gray',
-					windowWidth:400,
+					windowWidth:800,
 					windowHeight:'',
-					maxWindowHeight: 400,
-					windowName:'tags',
-					nodeType:2106
-				}],
-				
+					maxWindowHeight: 800,
+					windowName:'veranstalter',
+					nodeType:2101
+				}]
 			}]
 		});
 		me.callParent(arguments);
 	}
-
 });

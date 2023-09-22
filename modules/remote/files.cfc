@@ -39,14 +39,14 @@
 				
 				<cfset cFile = getMediaArchiveItem(sFile.instanceid) />
 				
-				<cfquery name="qBilder" datasource="#getConfig('DSN')#">
-					SELECT bilder FROM veranstaltung WHERE id = "#session['vaid']#" 
+				<cfquery name="qMedia" datasource="#getConfig('DSN')#">
+					SELECT #form['uploadTyp']# FROM veranstaltung WHERE id = "#session['vaid']#" 
 				</cfquery>
-				<cfset idstring = qBilder.bilder>	
+				<cfset idstring = qMedia[form['uploadTyp']]>	
 				<cfset idstring = ListRemoveDuplicates(ListAppend(idstring,sFile.instanceid))>	
 				<cfquery datasource="#getConfig('DSN')#">
-					UPDATE veranstaltung SET bilder = '#idstring#' WHERE id = "#session['vaid']#" 
-				</cfquery>
+					UPDATE veranstaltung SET #form['uploadTyp']# = '#idstring#' WHERE id = "#session['vaid']#" 
+				</cfquery>	
 					
 				<cfif cFile.recordcount>
 					<cfset returnStruct['message'] = "Die Datei wurde erfolgreich hochgeladen." />

@@ -1,7 +1,7 @@
-﻿Ext.define('oegb.store.Bilder', {
+﻿Ext.define('oegb.store.Downloads', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
-	storeId: 'Bilder',
+	storeId: 'Downloads',
 	proxy: {
 	type: 'ajax',
 	timeout: 300000,
@@ -9,7 +9,7 @@
     startParam: false, 
     limitParam: false,
 	noCache: true,
-	url: 'modules/common/retrieve.cfc?method=getBilder',
+	url: 'modules/common/retrieve.cfc?method=getDownloads',
 		reader: {
 			type: 'json'
 		}
@@ -26,6 +26,10 @@
 		name: 'beschreibung'
 	},{
 		name: 'vorschaubild'
+	},{
+		name: 'downloadlink'
+	},{
+		name: 'extension'
 	},{
 		name: 'previewable'
 	},{

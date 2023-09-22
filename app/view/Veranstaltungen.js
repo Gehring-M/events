@@ -20,7 +20,7 @@
 				flex: 4,
 				split: true,
 				autoScroll: true,
-				collapsible: false,
+				collapsible: true,
 				store: 'Veranstaltungen',
 				windowWidth:'800px',
 				maxWindowHeight: '90%',
@@ -483,16 +483,33 @@
 							enableTextSelection: false,
 						},
 						columns: [
-							{ text: 'Vorschau',  dataIndex: 'vorschaubild', width: 110,
+							{ text: 'Vorschau',  dataIndex: 'vorschaubild', align: 'center', width: 118,
 								renderer: function(value){
-									return '<div class="video-thumbnail"><span></span><img src="' + value + '" class="vidprev"/></div>';
+									if (value!="") {
+										return '<div><span></span><img src="' + value + '" class="pointer"/></div>';
+									} else {
+										return 'Nicht verfübar';
+									}
 								}
 							},
 							{ text: 'Hochgeladen am',  dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
 							{ text: 'Titel',  dataIndex: 'titel', flex: 1 },
 							{ text: 'Beschreibung',  dataIndex: 'beschreibung', flex: 1 },
+							{ text: 'Auflösung',  dataIndex: 'resolution', width: 110, align: 'center' },
+							{ text: 'Ansehen', align: 'center' , width: 90,
+								renderer: function(value,data,record) { 
+									data.tdCls = 'tdHover';
+									return'<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+								} 
+							},
+							{ text: 'Download', align: 'center' , width: 90,
+								renderer: function(value,data,record) { 
+									data.tdCls = 'tdHover';
+									return'<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+								} 
+							}
 						]
-					},{
+					},{	
 						xtype: 'panel',
 						border: false,
 						height: 1000,
@@ -502,48 +519,70 @@
 						html: '<iframe src="/modules/multiupload.cfm?typ=bilder" width="490" height="1000"></iframe>'
 					}]
 
-				/*			
-				},{ 
-					
-					xtype: 'grid',
-					border: true,
-					flex: 1,
-					title:'Dokumente',
-					store: 'Laender',
-					name: 'Preise',
-					windowWidth:800,
-					windowHeight:'',
-					maxWindowHeight: 800,
-					windowName:'preise',
-					text:'Preis bearbeiten / löschen',
-					nodeType:2134,
-					agShowDeleteButton: true,
-					margin:'0 0 0 0',
-					viewConfig: {
-						enableTextSelection: false,
-					},
-					columns: [
-						{ text: 'Preis vor Stichtag',  dataIndex: 'preis_earlybird', width: 150, align: 'center' },
-						{ text: 'Stichtag',  dataIndex: 'datum_earlybird', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
-						{ text: 'Preis nach Stichtag',  dataIndex: 'preis', width: 150, align: 'center' },
-						{ text: 'Beschreibung',  dataIndex: 'name', flex: 1 },
-					],
-					bbar:[{
-						xtype: 'button',
-						text: 'Neuen Tag hinzufügen',
-						height: 30,
-						margin:'0 5 0 0',
+				},{ 	
+					xtype: 'fieldcontainer',
+					layout: 'hbox',
+					margin: '0 0 0 5',
+					title: 'Downloads',
+					width: '100%',
+					height: '100%',
+					items: [{
+						xtype: 'grid',
+						border: true,
 						flex: 1,
-						windowWidth:400,
+						store: 'Downloads',
+						name: 'Downloads',
+						height: '100%',
+						windowWidth:600,
 						windowHeight:'',
-						maxWindowHeight: 400,
-						windowName:'tags',
-						nodeType:2106,
-						cls: 'btn-gray'
+						maxWindowHeight: 500,
+						windowName:'downloads',
+						text:'Download bearbeiten / löschen',
+						nodeType:2,
+						agShowDeleteButton: true,
+						margin:'0 0 0 0',
+						viewConfig: {
+							enableTextSelection: false,
+						},
+					
+						columns: [
+							{ text: 'Vorschau',  dataIndex: 'vorschaubild', align: 'center', width: 118,
+								renderer: function(value){
+									return '<div style="text-align: center" ><img src="' + value + '" /></div>';
+								}
+							},
+							{ text: 'Hochgeladen am',  dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
+							{ text: 'Titel',  dataIndex: 'titel', flex: 1 },
+							{ text: 'Beschreibung',  dataIndex: 'beschreibung', flex: 1 },
+							{ text: 'Auflösung',  dataIndex: 'resolution', width: 110, align: 'center' },
+							{ text: 'Dateityp',  dataIndex: 'extension', width: 80, align: 'center'},
+							{ text: 'Ansehen', align: 'center' , width: 90,
+								renderer: function(value,data,record) { 
+									if (record.data.previewable=="yes") {
+										data.tdCls = 'tdHover';
+										return'<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+									} else {
+										return'<img src="img/noeye.png" title="Diese Datei laden" alt="Diese Datei laden">';
+									}
+								} 
+							},
+							{ text: 'Laden', align: 'center' , width: 60,
+								renderer: function(value,data,record) { 
+									data.tdCls = 'tdHover';
+									return'<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+								} 
+							}
+						]
+					},{
+						xtype: 'panel',
+						border: false,
+						height: 1000,
+						margin:'0 0 0 0',
+						padding:'0 0 0 0',
+						width: 480,
+						html: '<iframe src="/modules/multiupload.cfm?typ=uploads" width="490" height="1000"></iframe>'
 					}]
-					
-					*/
-					
+
 				}]
 				
 				

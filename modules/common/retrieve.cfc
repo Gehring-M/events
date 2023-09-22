@@ -660,16 +660,19 @@
 <!--------------------------------------------------------------------------------->					
 <cffunction name="qTags" access="remote" returnFormat="json" output="no">
 	
-	<cfargument name="veranstaltung_fk" type="string" required="no">
+	<cfargument name="veranstaltung_fk" type="string" required="no" default="">
 	<cfargument name="filterText" type="string" required="no" default="">
-	
+		
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
    	
 	<cfif isAuth()>	
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
-				t.*, rvt.id rvtid
+				t.*
+				<cfif arguments.veranstaltung_fk NEQ "">
+				, rvt.id rvtid
+				</cfif>
 			FROM 
 				tag t
 				<cfif arguments.veranstaltung_fk NEQ "">
@@ -690,7 +693,7 @@
 			<cfset tmpStruct["recordid"] 	= qData.id>
 			<cfset tmpStruct["name"] 	= qData.name>
 			<cfset tmpStruct["checked"] = 1>
-			<cfif qData.rvtid EQ "">	
+			<cfif arguments.veranstaltung_fk NEQ "" AND qData.rvtid EQ "">	
 				<cfset tmpStruct["checked"] = 0>
 			</cfif>	
 			<cfset ArrayAppend(returnArray, tmpStruct)>
@@ -710,23 +713,119 @@
 			SELECT bilder FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
 		</cfquery>
 		<cfif qData.bilder NEQ "">
-			<cfset qBilder = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#")>
-			<cfloop query="qBilder">
-				<cfset myIMG = href("instance:"&qBilder.id)&"&dimensions=100x66&cropmode=cropcenter">
+			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#",additionalSelectFields='i.width,i.height')>
+				
+			<cfloop query="qData">
 				<cfset tmpStruct = {}>
-				<cfset tmpStruct["recordid"] 	= qBilder.id>
-				<cfset tmpStruct["vorschaubild"] = myIMG>
-				<cfset tmpStruct["createdwhen"] = qBilder.createdwhen>
-				<cfset tmpStruct["titel"] 		= qBilder.bezeichnung>
-				<cfset tmpStruct["beschreibung"] = qBilder.beschreibung>
+				<cfset tmpStruct["recordid"] 	= qData.id>	
+				<cfset tmpStruct["vorschaubild"] = href("instance:"&qData.id)&"&dimensions=100x66&cropmode=cropcenter">	
+				<cfif qData.height GT qData.width>
+					<cfset tmpStruct["hei"] = 600>
+					<cfset tmpStruct["wid"] = 395>	
+					<cfset tmpStruct["bild"] = href("instance:"&qData.id)&"&dimensions=395x600&cropmode=cropcenter">	
+				<cfelse>
+					<cfset tmpStruct["hei"] = 495>
+					<cfset tmpStruct["wid"] = 750>	
+					<cfset tmpStruct["bild"] = href("instance:"&qData.id)&"&dimensions=750x495&cropmode=cropcenter">	
+				</cfif>	
+				
+				<cfset tmpStruct["createdwhen"] = qData.createdwhen>
+				<cfset tmpStruct["titel"] 		= qData.bezeichnung>
+				<cfset tmpStruct["beschreibung"] = qData.beschreibung>
+				<cfset tmpStruct["previewable"] = "yes">
+				<cfset tmpStruct["resolution"] = qData.height&" x "&qData.width>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 			</cfloop>
 		</cfif>		
 	</cfif> 
     <cfreturn returnArray>
 </cffunction>						
+<!--------------------------------------------------------------------------------->				
+<cffunction name="getDownloads" access="remote" returnFormat="json" output="no">
+	<cfargument name="veranstaltung_fk" type="string" required="no">
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+	<cfif isAuth()>	
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT uploads FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
+		</cfquery>
+		<cfif qData.uploads NEQ "">
+			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.uploads#",additionalSelectFields='i.width,i.height')>
+			<cfloop query="qData">
+				
+				<cfset myIMG = "/img/icons/else.png">
+				<cfif ListFind("pdf,ppt,pptx,doc,docx,xls,xlsx",ListLast(qData.originalfilename,'.'))>
+					  <cfset myIMG = "/img/icons/"&ListLast(qData.originalfilename,'.')&".png">	
+				</cfif>	
 					
-					
+				<cfset tmpStruct = {}>	
+				<cfset tmpStruct["resolution"] = "">	
+				<cfif isPreviewable(qData.id)>
+					<cfset myIMG = href("instance:"&qData.id)&"&dimensions=100x66&cropmode=cropcenter">
+					<cfif qData.height GT qData.width>
+						<cfset tmpStruct["hei"] = 600>
+						<cfset tmpStruct["wid"] = 395>	
+						<cfset tmpStruct["bild"] = href("instance:"&qData.id)&"&dimensions=395x600&cropmode=cropcenter">	
+					<cfelse>
+						<cfset tmpStruct["hei"] = 495>
+						<cfset tmpStruct["wid"] = 750>	
+						<cfset tmpStruct["bild"] = href("instance:"&qData.id)&"&dimensions=750x495&cropmode=cropcenter">	
+					</cfif>		
+					<cfset tmpStruct["resolution"] = qData.height&" x "&qData.width>
+				</cfif>		
+				
+				<cfset tmpStruct["recordid"] 	= qData.id>
+				<cfset tmpStruct["vorschaubild"] = myIMG>
+				<cfset tmpStruct["extension"] = "."&lcase(ListLast(qData.originalfilename,'.'))>
+				<cfset tmpStruct["downloadlink"] = ListLast(qData.originalfilename,'.')>
+				<cfset tmpStruct["createdwhen"] = qData.createdwhen>
+				<cfset tmpStruct["titel"] 		= qData.bezeichnung>
+				<cfset tmpStruct["beschreibung"] = qData.beschreibung>
+				<cfset tmpStruct["previewable"] = isPreviewable(qData.id)>
+				<cfset ArrayAppend(returnArray, tmpStruct)>
+			</cfloop>
+		</cfif>		
+	</cfif> 
+    <cfreturn returnArray>
+</cffunction>						
+<!--------------------------------------------------------------------------------->
+<cffunction name="getKategorien" access="remote" returnFormat="json" output="no">
+	
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>		
+		<cfset qData = getStructuredContent(nodetype=2104,orderclause="name")>
+		<cfloop query="qData">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>						
+<!--------------------------------------------------------------------------------->
+<cffunction name="getTyp" access="remote" returnFormat="json" output="no">
+	
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>		
+		<cfset qData = getStructuredContent(nodetype=2105,orderclause="name")>
+		<cfloop query="qData">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>						
 					
 					
 					
@@ -958,25 +1057,7 @@
     
 </cffunction>
 
-<!--------------------------------------------------------------------------------->
-<cffunction name="getKategorien" access="remote" returnFormat="json" output="no">
-	
-  	<cfset var returnArray = ArrayNew(1)>
-	<cfset var tmpStruct = StructNew()>
-   	
-	<cfif isAuth()>		
-		<cfset qData = getStructuredContent(nodetype=2101,orderclause="name")>
-		<cfloop query="qData">
-			<cfset tmpStruct = {}>
-			<cfset tmpStruct["recordid"] 	= qData.id>
-			<cfset tmpStruct["name"] 	= qData.name>
-			<cfset ArrayAppend(returnArray, tmpStruct)>
-		</cfloop>
-		
-	</cfif> 
-    <cfreturn returnArray>
-    
-</cffunction>							
+						
 <!--------------------------------------------------------------------------------->
 <cffunction name="getSubkategorien" access="remote" returnFormat="json" output="no">
 	

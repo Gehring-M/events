@@ -18,23 +18,18 @@
 	
         <cfif allowed>
 			<cfif arguments.nodeType LT 2100>
-				<cfif arguments.nodeType EQ 1>
+				<cfif arguments.nodeType LTE 2>
 					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
 						SELECT * FROM veranstaltung WHERE id = '#session['vaid']#'
 					</cfquery>
-					
 					<cfif ListFind(qCheck.bilder,'#arguments.records#') GT 0>
-					
-	<!---				<cfcontent type="text/html" reset="yes">
-					<cfdump var="#ListDeleteAt(qCheck.bilder,ListFind(qCheck.bilder,'#arguments.records#'))#">
-					<cfdump var="#ListFind(qCheck.bilder,'#arguments.records#')#">
-						<cfdump var="#qCheck#">
-							<cfdump var="#arguments.records#">																				 
-						
-						
-						<cfabort>--->
 						<cfquery datasource="#getConfig('DSN')#">
 							UPDATE veranstaltung SET bilder = '#ListDeleteAt(qCheck.bilder,ListFind(qCheck.bilder,'#arguments.records#'))#' WHERE id = '#session['vaid']#'
+						</cfquery>
+					</cfif>		
+					<cfif ListFind(qCheck.uploads,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE veranstaltung SET uploads = '#ListDeleteAt(qCheck.uploads,ListFind(qCheck.uploads,'#arguments.records#'))#' WHERE id = '#session['vaid']#'
 						</cfquery>
 					</cfif>		
 				</cfif>	

@@ -111,8 +111,6 @@
 		$(document).ready(function(){
 			var fileMaxSize = 10000000;
 			
-			
-			
 			$('[type=file]').each(function () {
 				var $upload = $(this),
 					$container = $upload.parents('.ag-f-drop-target'),
@@ -132,6 +130,7 @@
 						restrictTo: cData.fileTypes,
 						cFileFieldname:$upload.attr('name'),
 						cFormFieldname:$upload.data('fieldId'),
+						uploadTyp:$container.data('uploadTyp'),
 						isMultiple:$container.data('isMultiple')
 					},
 					dropZone: $(this).parent(),
@@ -216,7 +215,8 @@
 						});
 					}
 					userMessage = $('<div class="ag-message ui-state-error">').html(tmpErrorMsg);
-					item.before(userMessage.slideDown());
+					item.before(userMessage.delay(10000).slideUp(function(){userMessage.remove()}));
+					
 				}
 			}
 		});
@@ -259,7 +259,7 @@
 <body>
 	<form action="" method="post" name="form" autocomplete="off">
 		<cfoutput>
-			<div class="ag-f-drop-target" data-is-multiple="1">
+			<div class="ag-f-drop-target" data-is-multiple="1" data-upload-typ="#url['typ']#">
 				<div class="ag-f-drop-indicator" data-hint="#hint#"></div>
 				<div class="ag-f-drop-wrapper" id="target_droploader" data-file-types="#allowedFileTypes#">
 					<input type="file" class="ag-f-x6" name="_droploader" data-field-id="droploader" multiple />

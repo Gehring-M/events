@@ -14,7 +14,7 @@
 	items: [
 		{
 			xtype: 'container',
-			html: "<div style='height: 130px'><br><img src='/img/logo.png?t=1' style='height: 50px'><br><br><p>Bitte geben Sie hier Ihren Benutzernamen und Ihr Passwort ein.</p></div>"
+			html: "<div style='height: 140px'><img src='/img/logo.png?t=3' style='height: 80px'><br><br><p>Bitte geben Sie hier Ihren Benutzernamen und Ihr Passwort ein.</p></div>"
 		},
 		{
 			name: 'ameisenUsername',

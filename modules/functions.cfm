@@ -55,16 +55,7 @@
 				<cfquery  datasource="#getConfig('DSN')#">
 					UPDATE veranstaltung SET bilder = '#qUpdate.bilder#', uploads = '#qUpdate.uploads#' WHERE id = "#arguments.instanceid#"
 				</cfquery>		
-						
-						
-						<!---
-					<cfset dataStruct = StructNew() />
-				<cfset dataStruct['bezeichnung'] = "Titel muss noch ergänzt werden" />
-				<cfset saveStruct = saveStructuredContent(instance=sFile.instanceid,nodetype=nodetype,data=dataStruct) />	
-						--->
-						
 			</cfif>	
-			
 		</cfcase>
 		<cfcase value="2101">	
 			<cfif StructKeyExists(arguments.data,'vkid') AND arguments.data['vkid'] neq "">
@@ -74,14 +65,12 @@
 				<cfset save = saveStructuredContent(nodetype=2111,data=myData)>
 			</cfif>
 		</cfcase>	
-		<cfcase value="1">
-			<cfquery datasource="#getConfig('DSN')#">
-				UPDATE ldata SET data = '#arguments.data['titel']#' WHERE instance_fk = "#arguments.data['instance']#" AND name = 'bezeichnung' and published = 1
-			</cfquery>
-			<cfquery datasource="#getConfig('DSN')#">
-				UPDATE ldata SET data = '#arguments.data['beschreibung']#' WHERE instance_fk = "#arguments.data['instance']#" AND name = 'beschreibung'and published = 1
-			</cfquery>	
-		</cfcase>	
+		<cfcase value="1,2">
+			<cfset dataStruct = StructNew() />
+			<cfset dataStruct['bezeichnung'] = arguments.data['titel'] />
+			<cfset dataStruct['beschreibung'] = arguments.data['beschreibung'] />
+			<cfset saveStruct = saveStructuredContent(instance=arguments.data['instance'],nodetype=1301,data=dataStruct) />	
+		</cfcase>
 	</cfswitch>
 	<cfreturn result>
 </cffunction>

@@ -593,8 +593,14 @@
 		var winheight = (el.windowHeight!="") ? el.windowHeight : '';
 		var maxwinheight = (el.maxWindowHeight!="") ? el.maxWindowHeight : '800';
 		var nodeType = (el.nodeType!="") ? el.nodeType : '';
-		if (el.xtype=="grid") var myReloadStore = el.getStore();
-		
+		if (el.xtype=="grid") {
+			var myReloadStore = el.getStore();
+			var myGrid = el;
+		}
+		if (el.xtype=="button") {
+			var myGrid = el.up('grid');
+			var myReloadStore = myGrid.getStore();
+		}
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
 		
@@ -742,7 +748,6 @@
 			}
 		});
 		
-		
 		// Bericht drucken
 		myDeleteButton.on({
 			click: {
@@ -789,6 +794,11 @@
 															}
 														}
 													});
+												}
+												if (myStore.storeId=="Bilder" || myStore.storeId=="Downloads" ) {
+													setTimeout(function(){
+														myGrid.headerCt.getGridColumns()[0].setWidth(118);
+													}, 250);
 												}
 											}
 										});

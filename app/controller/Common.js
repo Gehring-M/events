@@ -2,7 +2,10 @@
 	extend: 'Ext.app.Controller',
 	
 	views: [
-		'Veranstaltungen'
+		'Veranstaltungen',
+		'Veranstalter',
+		'Tags',
+		'Basics'
 	],
 
 	stores: [
@@ -14,7 +17,10 @@
 		'RVeranstaltungArtist',
 		'RVeranstaltungVeranstalter',
 		'Tags',
-		'Bilder'
+		'Bilder',
+		'Downloads',
+		'Kategorien',
+		'Typ'
 	],
 	
 	refs: [{
@@ -22,23 +28,27 @@
 		selector: 'Veranstaltungen',
 		xtype: 'Veranstaltungen',
 		autoCreate: true
-		/*
 	},{
-		ref: 'Kategorien',
-		selector: 'Kategorien',
-		xtype: 'Kategorien',
+		ref: 'Basics',
+		selector: 'Basics',
+		xtype: 'Basics',
 		autoCreate: true
 	},{
 		ref: 'Tags',
 		selector: 'Tags',
 		xtype: 'Tags',
 		autoCreate: true
-		*/
+	},{
+		ref: 'Veranstalter',
+		selector: 'Veranstalter',
+		xtype: 'Veranstalter',
+		autoCreate: true
 	}],
 	
 	init: function(){
 		var authStore = this.getAuthStore();
 		var myBilderStore = this.getBilderStore();
+		var myDownloadStore = this.getDownloadsStore();
 		var myVAStore = this.getVeranstaltungenStore();
 		
 		
@@ -50,6 +60,7 @@
 		this.cVeranstaltung = 0;
 		this.myTimeOut = 5000;
 		this.timerActive = false;
+		this.timerTyp = "";
 		
 		if (this.inited) {
 			return;
@@ -60,21 +71,24 @@
 		setInterval(function(){
 			var existingData = [];
 			if (me.timerActive) {
-				Ext.each(myBilderStore.data.items, function(cItem) {	
+				var myStore = myBilderStore;
+				if (me.timerTyp == "uploads") {
+					var myStore = myDownloadStore;
+				}
+				Ext.each(myStore.data.items, function(cItem) {	
 					existingData.push(cItem.data.recordid);
 				});
-				
 				Ext.Ajax.request({
 					url: '/modules/common/services.cfc?method=checkNewData',
 					params: {
 						veranstaltung_fk: me.cVeranstaltung,
-						fieldname: 'bilder',
+						fieldname: me.timerTyp,
 						existing: existingData
 					},
 					success: function(response) {
 						var jsonParse = Ext.JSON.decode(response.responseText);
 						if (jsonParse['reload']) {
-							myBilderStore.reload();
+							myStore.reload();
 						}
 					}
 				});
@@ -97,7 +111,6 @@
 				select: this.onGridRowSelected,
 				cellclick:  this.onCellClicked,
 				celldblclick:  this.onCellDoubleClick
-				
 			},
 			'button': {
 				click: this.onClickButton
@@ -190,20 +203,37 @@
 	
 	onCellClicked: function(gridview,markup,cellnumber,rec) {
 		
-		
 		if (gridview.up('grid').name == "veranstaltungen") {
 			this.cVeranstaltung = rec.data.recordid;
 		}
 		
-		/*
-		if (gridview.up('grid').name == "dokumente" && cellnumber == gridview.up('grid').columns.length-2) {
-			
-			myDataID = rec.data.upload;
+		if ((gridview.up('grid').name == "Downloads" || gridview.up('grid').name == "Bilder") && cellnumber == gridview.up('grid').columns.length-1) {
+			myDataID = rec.data.recordid;
 			if (myDataID != null) {
 				window.open("/data.cfm?dataid="+myDataID+"&download=yes");
 			}
 		}
 		
+		if ((gridview.up('grid').name == "Downloads" || gridview.up('grid').name == "Bilder") && (cellnumber == gridview.up('grid').columns.length-2 || cellnumber == 0)) {
+			if (rec.data.previewable == "yes") {
+				var myWindow = Ext.create('Ext.window.Window', {
+					title: 'Vorschau',
+					layout: 'fit',
+					closable: true,
+					width: rec.data.wid,
+					height: rec.data.hei,
+					modal: true,
+					items: [{
+						xtype: 'panel',
+						bodyPadding: 0,
+						html: '<img style="width: 100%" src="'+rec.data.bild+'"/>'
+					}]
+				}).show();
+				
+			}
+		}
+	
+		/*
 		if (gridview.up('grid').name == "dokumente" && cellnumber == gridview.up('grid').columns.length-3) {
 			
 			newVal = 0;
@@ -415,6 +445,7 @@
 	loadStoreOnTabChange: function(el) {
 		me=this;
 		this.timerActive = false;
+		this.timerTyp = "";
 		if (el.activeTab.xtype == "grid") {
 			el.activeTab.getStore().load({
 				params: {
@@ -426,15 +457,20 @@
 			myStore = myGrid.getStore();
 			if (myStore.storeId=="Bilder") {
 				me.timerActive = true;
+				me.timerTyp = 'bilder';
+			}
+			if (myStore.storeId=="Downloads") {
+				me.timerActive = true;
+				me.timerTyp = 'uploads';
 			}
 			myStore.load({
 				params: {
 					veranstaltung_fk:  this.cVeranstaltung
 				},
 				callback: function(response) {
-					if (myStore.storeId=="Bilder") {
+					if (myStore.storeId=="Bilder" || myStore.storeId=="Downloads" ) {
 						setTimeout(function(){
-							myGrid.headerCt.getGridColumns()[0].setWidth(110);
+							myGrid.headerCt.getGridColumns()[0].setWidth(118);
 						}, 250);
 					}
 				},scope: this
@@ -855,7 +891,7 @@
 				callback: function(response) {
 					if (myStore.storeId=="Bilder") {
 						setTimeout(function(){
-							myGrid.headerCt.getGridColumns()[0].setWidth(110);
+							myGrid.headerCt.getGridColumns()[0].setWidth(118);
 						}, 250);
 					}
 				},scope: this
@@ -946,18 +982,24 @@
 		this.application.setMainView(myView);
 		
 	},	
-	/*
-	actionKategorien: function() {
+	
+	actionBasics: function() {
+		this.getTagsStore().load();
 		this.getKategorienStore().load();
-		this.getSubkategorienStore().load();
-		this.getRKategorienSubkategorienStore().load();
-		this.application.setMainView(this.getKategorien());
+		this.getTypStore().load();
+		this.application.setMainView(this.getBasics());
+		
 	},
+	
 	actionTags: function() {
 		this.getTagsStore().load();
 		this.application.setMainView(this.getTags());
 	},
-	*/
+	actionVeranstalter: function() {
+		this.getVeranstalterStore().load();
+		this.application.setMainView(this.getVeranstalter());
+	},
+	
 	exportVeranstaltungen: function(){
 		var myView = this.getVeranstaltungen(),
 		me = this,

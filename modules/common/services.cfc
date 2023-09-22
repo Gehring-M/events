@@ -43,7 +43,6 @@
 	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
 	<cfargument name="fieldname" type="string" required="yes">
 	<cfargument name="existing" type="string" required="no" default="">
-		
 	<cfset var result		= {}>
     <cfset result["reload"] = false>
 	<cfif isAuth()>
@@ -56,37 +55,10 @@
 	</cfif>
 	<cfreturn result>
 </cffunction>	
-	
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-	
-<cffunction name="lockunlock" access="remote" returnFormat="json">
-	<cfargument name="recordid" type="numeric" required="yes">
-	<cfargument name="loginrequired" type="numeric" required="yes">
-	<cfset var result		= {}>
-    <cfset result["success"] = false>
-	<cfif isAuth()>
-		<cfset myData = StructNew()>
-		<cfset myData['loginrequired'] = arguments.loginrequired>
-		<cfset saveAdmin = saveStructuredContent(nodetype=2104,instance=arguments.recordid,data=myData)>
-		<cfset result["success"] = true>				
-	</cfif>
-	<cfreturn result>
-</cffunction>
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<cffunction name="privatepublic" access="remote" returnFormat="json">
-	<cfargument name="recordid" type="numeric" required="yes">
-	<cfargument name="public" type="numeric" required="yes">
-	<cfset var result		= {}>
-    <cfset result["success"] = false>
-	<cfif isAuth()>
-		<cfset myData = StructNew()>
-		<cfset myData['public'] = arguments.public>
-		<cfset saveAdmin = saveStructuredContent(nodetype=2104,instance=arguments.recordid,data=myData)>
-		<cfset result["success"] = true>				
-	</cfif>
-	<cfreturn result>
-</cffunction>
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+		
+		
+		
 <cffunction name="editKategorie" access="remote" returnFormat="json">
 	<cfargument name="dokument_fk" type="numeric" required="yes">
 	<cfargument name="kategorie_fk" type="numeric" required="yes">
