@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Auth', {
+﻿Ext.define('myapp.store.Auth', {
 	extend: 'Ext.data.Store',
 	storeId: 'SystemInfo',
 	proxy: {

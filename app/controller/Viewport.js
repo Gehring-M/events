@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.controller.Viewport', {
+﻿Ext.define('myapp.controller.Viewport', {
 	extend: 'Ext.app.Controller',
 	
 	stores: [
@@ -50,7 +50,7 @@
 			verbose : false,
 			maxInactive: (1000 * 60 * 240),
 			interval: (1000 * 60 * 1),
-			oegb: this.application 
+			myapp: this.application 
 		});
 		Ext.ux.ActivityMonitor.start();
 		//höre auf das event zum Autologout, wenn das event gefeuert wird -> logout	

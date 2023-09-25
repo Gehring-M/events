@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Kategorien', {
+﻿Ext.define('myapp.store.Kategorien', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
 	storeId: 'Kategorien',

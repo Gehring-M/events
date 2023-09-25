@@ -42,7 +42,7 @@ Ext.define('Ext.ux.ActivityMonitor', {
     interval : (1000 * 60 * 1), //1 minute
     maxInactive : (1000 * 60 * 5), //5 minutes
     
-	 oegb: null,
+	 myapp: null,
 	 
     init : function(config) {
         if (!config) { config = {}; }
@@ -107,9 +107,9 @@ Ext.define('Ext.ux.ActivityMonitor', {
         
         if (inactive >= this.maxInactive) {
             this.log('MAXIMUM INACTIVE TIME HAS BEEN REACHED');
-				if(this.oegb)
+				if(this.myapp)
 				{
-					this.oegb.fireEvent('autologout');
+					this.myapp.fireEvent('autologout');
 				}
 				this.stop();
 				//remove event listeners 

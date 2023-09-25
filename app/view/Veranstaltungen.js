@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.Veranstaltungen', {
+﻿Ext.define('myapp.view.Veranstaltungen', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.Veranstaltungen',
 	layout: {
@@ -9,7 +9,7 @@
 
 	initComponent: function(){
 		var me = this,
-		myController = oegb.app.getController('Common');
+		myController = myapp.app.getController('Common');
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'grid',

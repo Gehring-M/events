@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.controller.MainMenu', {
+﻿Ext.define('myapp.controller.MainMenu', {
 	extend: 'Ext.app.Controller',
 	
 	views: [

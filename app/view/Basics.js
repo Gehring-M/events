@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.Basics', {
+﻿Ext.define('myapp.view.Basics', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.Basics',
 	layout: {
@@ -9,7 +9,7 @@
 
 	initComponent: function(){
 		var me = this,
-		myController = oegb.app.getController('Common');
+		myController = myapp.app.getController('Common');
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'grid',

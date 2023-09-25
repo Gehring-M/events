@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Artist', {
+﻿Ext.define('myapp.store.Artist', {
   extend: 'Ext.data.Store',
 	autoLoad: true,
 	storeId: 'Artist',

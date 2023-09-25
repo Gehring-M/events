@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Laender', {
+﻿Ext.define('myapp.store.Laender', {
   extend: 'Ext.data.Store',
 	autoLoad: true,
 	storeId: 'laender',

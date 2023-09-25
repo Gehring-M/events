@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.MainMenu', {
+﻿Ext.define('myapp.store.MainMenu', {
   extend: 'Ext.data.Store',
 	//autoLoad: true,
 	autoLoad: false,

@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Typ', {
+﻿Ext.define('myapp.store.Typ', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
 	storeId: 'Typ',

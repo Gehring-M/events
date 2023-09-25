@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Benutzer', {
+﻿Ext.define('myapp.store.Benutzer', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
 	storeId: 'Benutzer',

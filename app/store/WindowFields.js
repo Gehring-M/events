@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.WindowFields', {
+﻿Ext.define('myapp.store.WindowFields', {
 	extend: 'Ext.data.Store',
 	storeId: 'SystemInfo',
 	autoLoad: true,

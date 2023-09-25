@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.Login', {
+﻿Ext.define('myapp.view.Login', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.loginview',
 	

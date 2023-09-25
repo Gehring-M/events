@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Veranstalter', {
+﻿Ext.define('myapp.store.Veranstalter', {
   extend: 'Ext.data.Store',
 	autoLoad: true,
 	storeId: 'Veranstalter',

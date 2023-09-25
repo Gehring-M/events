@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.WindowFields', {
+﻿Ext.define('myapp.view.WindowFields', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.windowfields',
 	

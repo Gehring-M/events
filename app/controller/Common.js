@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.controller.Common', {
+﻿Ext.define('myapp.controller.Common', {
 	extend: 'Ext.app.Controller',
 	
 	views: [
@@ -54,7 +54,7 @@
 		
 		me = this,
 		this.myAuthStore = authStore
-		this.myFunctions = oegb.app.getController('Funktionen');
+		this.myFunctions = myapp.app.getController('Funktionen');
 		this.isAdministrator = (authStore.findExact('administrator',true)==0) ? true : false;
 		this.user_fk = authStore.getAt(0).data.user_fk;
 		this.cVeranstaltung = 0;

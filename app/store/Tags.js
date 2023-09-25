@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.store.Tags', {
+﻿Ext.define('myapp.store.Tags', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
 	storeId: 'Tags',

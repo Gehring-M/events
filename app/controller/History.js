@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.controller.History', {
+﻿Ext.define('myapp.controller.History', {
 	extend: 'Ext.app.Controller',
 	
 	views: [

@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.controller.Funktionen', {
+﻿Ext.define('myapp.controller.Funktionen', {
 	extend: 'Ext.app.Controller',
 	
 	views: [
@@ -12,8 +12,8 @@
 	
 	init: function(){
 		var authStore = this.getAuthStore();
-		this.myFunctions = oegb.app.getController('Funktionen');
-		this.myCommonController = oegb.app.getController('Common');
+		this.myFunctions = myapp.app.getController('Funktionen');
+		this.myCommonController = myapp.app.getController('Common');
 		isAdministrator = (authStore.data.items[0].data.administrator==1) ? true : false;
 		
 		if (this.inited) {
@@ -584,7 +584,7 @@
 		var mandatoryMessage = "";
 		var me = this;
 		var myMask = new Ext.LoadMask(Ext.getBody(), {msg:"Bitte warten ..."});
-		var myCommonController = oegb.app.getController('Common');
+		var myCommonController = myapp.app.getController('Common');
 		
 		// standardwerte für höhe und breite ggf. setzen
 		var winwidth = (el.windowWidth!="") ? el.windowWidth : '600';
@@ -845,7 +845,7 @@
 		var me = this;
 		var reloadDetailGrid = false;
 		
-		myCommonController = oegb.app.getController('Common');
+		myCommonController = myapp.app.getController('Common');
 		
 		myForm = myWindow.down('form');
 		// objekt zum speichern der parameter erstellen

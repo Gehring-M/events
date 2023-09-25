@@ -8,7 +8,7 @@ Ext.Loader.setPath('Ext.aghelp', 'app/aghelp');
 
 Ext.application({
 	autoCreateViewport: true,
-	name: 'oegb',
+	name: 'myapp',
 	controllers: [
 		'History'
 	],

@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.Viewport', {
+﻿Ext.define('myapp.view.Viewport', {
 	extend: 'Ext.container.Viewport',
 	
 	layout: {

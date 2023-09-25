@@ -1,4 +1,4 @@
-﻿Ext.define('oegb.view.MainMenu', {
+﻿Ext.define('myapp.view.MainMenu', {
 	extend: 'Ext.toolbar.Toolbar',
 	alias: 'widget.mainmenu',
 	
