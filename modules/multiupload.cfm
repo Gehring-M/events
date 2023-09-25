@@ -131,6 +131,7 @@
 						cFileFieldname:$upload.attr('name'),
 						cFormFieldname:$upload.data('fieldId'),
 						uploadTyp:$container.data('uploadTyp'),
+						uploadBereich:$container.data('uploadBereich'),
 						isMultiple:$container.data('isMultiple')
 					},
 					dropZone: $(this).parent(),
@@ -259,7 +260,7 @@
 <body>
 	<form action="" method="post" name="form" autocomplete="off">
 		<cfoutput>
-			<div class="ag-f-drop-target" data-is-multiple="1" data-upload-typ="#url['typ']#">
+			<div class="ag-f-drop-target" data-is-multiple="1" data-upload-typ="#url['typ']#" data-upload-bereich="#url['bereich']#">
 				<div class="ag-f-drop-indicator" data-hint="#hint#"></div>
 				<div class="ag-f-drop-wrapper" id="target_droploader" data-file-types="#allowedFileTypes#">
 					<input type="file" class="ag-f-x6" name="_droploader" data-field-id="droploader" multiple />

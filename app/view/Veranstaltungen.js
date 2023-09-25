@@ -549,7 +549,7 @@
 						margin:'0 0 0 0',
 						padding:'0 0 0 0',
 						width: 480,
-						html: '<iframe src="/modules/multiupload.cfm?typ=bilder" width="490" height="1000"></iframe>'
+						html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="490" height="1000"></iframe>'
 					}]
 
 				},{ 	
@@ -646,7 +646,7 @@
 						margin:'0 0 0 0',
 						padding:'0 0 0 0',
 						width: 480,
-						html: '<iframe src="/modules/multiupload.cfm?typ=uploads" width="490" height="1000"></iframe>'
+						html: '<iframe src="/modules/multiupload.cfm?typ=uploads&bereich=veranstaltung" width="490" height="1000"></iframe>'
 					}]
 
 				}]

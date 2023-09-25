@@ -42,16 +42,24 @@
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <cffunction name="checkNewData" access="remote" returnFormat="json">
 	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
+	<cfargument name="artist_fk" type="numeric" required="yes">
 	<cfargument name="fieldname" type="string" required="yes">
 	<cfargument name="existing" type="string" required="no" default="">
 	<cfset var result		= {}>
     <cfset result["reload"] = false>
 	<cfif isAuth()>
-		<cfquery name="qCheck" datasource="#getConfig('DSN')#">
-			SELECT * FROM veranstaltung WHERE id = '#arguments.veranstaltung_fk#'
-		</cfquery>
+		
+		<cfif arguments.veranstaltung_fk NEQ 0>
+			<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+				SELECT * FROM veranstaltung WHERE id = '#arguments.veranstaltung_fk#'
+			</cfquery>
+		<cfelseif arguments.artist_fk NEQ 0>
+			<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+				SELECT * FROM artist WHERE id = '#arguments.artist_fk#'
+			</cfquery>
+		</cfif>	
 		<cfif ListLen(arguments.existing) NEQ ListLen(qCheck['#arguments.fieldname#'])>
-			 <cfset result["reload"] = true>
+			<cfset result["reload"] = true>
 		</cfif>	
 	</cfif>
 	<cfreturn result>

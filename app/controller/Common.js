@@ -83,6 +83,7 @@
 					url: '/modules/common/services.cfc?method=checkNewData',
 					params: {
 						veranstaltung_fk: me.cVeranstaltung,
+						artist_fk: me.cArtist,
 						fieldname: me.timerTyp,
 						existing: existingData
 					},
@@ -471,10 +472,12 @@
 		me=this;
 		this.timerActive = false;
 		this.timerTyp = "";
+		
 		if (el.activeTab.xtype == "grid") {
 			el.activeTab.getStore().load({
 				params: {
-					veranstaltung_fk:  this.cVeranstaltung
+					veranstaltung_fk:  this.cVeranstaltung,
+					artist_fk:  this.cArtist,
 				}
 			});
 		} else {
@@ -490,7 +493,8 @@
 			}
 			myStore.load({
 				params: {
-					veranstaltung_fk:  this.cVeranstaltung
+					veranstaltung_fk:  this.cVeranstaltung,
+					artist_fk:  this.cArtist
 				},
 				callback: function(response) {
 					if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
@@ -878,8 +882,11 @@
 	},
 	
 	onGridRowSelected: function(el,record,row) {
+		
+		
 	   if (el.view.up('grid').name=="veranstaltungen") {
-		   	this.cVeranstaltung = record.data.recordid,
+		   	this.cVeranstaltung = record.data.recordid;
+		   	this.cArtist = 0;
 		   	Ext.Ajax.request({
 				url: '/modules/common/services.cfc?method=setSession',
 				params: {
@@ -912,7 +919,8 @@
 	   }
 		
 		if (el.view.up('grid').name=="artist") {
-		   	this.cArtist = record.data.recordid,
+		   	this.cArtist = record.data.recordid;
+			this.cVeranstaltung = 0; 
 			Ext.Ajax.request({
 				url: '/modules/common/services.cfc?method=setSession',
 				params: {

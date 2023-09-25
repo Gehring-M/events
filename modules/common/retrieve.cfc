@@ -340,68 +340,8 @@
 		<cfquery name="qVATyp" datasource="#getConfig('DSN')#">
 			SELECT * FROM r_veranstaltung_typ 
 		</cfquery>
-			
-<!---			<cfdump var="##">--->
-			
-		
-	<!---	
-						
-					
 	
 					
-					<cfcontent type="text/html" reset="yes">
-					<cfdump var="#qData#">
-					<cfabort>
-		<cfif qData.recordcount NEQ "">	
-			<cfquery name="qKategorien" datasource="#getConfig('DSN')#">
-				SELECT 
-					rdrks.*, k.name kategorie, sk.name subkategorie
-				FROM 
-					r_dokumente_r_kategorien_subkategorien rdrks
-					LEFT JOIN r_kategorien_subkategorien rks on rdrks.r_kategorien_subkategorien_fk = rks.id
-					LEFT JOIN kategorien k on rks.kategorie_fk = k.id
-					LEFT JOIN subkategorien sk on rks.subkategorie_fk = sk.id
-				WHERE
-					rdrks.dokument_fk IN (<cfqueryparam cfsqltype="CF_SQL_VARCHAR" list="Yes" value="#ValueList(qData.id)#">)
-				ORDER BY
-				rdrks.dokument_fk
-			</cfquery>
-			<cfloop query="qKategorien">
-				<cfif qKategorien['dokument_fk'][currentrow] NEQ qKategorien['dokument_fk'][currentrow-1]>
-					<cfset sKategorieNamen[qKategorien.dokument_fk] = qKategorien.kategorie&" > "&qKategorien.subkategorie>
-					<cfset sKategorieIDs[qKategorien.dokument_fk] = qKategorien.r_kategorien_subkategorien_fk>
-				<cfelse>
-					<cfset sKategorieNamen[qKategorien.dokument_fk] = sKategorieNamen[qKategorien.dokument_fk] & " <br>" &qKategorien.kategorie&" > "&qKategorien.subkategorie>
-					<cfset sKategorieIDs[qKategorien.dokument_fk] = sKategorieIDs[qKategorien.dokument_fk] & ","&qKategorien.r_kategorien_subkategorien_fk>	
-				</cfif>	
-			</cfloop>	
-
-			<cfquery name="qTags" datasource="#getConfig('DSN')#">
-				SELECT 
-					rdt.*, t.name
-				FROM 
-					r_dokumente_tags rdt
-					LEFT JOIN tags t on rdt.tag_fk = t.id
-				WHERE
-					rdt.dokument_fk IN (<cfqueryparam cfsqltype="CF_SQL_VARCHAR" list="Yes" value="#ValueList(qData.id)#">)
-				ORDER BY
-					rdt.dokument_fk, t.name
-			</cfquery>
-				
-			<cfloop query="qTags">
-				<cfif qTags['dokument_fk'][currentrow] NEQ qTags['dokument_fk'][currentrow-1]>
-					<cfset sTagNamen[qTags.dokument_fk] = qTags.name>
-					<cfset sTagIDs[qTags.dokument_fk] = qTags.tag_fk>	
-				<cfelse>
-					<cfset sTagNamen[qTags.dokument_fk] =  sTagNamen[qTags.dokument_fk]&", "&qTags.name>
-					<cfset sTagIDs[qTags.dokument_fk] = sTagIDs[qTags.dokument_fk]&","&qTags.tag_fk>
-				</cfif>	
-			</cfloop>
-
-		</cfif>	
-
---->
-							
 		<cfloop query="qData">
 			
 			<cfif qData.parent_fk EQ "">
@@ -719,16 +659,22 @@
 </cffunction>							
 <!--------------------------------------------------------------------------------->				
 <cffunction name="getBilder" access="remote" returnFormat="json" output="no">
-	<cfargument name="veranstaltung_fk" type="string" required="no">
+	<cfargument name="veranstaltung_fk" type="string" required="no" default="0">
+  	<cfargument name="artist_fk" type="string" required="no" default="0">
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
 	<cfif isAuth()>	
-		<cfquery name="qData" datasource="#getConfig('DSN')#">
-			SELECT bilder FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
-		</cfquery>
+		<cfif arguments.veranstaltung_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT bilder FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
+			</cfquery>
+		<cfelseif arguments.artist_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT bilder FROM artist WHERE id = "#arguments.artist_fk#" 
+			</cfquery>
+		</cfif>	
 		<cfif qData.bilder NEQ "">
 			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#",additionalSelectFields='i.width,i.height')>
-				
 			<cfloop query="qData">
 				<cfset tmpStruct = {}>
 				<cfset tmpStruct["recordid"] 	= qData.id>	
@@ -756,13 +702,23 @@
 </cffunction>						
 <!--------------------------------------------------------------------------------->				
 <cffunction name="getDownloads" access="remote" returnFormat="json" output="no">
-	<cfargument name="veranstaltung_fk" type="string" required="no">
+	<cfargument name="veranstaltung_fk" type="string" required="no" default="0">
+  	<cfargument name="artist_fk" type="string" required="no" default="0">
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
 	<cfif isAuth()>	
-		<cfquery name="qData" datasource="#getConfig('DSN')#">
-			SELECT uploads FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
-		</cfquery>
+	
+		<cfif arguments.veranstaltung_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT uploads FROM veranstaltung WHERE id = "#arguments.veranstaltung_fk#" 
+			</cfquery>
+		<cfelseif arguments.artist_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT uploads FROM artist WHERE id = "#arguments.artist_fk#" 
+			</cfquery>
+		</cfif>	
+		
+		
 		<cfif qData.uploads NEQ "">
 			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.uploads#",additionalSelectFields='i.width,i.height')>
 			<cfloop query="qData">

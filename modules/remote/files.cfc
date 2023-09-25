@@ -39,13 +39,18 @@
 				
 				<cfset cFile = getMediaArchiveItem(sFile.instanceid) />
 				
+				<cfset myID = session['vaid']>
+				<cfif form['uploadBereich'] EQ "artist">
+					<cfset myID = session['aid']>
+				</cfif>	
+					
 				<cfquery name="qMedia" datasource="#getConfig('DSN')#">
-					SELECT #form['uploadTyp']# FROM veranstaltung WHERE id = "#session['vaid']#" 
+					SELECT #form['uploadTyp']# FROM #form['uploadBereich']# WHERE id = "#myID#" 
 				</cfquery>
 				<cfset idstring = qMedia[form['uploadTyp']]>	
 				<cfset idstring = ListRemoveDuplicates(ListAppend(idstring,sFile.instanceid))>	
 				<cfquery datasource="#getConfig('DSN')#">
-					UPDATE veranstaltung SET #form['uploadTyp']# = '#idstring#' WHERE id = "#session['vaid']#" 
+					UPDATE #form['uploadBereich']# SET #form['uploadTyp']# = '#idstring#' WHERE id = "#myID#" 
 				</cfquery>	
 					
 				<cfif cFile.recordcount>
