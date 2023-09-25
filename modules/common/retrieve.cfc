@@ -337,6 +337,12 @@
 				v1.von, v1.uhrzeitvon
 		</cfquery>
 			
+		<cfquery name="qVATyp" datasource="#getConfig('DSN')#">
+			SELECT * FROM r_veranstaltung_typ 
+		</cfquery>
+			
+<!---			<cfdump var="##">--->
+			
 		
 	<!---	
 						
@@ -403,6 +409,9 @@
 				<cfquery name="qSubData" dbtype="query">
 					SELECT * FROM qData WHERE parent_fk = '#qData.id#'
 				</cfquery>
+				<cfquery name="tmpVATyp" dbtype="query">
+					SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
 				<cfset tmpStruct = {}>
 				<cfset tmpStruct["recordid"] = qData.id>
 				<cfset tmpStruct["parent_fk"] = null>
@@ -429,9 +438,13 @@
 				<cfset tmpStruct["link"] = qData.link>
 				<cfset tmpStruct["uploads"] = qData.uploads>
 				<cfset tmpStruct["optionstyle"]	= "font-weight: bold; border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px;">		
+				<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				
 				<cfloop query="qSubData">
+					<cfquery name="tmpVATyp" dbtype="query">
+						SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qSubData.id#'
+					</cfquery>
 					<cfset tmpStruct = {}>
 					<cfset tmpStruct["recordid"] = qSubData.id>
 					<cfset tmpStruct["parent_fk"] = qSubData.parent_fk>
@@ -457,7 +470,8 @@
 					<cfset tmpStruct["bilder"] = qSubData.bilder>
 					<cfset tmpStruct["link"] = qSubData.link>
 					<cfset tmpStruct["uploads"] = qSubData.uploads>
-					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">		
+					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
+					<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
 
@@ -733,7 +747,7 @@
 				<cfset tmpStruct["titel"] 		= qData.bezeichnung>
 				<cfset tmpStruct["beschreibung"] = qData.beschreibung>
 				<cfset tmpStruct["previewable"] = "yes">
-				<cfset tmpStruct["resolution"] = qData.height&" x "&qData.width>
+				<cfset tmpStruct["resolution"] = qData.width&" x "&qData.height>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 			</cfloop>
 		</cfif>		
@@ -771,7 +785,7 @@
 						<cfset tmpStruct["wid"] = 750>	
 						<cfset tmpStruct["bild"] = href("instance:"&qData.id)&"&dimensions=750x495&cropmode=cropcenter">	
 					</cfif>		
-					<cfset tmpStruct["resolution"] = qData.height&" x "&qData.width>
+					<cfset tmpStruct["resolution"] = qData.width&" x "&qData.height>
 				</cfif>		
 				
 				<cfset tmpStruct["recordid"] 	= qData.id>
@@ -791,15 +805,42 @@
 <!--------------------------------------------------------------------------------->
 <cffunction name="getKategorien" access="remote" returnFormat="json" output="no">
 	
+	<cfargument name="artist_fk" type="string" required="no" default="">
+	<cfargument name="filterText" type="string" required="no" default="">
+		
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
    	
 	<cfif isAuth()>		
-		<cfset qData = getStructuredContent(nodetype=2104,orderclause="name")>
+		
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT 
+				k.*
+				<cfif arguments.artist_fk NEQ "">
+				, rak.id rakid
+				</cfif>
+			FROM 
+				kategorie k
+				<cfif arguments.artist_fk NEQ "">
+					LEFT JOIN r_artist_kategorie rak on k.id=rak.kategorie_fk and rak.artist_fk = '#arguments.artist_fk#'
+				</cfif>
+			WHERE
+				1=1
+				<cfif arguments.filterText NEQ "">
+					AND k.name like '%#arguments.filterText#%'
+				</cfif>
+			ORDER BY 
+				k.name
+		</cfquery>
+		
 		<cfloop query="qData">
 			<cfset tmpStruct = {}>
 			<cfset tmpStruct["recordid"] 	= qData.id>
 			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["checked"] = 1>
+			<cfif arguments.artist_fk NEQ "" AND qData.rakid EQ "">	
+				<cfset tmpStruct["checked"] = 0>
+			</cfif>	
 			<cfset ArrayAppend(returnArray, tmpStruct)>
 		</cfloop>
 		

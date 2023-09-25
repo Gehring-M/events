@@ -166,9 +166,7 @@
 				&& (tabname=="" || tabname!="" && tabname == cItem.data.tab)
 				) {
 				switch (cItem.data.xtype) {
-						
 					case 'combobox':
-					
 						if (cItem.data.mehrfachauswahl=='ja' && rec != undefined && rec[cItem.data.name]!="" && rec[cItem.data.name].toString().indexOf(",")!=-1) {
 							myRec=[];
 							Ext.each(rec[cItem.data.name].split(","), function(cid) {
@@ -795,7 +793,7 @@
 														}
 													});
 												}
-												if (myStore.storeId=="Bilder" || myStore.storeId=="Downloads" ) {
+												if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
 													setTimeout(function(){
 														myGrid.headerCt.getGridColumns()[0].setWidth(118);
 													}, 250);

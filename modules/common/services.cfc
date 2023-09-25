@@ -26,15 +26,16 @@
 	<cfreturn result>
 </cffunction>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<cffunction name="setVA" access="remote" returnFormat="json">
+<cffunction name="setSession" access="remote" returnFormat="json">
+	<cfargument name="typ" type="string" required="yes">
 	<cfargument name="id" type="numeric" required="yes">
 	<cfset var result		= {}>
-    <cfset result["success"] = false>
+    <cfset result["success"] = true>
 	<cfif isAuth()>
-		<cfif !StructKeyExists(session,'vaid')>
-			<cfset session['vaid'] = 0>
+		<cfif !StructKeyExists(session,arguments.typ)>
+			<cfset session[arguments.typ] = 0>
 		</cfif>	
-		<cfset session['vaid'] = arguments.id>	
+		<cfset session[arguments.typ] = arguments.id>	
 	</cfif>
 	<cfreturn result>
 </cffunction>	
@@ -57,58 +58,23 @@
 </cffunction>	
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 		
-		
-		
 <cffunction name="editKategorie" access="remote" returnFormat="json">
-	<cfargument name="dokument_fk" type="numeric" required="yes">
+	<cfargument name="artist_fk" type="numeric" required="yes">
 	<cfargument name="kategorie_fk" type="numeric" required="yes">
 	<cfargument name="status" type="boolean" required="yes">
-		
-	<cfset kategorieIsUniqe = true>	
-		
 	<cfset var result		= {}>
     <cfset result["success"] = false>
 	<cfif isAuth()>
-		
 		<cfif arguments.status>
-			<cfif 1 EQ 2>
-				<cfquery datasource="#getConfig('DSN')#">
-					DELETE FROM r_dokumente_r_kategorien_subkategorien WHERE dokument_fk = '#arguments.dokument_fk#'
-				</cfquery>
-			</cfif>
 			<cfset myData = StructNew()>
-			<cfset myData['dokument_fk'] = arguments.dokument_fk>
-			<cfset myData['r_kategorien_subkategorien_fk'] = arguments.kategorie_fk>
-			<cfset saveStructuredContent(nodetype=2105,data=myData)>
+			<cfset myData['artist_fk'] = arguments.artist_fk>
+			<cfset myData['kategorie_fk'] = arguments.kategorie_fk>
+			<cfset saveStructuredContent(nodetype=2114,data=myData)>
 		<cfelse>
 			<cfquery datasource="#getConfig('DSN')#">
-				DELETE FROM r_dokumente_r_kategorien_subkategorien WHERE dokument_fk = '#arguments.dokument_fk#' AND r_kategorien_subkategorien_fk = '#arguments.kategorie_fk#'
+				DELETE FROM r_artist_kategorie WHERE artist_fk = '#arguments.artist_fk#' AND kategorie_fk = '#arguments.kategorie_fk#'
 			</cfquery>
 		</cfif>
-				
-		<cfquery name="qKategorien" datasource="#getConfig('DSN')#">
-			SELECT 
-				rdrks.*, k.name kategorie, sk.name subkategorie
-			FROM 
-				r_dokumente_r_kategorien_subkategorien rdrks
-				LEFT JOIN r_kategorien_subkategorien rks on rdrks.r_kategorien_subkategorien_fk = rks.id
-				LEFT JOIN kategorien k on rks.kategorie_fk = k.id
-				LEFT JOIN subkategorien sk on rks.subkategorie_fk = sk.id
-			WHERE
-				rdrks.dokument_fk = '#arguments.dokument_fk#'
-		</cfquery>	
-		
-		<cfset kategorieNamen = "">
-		<cfset kategorieIDs = "">
-				
-		<cfloop query="qKategorien">
-			<cfset kategorieNamen = ListAppend(kategorieNamen,qKategorien.kategorie&' > '&qKategorien.subkategorie,'|')>
-			<cfset kategorieIDs = ListAppend(kategorieIDs,qKategorien.r_kategorien_subkategorien_fk)>
-		</cfloop>
-		
-		<cfset result["kategorieNamen"] = Replace(kategorieNamen,"|","<br>","ALL")>	
-		<cfset result["kategorieIDs"] = kategorieIDs>	
-				
 		<cfset result["success"] = true>				
 	</cfif>
 	<cfreturn result>

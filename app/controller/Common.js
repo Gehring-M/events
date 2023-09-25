@@ -4,8 +4,8 @@
 	views: [
 		'Veranstaltungen',
 		'Veranstalter',
-		'Tags',
-		'Basics'
+		'Basics',
+		'Artist'
 	],
 
 	stores: [
@@ -34,14 +34,14 @@
 		xtype: 'Basics',
 		autoCreate: true
 	},{
-		ref: 'Tags',
-		selector: 'Tags',
-		xtype: 'Tags',
-		autoCreate: true
-	},{
 		ref: 'Veranstalter',
 		selector: 'Veranstalter',
 		xtype: 'Veranstalter',
+		autoCreate: true
+	},{
+		ref: 'Artist',
+		selector: 'Artist',
+		xtype: 'Artist',
 		autoCreate: true
 	}],
 	
@@ -58,6 +58,7 @@
 		this.isAdministrator = (authStore.findExact('administrator',true)==0) ? true : false;
 		this.user_fk = authStore.getAt(0).data.user_fk;
 		this.cVeranstaltung = 0;
+		this.cArtist = 0;
 		this.myTimeOut = 5000;
 		this.timerActive = false;
 		this.timerTyp = "";
@@ -205,6 +206,9 @@
 		
 		if (gridview.up('grid').name == "veranstaltungen") {
 			this.cVeranstaltung = rec.data.recordid;
+		}
+		if (gridview.up('grid').name == "artist") {
+			this.cArtist = rec.data.recordid;
 		}
 		
 		if ((gridview.up('grid').name == "Downloads" || gridview.up('grid').name == "Bilder") && cellnumber == gridview.up('grid').columns.length-1) {
@@ -365,6 +369,27 @@
 
 		}
 		
+		if (gridview.up('grid').name == "kategoriezuweisung" && cellnumber == 0) {
+			
+			var me = this,
+			status = !rec.data.checked,
+			myView = this.getArtist();
+			
+			Ext.Ajax.request({
+				url: '/modules/common/services.cfc?method=editKategorie',
+				params: {
+					artist_fk: me.cArtist,
+					kategorie_fk: rec.data.recordid,
+					status: status
+				},
+				success: function(response) {
+					var jsonParse = Ext.JSON.decode(response.responseText);
+				}
+			});
+			rec.set('checked',status);
+
+		}
+		
     },
 	
 	onCellDoubleClick: function(gridview,markup,cellnumber,rec) {
@@ -468,7 +493,7 @@
 					veranstaltung_fk:  this.cVeranstaltung
 				},
 				callback: function(response) {
-					if (myStore.storeId=="Bilder" || myStore.storeId=="Downloads" ) {
+					if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
 						setTimeout(function(){
 							myGrid.headerCt.getGridColumns()[0].setWidth(118);
 						}, 250);
@@ -850,27 +875,15 @@
 		if (myGrid.hasOwnProperty('agLoadDetailsOnSelect') && myGrid.agLoadDetailsOnSelect!='') {
 			this.loadDetailsOnGridSelect(el,record);
 		}
-		/*
-		if (myGrid.name == "dokumente") {
-			this.setCheckboxes4Documents(record);
-			if (record.data.parent_fk != null) {
-				this.getDokumente().down('grid[name=kategorienbaum]').setDisabled(true);
-				this.getDokumente().down('grid[name=tagzuweisung]').setDisabled(true);
-			} else {
-				this.getDokumente().down('grid[name=kategorienbaum]').setDisabled(false);
-				this.getDokumente().down('grid[name=tagzuweisung]').setDisabled(false);
-			}
-		}
-		*/
-		
 	},
 	
 	onGridRowSelected: function(el,record,row) {
 	   if (el.view.up('grid').name=="veranstaltungen") {
 		   	this.cVeranstaltung = record.data.recordid,
-			Ext.Ajax.request({
-				url: '/modules/common/services.cfc?method=setVA',
+		   	Ext.Ajax.request({
+				url: '/modules/common/services.cfc?method=setSession',
 				params: {
+					typ: 'vaid',
 					id: this.cVeranstaltung,
 				}
 			});
@@ -889,7 +902,40 @@
 					veranstaltung_fk:  this.cVeranstaltung,
 				},
 				callback: function(response) {
-					if (myStore.storeId=="Bilder") {
+					if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
+						setTimeout(function(){
+							myGrid.headerCt.getGridColumns()[0].setWidth(118);
+						}, 250);
+					}
+				},scope: this
+			});
+	   }
+		
+		if (el.view.up('grid').name=="artist") {
+		   	this.cArtist = record.data.recordid,
+			Ext.Ajax.request({
+				url: '/modules/common/services.cfc?method=setSession',
+				params: {
+					typ: 'aid',
+					id: this.cArtist,
+				}
+			});
+		   	myTabPanel = el.view.up('grid').up('form').down('tabpanel');
+		   
+		   	if (myTabPanel.activeTab.xtype == "grid") {
+			 	myStore = myTabPanel.activeTab.getStore();
+				myGrid = myTabPanel.activeTab;
+			} else {
+				myStore = myTabPanel.activeTab.down('grid').getStore();
+				myGrid = myTabPanel.activeTab.down('grid');
+			}
+		   
+			myStore.load({
+				params: {
+					artist_fk:  this.cArtist,
+				},
+				callback: function(response) {
+					if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
 						setTimeout(function(){
 							myGrid.headerCt.getGridColumns()[0].setWidth(118);
 						}, 250);
@@ -955,7 +1001,6 @@
 			myView = this.getVeranstaltungen();
 		
 			myVeranstaltungenStore.removeFilter('filterOpened');
-
 			myVeranstaltungenStore.load({
 				callback: function(response) {
 
@@ -975,12 +1020,20 @@
 				}
 			});
 		
-			/*
-		this.getKategorienStore().load();
-		this.getTagsStore().load();
-		*/
 		this.application.setMainView(myView);
 		
+	},	
+	
+	actionArtist: function() {
+		var myView = this.getArtist();
+		this.getArtistStore().load({
+			callback: function(response) {
+				if (response.length > 0) {
+					myView.down('grid[name=artist]').getView().select(0);
+				}
+			}
+		});
+		this.application.setMainView(myView);
 	},	
 	
 	actionBasics: function() {
@@ -1015,7 +1068,6 @@
 		myVisibleColumns = [],
 		myColumnLabels={};
 		disabledColumns = "opened,checked,button";
-		
 		
 		csvContent += snewLine;
 

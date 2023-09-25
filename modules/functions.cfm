@@ -13,6 +13,16 @@
 		   
 	<cfswitch expression="#arguments.nodetype#">
 		<cfcase value="2102">
+			<cfquery name="qUpdate" datasource="#getConfig('DSN')#">
+				DELETE FROM r_veranstaltung_typ WHERE veranstaltung_fk = "#arguments.data.instance#"
+			</cfquery>
+			<cfloop list="#arguments.data.typ_fk#" index="cItem">
+				<cfset myData = StructNew()>
+				<cfset myData['veranstaltung_fk'] = arguments.data.instance>
+				<cfset myData['typ_fk'] = cItem>
+				<cfset save = saveStructuredContent(nodetype=2115,data=myData)>
+			</cfloop>
+			
 			<cfif StructKeyExists(arguments.data,'duplicate') AND arguments.data['duplicate'] eq 1>
 				<!--- Veranstalter verknüpfungen duplizieren --->
 				<cfset qDuplicate = getStructuredContent(nodetype=2111,whereclause="veranstaltung_fk = "&arguments.data.instance)>

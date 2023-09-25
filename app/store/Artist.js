@@ -18,6 +18,8 @@
 	fields: [{
 		name: 'recordid'
 	},{ 
+		name: 'checked'	
+	},{ 
 		name: 'user_fk'	
 	},{ 
 		name: 'name'	

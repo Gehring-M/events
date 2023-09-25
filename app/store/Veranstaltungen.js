@@ -65,5 +65,7 @@
 		name: 'uploads'
 	},{ 
 		name: 'optionstyle'
+	},{ 
+		name: 'typ_fk'
 	}]
 });
