@@ -31,9 +31,8 @@
 					</cfquery>
 				</cfif>
 			</cfif>
-			
-			<cfset myData['latitude'] = "">
-			<cfset myData['longitude'] ="">	
+			<cfset myData['latitude'] = 0>
+			<cfset myData['longitude'] = 0>
 			<cfset myData['ort_fk'] = "">	
 			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
 				<cfset myData['latitude'] = latlon['lat']>
@@ -116,8 +115,8 @@
 					</cfquery>
 				</cfif>
 			</cfif>
-			<cfset myData['latitude'] = "">
-			<cfset myData['longitude'] ="">	
+			<cfset myData['latitude'] = 0>
+			<cfset myData['longitude'] = 0>
 			<cfset myData['ort_fk'] = "">	
 			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
 				<cfset myData['latitude'] = latlon['lat']>
@@ -153,8 +152,8 @@
 					</cfquery>
 				</cfif>
 			</cfif>
-			<cfset myData['latitude'] = "">
-			<cfset myData['longitude'] ="">	
+			<cfset myData['latitude'] = 0>
+			<cfset myData['longitude'] = 0>
 			<cfset myData['ort_fk'] = "">	
 			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
 				<cfset myData['latitude'] = latlon['lat']>
@@ -184,8 +183,8 @@
 					</cfquery>
 				</cfif>
 			</cfif>	
-			<cfset myData['latitude'] = "">
-			<cfset myData['longitude'] ="">	
+			<cfset myData['latitude'] = 0>
+			<cfset myData['longitude'] = 0>
 			<cfset myData['ort_fk'] = "">	
 			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
 				<cfset myData['latitude'] = latlon['lat']>
