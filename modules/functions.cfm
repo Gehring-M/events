@@ -10,9 +10,39 @@
 	<cfset result['overWriteMessage'] = "">
 	<cfset var uploadStruct = StructNew()>
 	<cfset var myUploadID = 0>
-		   
+	<cfset var qPLZ = QueryNew('id')>	   
 	<cfswitch expression="#arguments.nodetype#">
 		<cfcase value="2102">
+			<cfset myData = StructNew()>
+			<cfset latlon = getLatLon(arguments.data.adresse,arguments.data.plz,arguments.data.ort)>
+			<cfif latlon['plz'] NEQ "">
+				<cfif arguments.data.plz NEQ latlon['plz']>
+					<cfset myData['plz'] = latlon['plz']>	
+				</cfif>	
+				<cfset arguments.data.plz = latlon['plz']>
+			</cfif>
+			<cfif arguments.data.plz NEQ "">
+				<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+					SELECT id FROM ort WHERE plz = "#arguments.data.plz#"
+				</cfquery>
+				<cfif qPLZ.recordcount EQ 0>
+					<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+						SELECT id FROM ort WHERE weitereplz = "#arguments.data.plz#"
+					</cfquery>
+				</cfif>
+			</cfif>
+			
+			<cfset myData['latitude'] = "">
+			<cfset myData['longitude'] ="">	
+			<cfset myData['ort_fk'] = "">	
+			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
+				<cfset myData['latitude'] = latlon['lat']>
+				<cfset myData['longitude'] = latlon['lon']>
+			</cfif>
+			<cfif qPLZ.recordcount NEQ 0>
+				<cfset myData['ort_fk'] = qPLZ.id>
+			</cfif>	
+			<cfset save = saveStructuredContent(nodetype=2102,instance=arguments.instanceid,data=myData)>	
 			<cfquery name="qUpdate" datasource="#getConfig('DSN')#">
 				DELETE FROM r_veranstaltung_typ WHERE veranstaltung_fk = "#arguments.data.instance#"
 			</cfquery>
@@ -67,13 +97,104 @@
 				</cfquery>		
 			</cfif>	
 		</cfcase>
-		<cfcase value="2101">	
+		<cfcase value="2101">
+			<cfset myData = StructNew()>
+			<cfset latlon = getLatLon(arguments.data.adresse,arguments.data.plz,arguments.data.ort)>
+			<cfif latlon['plz'] NEQ "">
+				<cfif arguments.data.plz NEQ latlon['plz']>
+					<cfset myData['plz'] = latlon['plz']>	
+				</cfif>
+				<cfset arguments.data.plz =latlon['plz']>
+			</cfif>
+			<cfif arguments.data.plz NEQ "">
+				<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+					SELECT id FROM ort WHERE plz = "#arguments.data.plz#"
+				</cfquery>
+				<cfif qPLZ.recordcount EQ 0>
+					<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+						SELECT id FROM ort WHERE weitereplz = "#arguments.data.plz#"
+					</cfquery>
+				</cfif>
+			</cfif>
+			<cfset myData['latitude'] = "">
+			<cfset myData['longitude'] ="">	
+			<cfset myData['ort_fk'] = "">	
+			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
+				<cfset myData['latitude'] = latlon['lat']>
+				<cfset myData['longitude'] = latlon['lon']>
+			</cfif>
+			<cfif qPLZ.recordcount NEQ 0>
+				<cfset myData['ort_fk'] = qPLZ.id>
+			</cfif>	
+			<cfset save = saveStructuredContent(nodetype=2101,instance=arguments.instanceid,data=myData)>	
 			<cfif StructKeyExists(arguments.data,'vkid') AND arguments.data['vkid'] neq "">
 				<cfset myData = StructNew()>
 				<cfset myData['veranstaltung_fk'] = arguments.data['vkid']>
 				<cfset myData['veranstalter_fk'] = arguments.instanceid>
 				<cfset save = saveStructuredContent(nodetype=2111,data=myData)>
 			</cfif>
+		</cfcase>	
+		<cfcase value="2103">
+			<cfset myData = StructNew()>
+			<cfset latlon = getLatLon(arguments.data.adresse,arguments.data.plz,arguments.data.ort)>
+			<cfif latlon['plz'] NEQ "">
+				<cfif arguments.data.plz NEQ latlon['plz']>
+					<cfset myData['plz'] = latlon['plz']>	
+				</cfif>
+				<cfset arguments.data.plz =latlon['plz']>
+			</cfif>	
+			<cfif arguments.data.plz NEQ "">
+				<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+					SELECT id FROM ort WHERE plz = "#arguments.data.plz#"
+				</cfquery>
+				<cfif qPLZ.recordcount EQ 0>
+					<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+						SELECT id FROM ort WHERE weitereplz = "#arguments.data.plz#"
+					</cfquery>
+				</cfif>
+			</cfif>
+			<cfset myData['latitude'] = "">
+			<cfset myData['longitude'] ="">	
+			<cfset myData['ort_fk'] = "">	
+			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
+				<cfset myData['latitude'] = latlon['lat']>
+				<cfset myData['longitude'] = latlon['lon']>
+			</cfif>
+			<cfif qPLZ.recordcount NEQ 0>
+				<cfset myData['ort_fk'] = qPLZ.id>
+			</cfif>	
+			<cfset save = saveStructuredContent(nodetype=2103,instance=arguments.instanceid,data=myData)>	
+		</cfcase>
+		<cfcase value="2110">
+			<cfset myData = StructNew()>
+			<cfset latlon = getLatLon(arguments.data.adresse,arguments.data.plz,arguments.data.ort)>
+			<cfif latlon['plz'] NEQ "">
+				<cfif arguments.data.plz NEQ latlon['plz']>
+					<cfset myData['plz'] = latlon['plz']>	
+				</cfif>
+				<cfset arguments.data.plz = latlon['plz']>
+			</cfif>
+			<cfif arguments.data.plz NEQ "">
+				<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+					SELECT id FROM ort WHERE plz = "#arguments.data.plz#"
+				</cfquery>
+				<cfif qPLZ.recordcount EQ 0>
+					<cfquery name="qPLZ" datasource="#getConfig('DSN')#">
+						SELECT id FROM ort WHERE weitereplz = "#arguments.data.plz#"
+					</cfquery>
+				</cfif>
+			</cfif>	
+			<cfset myData['latitude'] = "">
+			<cfset myData['longitude'] ="">	
+			<cfset myData['ort_fk'] = "">	
+			<cfif latlon['lat'] NEQ "" AND latlon['lon'] NEQ "">	
+				<cfset myData['latitude'] = latlon['lat']>
+				<cfset myData['longitude'] = latlon['lon']>
+			</cfif>
+			<cfif qPLZ.recordcount NEQ 0>
+				<cfset myData['ort_fk'] = qPLZ.id>
+			</cfif>	
+			<cfset save = saveStructuredContent(nodetype=2110,instance=arguments.instanceid,data=myData)>	
 		</cfcase>	
 		<cfcase value="1,2">
 			<cfset dataStruct = StructNew() />
@@ -85,5 +206,66 @@
 	<cfreturn result>
 </cffunction>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-					
+<cffunction name="getLatLon" returntype="struct">
+    <cfargument name="strasse" type="string" />
+    <cfargument name="plz" type="string" />
+    <cfargument name="ort" type="string" />
+
+    
+    <cfset var dataStruct = structNew() >
+    <cfset var address = "" >
+    <cfset var bezirk = "" >
+    <cfset var apiKey = getConfig('api.key.googlemaps.geocode') >
+    <cfset var geourl = "https://maps.googleapis.com/maps/api/geocode/json?key=#apiKey#&address=" >
+
+    <cfset dataStruct['lat'] = "">
+    <cfset dataStruct['lon'] = "">
+    <cfset dataStruct['plz'] = "">
+    <cfset dataStruct['errorType'] = "">
+    <cfset dataStruct['errorMessage'] = "">
+        
+    <cfif arguments.strasse eq "" OR arguments.ort eq "" OR apiKey eq "">
+        <cfreturn dataStruct>
+    </cfif>
+
+    <cfif arguments.plz eq "">
+        <cfset address = arguments.strasse & "+" & arguments.ort >
+    <cfelse>
+        <cfset address = arguments.strasse & "+" & arguments.plz & "+" & arguments.ort >
+    </cfif>
+    <cfset address = replace(address, " ", "+") >
+    <cfset geourl = geourl & address >
+    <cftry>
+        <cfhttp url = "#geourl#" result="res" />
+        <cfcatch>
+            <cfset dataStruct['errorMessage'] = "Fehler 1 bei HTTPRequest bei der Geocode Anfrage für Adresse: #address#)">
+            <cfreturn dataStruct>
+        </cfcatch>
+    </cftry>
+    <cfif res.status_code neq "200">
+        <cfset dataStruct['errorMessage'] = "Fehler 2 bei Antwort auf Geocode Anfrage, Status: #res.statuscode#, für Adresse: #address# ">
+        <cfreturn dataStruct>
+    </cfif>
+    <cfif IsJson(#res.filecontent#)>
+        <cfset JsonAdresse = deserializeJson(#res.filecontent#) />
+        <cfif JsonAdresse.status neq "OK">
+            <cfset dataStruct['errorType'] = JsonAdresse.status>
+            <cfset dataStruct['errorMessage'] = "Fehler 3 bei Antwort auf Geocode Anfrage, Status: #JsonAdresse.status#, für Adresse: #address# ">
+            <cfreturn dataStruct>
+        </cfif>
+        <cfset dataStruct['lat'] = JsonAdresse.results[1].geometry.location.lat>
+        <cfset dataStruct['lon'] = JsonAdresse.results[1].geometry.location.lng>
+		<cfloop from="1" to="#ArrayLen(JsonAdresse.results[1].address_components)#" index="cRow">
+			<cfif JsonAdresse.results[1].address_components[cRow]['types'][1] EQ "postal_code">
+				<cfset dataStruct['plz'] = JsonAdresse.results[1].address_components[cRow]['long_name']>
+			</cfif>
+		</cfloop>	
+        <cfreturn dataStruct>
+    <cfelse>
+        <cfset dataStruct['errorMessage'] = "Fehler bei Antwort auf Geocode Anfrage für Adresse: #address#, kein gültiges Json \n content: #res.filecontent#">
+        <cfreturn dataStruct>
+    </cfif>
+
+</cffunction>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->						
 </cfsilent>

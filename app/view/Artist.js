@@ -95,7 +95,7 @@
 					cls: 'button-grey'
 				},{
 					xtype: 'button',
-					text: 'Neun Künster anlegen',
+					text: 'Neuen Künster anlegen',
 					width: 200,
 					height: 24,
 					margin:'0 0 0 10',

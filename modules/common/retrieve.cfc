@@ -672,6 +672,10 @@
 			<cfquery name="qData" datasource="#getConfig('DSN')#">
 				SELECT bilder FROM artist WHERE id = "#arguments.artist_fk#" 
 			</cfquery>
+		<cfelseif arguments.veranstalter_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT bilder FROM veranstalter WHERE id = "#arguments.veranstalter_fk#" 
+			</cfquery>
 		</cfif>	
 		<cfif qData.bilder NEQ "">
 			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.bilder#",additionalSelectFields='i.width,i.height')>
@@ -716,8 +720,11 @@
 			<cfquery name="qData" datasource="#getConfig('DSN')#">
 				SELECT uploads FROM artist WHERE id = "#arguments.artist_fk#" 
 			</cfquery>
+		<cfelseif arguments.veranstalter_fk NEQ 0>
+			<cfquery name="qData" datasource="#getConfig('DSN')#">
+				SELECT uploads FROM veranstalter WHERE id = "#arguments.veranstalter_fk#" 
+			</cfquery>
 		</cfif>	
-		
 		
 		<cfif qData.uploads NEQ "">
 			<cfset qData = getStructuredContent(nodetype=1301,instanceids="#qData.uploads#",additionalSelectFields='i.width,i.height')>

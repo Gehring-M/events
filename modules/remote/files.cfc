@@ -43,9 +43,12 @@
 				<cfif form['uploadBereich'] EQ "artist">
 					<cfset myID = session['aid']>
 				</cfif>	
+				<cfif form['uploadBereich'] EQ "veranstalter">
+					<cfset myID = session['vid']>
+				</cfif>	
 					
 				<cfquery name="qMedia" datasource="#getConfig('DSN')#">
-					SELECT #form['uploadTyp']# FROM #form['uploadBereich']# WHERE id = "#myID#" 
+					SELECT #form['uploadTyp']# FROM #form['uploadBereich']# WHERE id = "#myID#"
 				</cfquery>
 				<cfset idstring = qMedia[form['uploadTyp']]>	
 				<cfset idstring = ListRemoveDuplicates(ListAppend(idstring,sFile.instanceid))>	

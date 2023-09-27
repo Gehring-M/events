@@ -111,13 +111,13 @@
 		<upload>
 			<name>uploads</name>
 			<type>medienarchiveintrag</type>
-			<category>ma-veranstaltung</category>
+			<category>ma-droploader</category>
 			<multiple>no</multiple>
 		</upload>
 		<upload>
 			<name>bilder</name>
 			<type>medienarchiveintrag</type>
-			<category>ma-veranstaltung</category>
+			<category>ma-droploader</category>
 			<multiple>no</multiple>
 		</upload>
 	</uploads>

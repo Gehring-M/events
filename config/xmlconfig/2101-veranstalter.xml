@@ -66,5 +66,19 @@
 		<type>textlong</type>
 		<required>no</required>
 	</field>
-</editfields> 
+</editfields>
+<uploads>
+	<upload>
+		<name>uploads</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-droploader</category>
+		<multiple>no</multiple>
+	</upload>
+	<upload>
+		<name>bilder</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-droploader</category>
+		<multiple>no</multiple>
+	</upload>
+</uploads>	
 </ameisen-node>

@@ -42,6 +42,13 @@
 		<required>no</required>
 	</field>
 	<field>
+		<name>ort_fk</name>
+		<type>genericelement</type>
+		<element>ort</element>
+		<required>no</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
 		<name>latitude</name> 
 		<type>textshort</type>
 		<required>no</required>
@@ -76,7 +83,7 @@
 		<type>textlong</type>
 		<required>no</required>
 	</field>
-		<field>
+	<field>
 		<name>geprueft</name> 
 		<type>datetime</type>
 		<required>no</required>
@@ -86,13 +93,13 @@
 	<upload>
 		<name>uploads</name>
 		<type>medienarchiveintrag</type>
-		<category>ma-artist-uploads</category>
+		<category>ma-droploader</category>
 		<multiple>no</multiple>
 	</upload>
 	<upload>
 		<name>bilder</name>
 		<type>medienarchiveintrag</type>
-		<category>ma-artist-bilder</category>
+		<category>ma-droploader</category>
 		<multiple>no</multiple>
 	</upload>
 </uploads>	
