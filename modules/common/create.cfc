@@ -3,20 +3,6 @@
 <cfinclude template="/modules/functions.cfm">
 <cfsilent>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<cffunction name="addTag" access="remote" returnFormat="json">
-	<cfargument name="tag" type="string" default="""">
-	<cfset var result		= {}>
-    <cfset result["success"] = false>
-	<cfif isAuth() AND arguments.tag NEQ "">
-		<cfset myData = StructNew()>
-		<cfset myData['name'] = arguments.tag>
-		<cfset myData['parent_fk'] = null>
-		<cfset save = saveStructuredContent(nodetype=2101,data=myData)>
-		<cfset result["success"] = true>				
-	</cfif>
-	<cfreturn result>
-</cffunction>
-<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <cffunction name="addVeranstalterToVeranstaltung" access="remote" returnFormat="json">
 	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
 	<cfargument name="veranstalter_fk" type="numeric" required="yes">

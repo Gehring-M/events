@@ -11,9 +11,9 @@
 	<cfset var result		= {}>
     <cfset result["success"] = false>
 	<cfset result["message"] = "Der Datensatz konnte nicht gelöscht werden.">
-    
+		
+		
     <cfset allowed = true>
-	
 	<cfif isAuth()>	
         <cfif allowed>
 			<cfif arguments.nodeType LT 2100>
@@ -64,11 +64,60 @@
 					<cfset deleteStructuredContent(cRecord)>
 				</cfloop>
 			<cfelse>
-				 <cfloop list="#arguments.records#" index="cRecord">
-					<cfset deleteFlatContent(nodetype=arguments.nodeType,instanceid=cRecord)>
-				</cfloop>
+			
+				<cfif arguments.nodeType EQ 2102>
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM veranstaltung WHERE id IN ('#arguments.records#') OR parent_fk IN ('#arguments.records#') ORDER BY parent_fk desc
+					</cfquery>
+					<!---Bilder löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.bilder))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<!---Uploads löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.uploads))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.id))#" index="cRecord">
+						<cfset deleteFlatContent(nodetype=arguments.nodeType,instanceid=cRecord)>
+					</cfloop>
+				<cfelseif arguments.nodeType EQ 2101>
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM veranstalter WHERE id IN ('#arguments.records#')
+					</cfquery>
+					<!---Bilder löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.bilder))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<!---Uploads löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.uploads))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.id))#" index="cRecord">
+						<cfset deleteFlatContent(nodetype=arguments.nodeType,instanceid=cRecord)>
+					</cfloop>
+				<cfelseif arguments.nodeType EQ 2103>
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM artist WHERE id IN ('#arguments.records#')
+					</cfquery>
+					<!---Bilder löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.bilder))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<!---Uploads löschen--->
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.uploads))#" index="cRecord">
+						<cfset deleteStructuredContent(cRecord)>
+					</cfloop>
+					<cfloop list="#ListRemoveDuplicates(ValueList(qCheck.id))#" index="cRecord">
+						<cfset deleteFlatContent(nodetype=arguments.nodeType,instanceid=cRecord)>
+					</cfloop>
+					
+				<cfelse>		
+					<cfloop list="#arguments.records#" index="cRecord">
+						<cfset deleteFlatContent(nodetype=arguments.nodeType,instanceid=cRecord)>
+					</cfloop>
+				</cfif>		
+					
 			</cfif>	
-				
             <cfset result["success"] = true>
             <cfset result["message"] = "Der Datensatz wurde erfolgreich gelöscht.">
         <cfelse>

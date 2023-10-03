@@ -3,7 +3,6 @@
 <cfinclude template="/modules/functions.cfm" >
 <cfoutput>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-
 <cffunction name="editTags" access="remote" returnFormat="json">
 	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
 	<cfargument name="tag_fk" type="numeric" required="yes">
@@ -69,7 +68,6 @@
 	<cfreturn result>
 </cffunction>	
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-		
 <cffunction name="editKategorie" access="remote" returnFormat="json">
 	<cfargument name="artist_fk" type="numeric" required="yes">
 	<cfargument name="kategorie_fk" type="numeric" required="yes">

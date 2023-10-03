@@ -113,8 +113,7 @@
 				itemdblclick: this.onDblClickGrid,
 				itemclick: this.onClickGrid,
 				select: this.onGridRowSelected,
-				cellclick:  this.onCellClicked,
-				celldblclick:  this.onCellDoubleClick
+				cellclick:  this.onCellClicked
 			},
 			'button': {
 				click: this.onClickButton
@@ -123,26 +122,13 @@
 				tabchange: this.loadStoreOnTabChange
 			},
 			'combobox': {
-				select: this.onSelectCombobox,
-				change: this.onChangeCombobox,
 				blur: this.onBlurCombobox,
-				beforequery: this.onBeforeQuery,
-				expand: this.onExpandCombobox,
-				collapse: this.onCollapseCombobox
+				beforequery: this.onBeforeQuery
 			},
 			'textfield[name=gridFilter]': {
 				change: this.onKeyUpTextfield
 			},
-			'numberfield': {
-				change: this.onChangeNumberField
-			},
-			'datefield': {
-				select: this.onSelectDateField,
-				change: this.onChangeDateField
-			},
-			'checkcolumn': {
-				checkchange: this.onCheckCheckbox
-			},
+		
 			'#btnTagToDoc': {
 				click: this.onStartTagging
 			},
@@ -170,39 +156,8 @@
 		window.open("/data.cfm?dataid="+myDataID+"&download=yes");
 	},
 	
-	onCollapseCombobox: function(el) {
-		el.getStore().removeFilter('rKatSubkat');
-	},	
 	onSelectFile: function(el) {
 		el.up('window').down('hiddenfield[name=originalfilename]').setValue(el.getValue())
-	},
-	onExpandCombobox: function(el) {
-		if (el.name=="subkategorie_fk") {
-			var myComboStore = el.getStore(),
-			myGridStore = el.up('window').gridStore,
-			existingRelations = [],
-			cKategorie = el.up('window').agRecord.data.kategorie_fk;
-			
-			Ext.each(myGridStore.data.items, function(cItem) {	
-				if (cItem.data.parent_fk == cKategorie) {
-					existingRelations.push(cItem.data.subkategorie_fk)
-				}
-			});
-		
-			myComboStore.removeFilter('rKatSubkat');
-			if (existingRelations.length > 0) {
-				myComboStore.addFilter({
-					id:'rKatSubkat',
-					filterFn:function(record) {
-						if (!existingRelations.includes(record.data.recordid) ) {
-							return true;
-						} else {
-							return false;
-						}
-					}
-				});
-			}
-		}
 	},
 	
 	onCellClicked: function(gridview,markup,cellnumber,rec) {
@@ -242,9 +197,7 @@
 			}
 		}
 	
-		
 		if (gridview.up('grid').name == "veranstaltungen" && cellnumber == 0) {
-			
 			var tmpID = rec.data.recordid;
 			var status = !rec.data.opened;	
 			if (rec.data.parent_fk == null) {
@@ -267,10 +220,8 @@
 				});
 			}
 		}
-		
 	
 		if (gridview.up('grid').name == "tagzuweisung" && cellnumber == 0) {
-			
 			var me = this,
 			status = !rec.data.checked,
 			myView = this.getVeranstaltungen();
@@ -313,10 +264,6 @@
 		
     },
 	
-	onCellDoubleClick: function(gridview,markup,cellnumber,rec) {
-		
-    },
-	
 	loadDetailsOnGridClick: function(el,record) {
 		var myElement = el.up('form').down('tabpanel'),
 		nextGrid = "",
@@ -339,21 +286,6 @@
 					filterValue: filterValue
 				}
 			});
-		}
-	},
-	
-	onCheckCheckbox: function(el,index) {
-		var myGrid = el.up('grid'),
-		myStore = myGrid.getStore(),
-		myRecord = myStore.getAt(index);
-		if (myGrid.name=="boxen") {
-			myGrid.suspendLayout = true;
-			Ext.Array.each(myStore.data.items,function(cItem) {
-				if (cItem.data.recordid != myRecord.data.recordid) {
-					cItem.set('checked',false);
-				}
-			});
-			myGrid.suspendLayout = false;
 		}
 	},
 	
@@ -430,18 +362,6 @@
 				
 	},
 	
-	onSelectDateField: function(el) {
-		
-	},
-	
-	onChangeDateField: function(el) {	
-	
-	},
-	
-	onChangeNumberField: function(el) {	
-		
-	},
-	
 	onKeyUpTextfield: function(el,a,b,c) {
     
 		var myGrid = el.up('grid');
@@ -469,7 +389,6 @@
 				}
 			});
 		
-	
 			if (myStore.data.length == 1) {
 				myGrid.getView().select(0);
 				if (myGrid.hasOwnProperty('agLoadDetailsOnSelect') && myGrid.agLoadDetailsOnSelect!='') {
@@ -533,21 +452,6 @@
 				Ext.Msg.alert('Details','Bitte suchen Sie mittels Texteingabe im Feld "'+el.agFieldLabel+'" bzw. wählen Sie dann eine Option aus der Auswahlliste aus.');
 			}
 			
-		}
-	},
-	onChangeCombobox: function(el,record) {
-		
-	},
-	
-	onSelectCombobox: function(el,record) {
-		this.resetProxy(el);
-		if (el.name == "filterVordefinierterFilter") {
-			el.up('form').down('grid').getStore().load({
-				params: {
-					filterField: el.name,
-					filterValue: el.getValue()
-				}
-			});
 		}
 	},
 	
@@ -704,21 +608,6 @@
 		
 		if (el.name=='btnExport') {
 			this.exportVeranstaltungen();
-		}
-		
-	},
-	
-	showMask: function(element,text,status){
-		myElement = this.application.viewport;
-		myText = "<span>Einen Moment bitte.</span>Der Fragebogen wird geladen.";
-		myStatus = (status == 'show') ? false : true;
-		if (element != "") myElement = element;
-		if (text != "") myText = "<span>Einen Moment bitte.</span>"+text;
-			
-		if (myStatus) {
-			myElement.setLoading(false);
-		} else {
-			myElement.setLoading({msg:myText,baseCls:'ag-mask-msg'});
 		}
 		
 	},
@@ -921,11 +810,9 @@
 		
 		var myVeranstaltungenStore = this.getVeranstaltungenStore(),
 			myView = this.getVeranstaltungen();
-		
 			myVeranstaltungenStore.removeFilter('filterOpened');
 			myVeranstaltungenStore.load({
 				callback: function(response) {
-
 					if (response.length > 0) {
 						myView.down('grid[name=veranstaltungen]').getView().select(0);
 					}
@@ -941,9 +828,7 @@
 					});
 				}
 			});
-		
 		this.application.setMainView(myView);
-		
 	},	
 	
 	actionArtist: function() {
@@ -968,12 +853,6 @@
 		this.getKategorienStore().load();
 		this.getTypStore().load();
 		this.application.setMainView(this.getBasics());
-		
-	},
-	
-	actionTags: function() {
-		this.getTagsStore().load();
-		this.application.setMainView(this.getTags());
 	},
 	
 	actionVeranstalter: function() {
@@ -982,7 +861,6 @@
 		var myTabPanel = myView.down('tabpanel');
 		this.timerActive = false;
 		this.timerTyp = "";
-		
 		this.getVeranstalterStore().load({
 			callback: function(response) {
 				if (response.length > 0) {
@@ -1007,25 +885,7 @@
 							me.timerActive = true;
 							me.timerTyp = 'uploads';
 						}
-						/*
-						myStore.load({
-							params: {
-								veranstaltung_fk:  me.cVeranstaltung,
-								artist_fk:  me.cArtist,
-								veranstalter_fk:  me.cVeranstalter
-							},
-							callback: function(response) {
-								if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
-									setTimeout(function(){
-										myGrid.headerCt.getGridColumns()[0].setWidth(118);
-									}, 250);
-								}
-							},scope: this
-						});
-						*/
 					}
-					
-					
 				}
 			}
 		});
@@ -1035,7 +895,6 @@
 				myView.down('grid[name=veranstalter]').getView().select(0);
 			}
 		}, 500);
-		
 	},
 	
 	exportVeranstaltungen: function(){

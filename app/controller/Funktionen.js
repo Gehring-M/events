@@ -754,15 +754,6 @@
 						if (elem === 'yes') {
 							myMask.show();
 							openedNodes = [];
-							if (nodeType == 2101) {
-								/*
-								Ext.Array.each(myCommonController.getTagsStore().data.items,function(cItem) {
-									if (cItem.data.parent_fk=="" && cItem.data.opened) {
-										openedNodes.push(cItem.data.recordid);
-									}
-								});
-								*/
-							}
 							Ext.Ajax.request({
 								url: '/modules/common/delete.cfc?method=deleteRecord',
 								params: {
@@ -810,7 +801,6 @@
 										
 									}
 										
-									
 									myMask.hide();
 								}
 							});
@@ -929,25 +919,11 @@
 		
 		openedNodes = [];
 		
-		/*
-		if (el.nodeType == 2101) {
-			if (el.agRecord != undefined) {
-				myParams['parent_fk'] = el.agRecord.data.recordid;
-			} else {
-				myParams['parent_fk'] = record.data.parent_fk;
-			}
-			Ext.Array.each(myCommonController.getTagsStore().data.items,function(cItem) {
-				if (cItem.data.parent_fk=="" && cItem.data.opened) {
-					openedNodes.push(cItem.data.recordid);
-				}
-			});
-		}
-		*/
 		
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
 			
-			// mySaveButton.setDisabled(true);
+			mySaveButton.setDisabled(true);
 			
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',

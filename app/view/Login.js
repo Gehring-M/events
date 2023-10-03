@@ -7,7 +7,7 @@
 		align: 'stretch'
 	},
 	width: 500,
-	title: 'Veranstaltungen Schwaz - Intranet Verwaltungsclient',
+	title: 'Kulturbezirk Schwaz - Verwaltungsclient',
 	bodyPadding: '20 20 5 20',
 	frame: true,
 	

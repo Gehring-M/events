@@ -17,7 +17,7 @@
 		
 		// document zum manipulieren von z.b. title-tag
 		this.domDocument = Ext.getDoc();
-		this.domDocument.dom.title = 'Veranstaltungen Schwaz - Intranet Verwaltungsclient';
+		this.domDocument.dom.title = 'Kulturbezirk Schwaz - Verwaltungsclient';
 		
 		this.MainMenu;
 		this.control(
@@ -82,7 +82,7 @@
 					var myTabPanel = this.application.centerRegion.down('tabpanel');
 					myTabPanel.setActiveTab(myTabPanel.child('panel[ref='.concat(myToken.split(":")[1],']')));
 				}
-				this.domDocument.dom.title = 'Veranstaltungen Schwaz - Intranet Verwaltungsclient • ' + Ext.String.capitalize(page[1]) + '-' + Ext.String.capitalize(action[0]) + ((arguments) ? '@'+arguments : '');
+				this.domDocument.dom.title = 'Kulturbezirk Schwaz - Verwaltungsclient • ' + Ext.String.capitalize(page[1]) + '-' + Ext.String.capitalize(action[0]) + ((arguments) ? '@'+arguments : '');
 			}
 		} else {
 			this.application.clearMainView();
