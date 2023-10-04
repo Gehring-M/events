@@ -346,7 +346,7 @@
 				<cfset tmpStruct["recordid"] = qData.id>
 				<cfset tmpStruct["parent_fk"] = null>
 				<cfset tmpStruct["children"] = qSubData.recordcount>
-				<cfset tmpStruct["opened"] = 1>
+				<cfset tmpStruct["opened"] = 0>
 				<cfset tmpStruct["name"] = qData.name>
 				<cfset tmpStruct["parent_name"] = qData.parent_name>
 				<cfset tmpStruct["von"] = qData.von>
@@ -378,7 +378,7 @@
 					<cfset tmpStruct = {}>
 					<cfset tmpStruct["recordid"] = qSubData.id>
 					<cfset tmpStruct["parent_fk"] = qSubData.parent_fk>
-					<cfset tmpStruct["opened"] = 1>
+					<cfset tmpStruct["opened"] = 0>
 					<cfset tmpStruct["children"] = 0>
 					<cfset tmpStruct["name"] = qSubData.name>
 					<cfset tmpStruct["parent_name"] = qSubData.parent_name>

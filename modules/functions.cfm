@@ -47,7 +47,7 @@
 			</cfquery>
 			<cfloop list="#arguments.data.typ_fk#" index="cItem">
 				<cfset myData = StructNew()>
-				<cfset myData['veranstaltung_fk'] = arguments.data.instance>
+				<cfset myData['veranstaltung_fk'] = arguments.instanceid>
 				<cfset myData['typ_fk'] = cItem>
 				<cfset save = saveStructuredContent(nodetype=2115,data=myData)>
 			</cfloop>

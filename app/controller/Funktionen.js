@@ -754,6 +754,13 @@
 						if (elem === 'yes') {
 							myMask.show();
 							openedNodes = [];
+							if (nodeType == 2102) {
+								Ext.Array.each(myCommonController.getVeranstaltungenStore().data.items,function(cItem) {
+									if (cItem.data.parent_fk=="" && cItem.data.opened) {
+										openedNodes.push(cItem.data.recordid);
+									}
+								});
+							}
 							Ext.Ajax.request({
 								url: '/modules/common/delete.cfc?method=deleteRecord',
 								params: {
@@ -766,7 +773,7 @@
 										myReloadStore.reload({
 											callback: function(response) {
 												if (openedNodes.length > 0) {
-													var tmpStore = myCommonController.getTagsStore();
+													var tmpStore = myCommonController.getVeranstaltungenStore();
 													tmpStore.removeFilter('filterOpened');
 													Ext.Array.each(tmpStore.data.items,function(cItem) {
 														if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
@@ -918,13 +925,16 @@
 		}
 		
 		openedNodes = [];
-		
-		
+		if (el.nodeType == 2102) {
+			Ext.Array.each(myCommonController.getVeranstaltungenStore().data.items,function(cItem) {
+				if (cItem.data.parent_fk == null && cItem.data.opened) {
+					openedNodes.push(cItem.data.recordid);
+				}
+			});
+		}
+	
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
-			
-			mySaveButton.setDisabled(true);
-			
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',
 				submitEmptyText: false,
@@ -936,7 +946,7 @@
 						myReloadStore.reload({
 							callback: function(response) {
 								if (openedNodes.length > 0) {
-									var tmpStore = myCommonController.getTagsStore();
+									var tmpStore = myCommonController.getVeranstaltungenStore();
 									tmpStore.removeFilter('filterOpened');
 									Ext.Array.each(tmpStore.data.items,function(cItem) {
 										if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
@@ -946,7 +956,7 @@
 									tmpStore.addFilter({
 										id:'filterOpened',
 										filterFn:function(record) {
-											if (record.data.opened || record.data.parent_fk == "") {
+											if (record.data.opened || record.data.parent_fk == null) {
 												return true;
 											} else {
 												return false;
@@ -962,8 +972,7 @@
 											myRecord = cRec;
 										}
 									});
-									//myCommonController.onDblClickGrid(myGrid.getView(),myRecord);
-									Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
+									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
 								}
 							}
 						});
@@ -974,13 +983,11 @@
 						
 					}
 					myMask.hide();
-					mySaveButton.setDisabled(false);
 				},
 				failure: function(form, action) {
 					var jsonParse = Ext.JSON.decode(action.response.responseText);
 					Ext.Msg.alert('Systemnachricht',jsonParse.message);
 					myMask.hide();
-					mySaveButton.setDisabled(false);
 				}
 			},this );
 
