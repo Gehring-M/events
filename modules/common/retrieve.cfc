@@ -330,7 +330,9 @@
 		<cfquery name="qVATyp" datasource="#getConfig('DSN')#">
 			SELECT * FROM r_veranstaltung_typ 
 		</cfquery>
-	
+		<cfquery name="qVARegion" datasource="#getConfig('DSN')#">
+			SELECT * FROM r_veranstaltung_region 
+		</cfquery>
 					
 		<cfloop query="qData">
 			
@@ -342,6 +344,12 @@
 				<cfquery name="tmpVATyp" dbtype="query">
 					SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qData.id#'
 				</cfquery>
+					<cfquery name="tmpRegion" dbtype="query">
+					SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
+				<cfquery name="RRegion" datasource="#getConfig('DSN')#">
+			SELECT * FROM region WHERE id ='#tmpRegion.region_fk#'
+		</cfquery>
 				<cfset tmpStruct = {}>
 				<cfset tmpStruct["recordid"] = qData.id>
 				<cfset tmpStruct["parent_fk"] = null>
@@ -369,11 +377,16 @@
 				<cfset tmpStruct["uploads"] = qData.uploads>
 				<cfset tmpStruct["optionstyle"]	= "font-weight: bold; border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px;">		
 				<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
+				<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
+				<cfset tmpStruct["region"]	= RRegion.name>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				
 				<cfloop query="qSubData">
 					<cfquery name="tmpVATyp" dbtype="query">
 						SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qSubData.id#'
+					</cfquery>
+					<cfquery name="tmpVARegion" dbtype="query">
+						SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qSubData.id#'
 					</cfquery>
 					<cfset tmpStruct = {}>
 					<cfset tmpStruct["recordid"] = qSubData.id>
@@ -402,6 +415,7 @@
 					<cfset tmpStruct["uploads"] = qSubData.uploads>
 					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
 					<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
+						<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
 
@@ -821,6 +835,70 @@
     
 </cffunction>						
 <!--------------------------------------------------------------------------------->
+<cffunction name="getRegion" access="remote" returnFormat="json" output="no">
+	
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>		
+		<cfset qData = getStructuredContent(nodetype=2118,orderclause="name")>
+		<cfloop query="qData">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>
+<!--------------------------------------------------------------------------------->
+<cffunction name="qRegion" access="remote" returnFormat="json" output="no">
+	
+	<cfargument name="veranstaltung_fk" type="string" required="no" default="">
+	<cfargument name="filterText" type="string" required="no" default="">
+		
+  	<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+   	
+	<cfif isAuth()>	
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT 
+				t.*
+				<cfif arguments.veranstaltung_fk NEQ "">
+				, rvt.id rvtid
+				</cfif>
+			FROM 
+				region t
+				<cfif arguments.veranstaltung_fk NEQ "" AND FALSE>
+					LEFT JOIN r_veranstaltung_tag rvt on rvt.tag_fk = t.id AND rvt.veranstaltung_fk = '#arguments.veranstaltung_fk#'
+				</cfif>
+			WHERE
+				1=1
+				<cfif arguments.filterText NEQ "">
+					AND t.name like '%#arguments.filterText#%'
+				</cfif>
+				
+			ORDER BY 
+				t.name
+		</cfquery>
+		
+		<cfloop query="qData">
+			<cfset tmpStruct = {}>
+			<cfset tmpStruct["recordid"] 	= qData.id>
+			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["checked"] = 1>
+			<cfif arguments.veranstaltung_fk NEQ "" AND qData.rvtid EQ "">	
+				<cfset tmpStruct["checked"] = 0>
+			</cfif>	
+			<cfset ArrayAppend(returnArray, tmpStruct)>
+		</cfloop>
+		
+	</cfif> 
+    <cfreturn returnArray>
+    
+</cffunction>	
 </cfsilent>
 
 </cfcomponent>

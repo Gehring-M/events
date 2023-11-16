@@ -205,6 +205,44 @@
 				}]
 				
 				
+			},{
+				xtype: 'grid',
+				region: 'east',
+				name:'region',
+				flex: 1,
+				split: true,
+				autoScroll: true,
+				title: 'Region',
+				store: 'Region',
+				agShowDeleteButton: true,
+				windowWidth:500,
+				windowHeight:'',
+				maxWindowHeight: 400,
+				windowName:'typ',
+				text:'Region ändern',
+				nodeType:2118,
+				plugins: [{
+					ptype: 'bufferedrenderer',
+					trailingBufferZone: 20, 
+					leadingBufferZone: 50  
+				}],	
+				columns: [{
+					text: 'Name',  dataIndex: 'name',  flex: 1
+				}],
+				tools:[{		
+					xtype: 'button',
+					text: 'Neue Region hinzufügen',
+					height: 24,
+					margin:'0 0 0 10',
+					cls: 'btn-gray',
+					windowWidth:400,
+					windowHeight:'',
+					maxWindowHeight: 400,
+					windowName:'typ',
+					nodeType:2118
+				}]
+				
+				
 			}]
 		});
 		me.callParent(arguments);

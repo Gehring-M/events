@@ -67,5 +67,9 @@
 		name: 'optionstyle'
 	},{ 
 		name: 'typ_fk'
+	},{ 
+		name: 'region_fk'
+	},{ 
+		name: 'region'
 	}]
 });

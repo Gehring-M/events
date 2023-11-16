@@ -660,6 +660,7 @@
 		
 		// Fenster erzeugen
 		var myWindow = this.createWindow(winwidth,winheight,el.text,'windowfields',maxwinheight,nodeType,modus,el,record);
+		console.log(myWindow)
 		
 		if (myTabs[1] != undefined) {
 			
@@ -691,6 +692,7 @@
 				
 				// felder und values des tabs holen
 				var myFields = me.getWindowFields(el.windowName,record.data,modus,cTab,myWindow);
+				console.log(myFields)
 				myWindow.down('fieldcontainer[name=container_'+el.windowName+'_'+cTab+']').add(myFields);
 				
 			});

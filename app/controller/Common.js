@@ -20,7 +20,8 @@
 		'Bilder',
 		'Downloads',
 		'Kategorien',
-		'Typ'
+		'Typ',
+		'Region'
 	],
 	
 	refs: [{
@@ -631,6 +632,7 @@
         }
         
 		if (el.up('grid').hasOwnProperty('windowName') && (!el.up('grid').hasOwnProperty('nameForeignKey') || myStore.data.length > 0)) {
+			console.log("test")
 			if (editierbar) myWindow = this.myFunctions.onOpenWindow(el.up('grid'),record,'');
             if (!editierbar) {
                 myWindow.down('button[name=btnSaveWindow]').setDisabled(true);
@@ -852,6 +854,7 @@
 		this.getTagsStore().load();
 		this.getKategorienStore().load();
 		this.getTypStore().load();
+		this.getRegionStore().load();
 		this.application.setMainView(this.getBasics());
 	},
 	

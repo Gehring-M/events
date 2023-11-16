@@ -75,6 +75,8 @@
 					{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Preis',  dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
+					{ text: 'Region',  dataIndex: 'region', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
+			
 					{
 						xtype: 'componentcolumn', 
 						sortable: false,
