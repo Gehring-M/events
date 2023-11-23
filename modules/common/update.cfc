@@ -89,8 +89,10 @@
 				<cfif StructKeyExists(form,'duplicate') AND form['duplicate'] EQ 1>
 					<cfset instanceid = 0>
 				</cfif>	
-
+				
 				<!--- Daten eintragen --->
+					
+					<cfdump var="#result#">
 				<cfset result["success"] = true>
 				<cfset saveStruct = saveStructuredContent(nodetype=arguments.nodeType,instance=instanceid,data=myData)>
 

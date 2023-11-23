@@ -261,8 +261,10 @@
         <cfset dataStruct['lat'] = JsonAdresse.results[1].geometry.location.lat>
         <cfset dataStruct['lon'] = JsonAdresse.results[1].geometry.location.lng>
 		<cfloop from="1" to="#ArrayLen(JsonAdresse.results[1].address_components)#" index="cRow">
+
+		<!---TODO Maybe remove or fix--->
 			<cfif JsonAdresse.results[1].address_components[cRow]['types'][1] EQ "postal_code">
-				<cfset dataStruct['plz'] = JsonAdresse.results[1].address_components[cRow]['long_name']>
+			<!---	<cfset dataStruct['plz'] = JsonAdresse.results[1].address_components[cRow]['long_name']>--->
 			</cfif>
 		</cfloop>	
         <cfreturn dataStruct>

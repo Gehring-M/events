@@ -898,6 +898,159 @@
 	</cfif> 
     <cfreturn returnArray>
     
+</cffunction>
+<!--------------------------------------------------------------------------------->
+<cffunction name="getVeranstaltungsKalender" access="remote" returnFormat="json" output="no">
+	
+	<cfargument name="veranstaltung_fk" type="string" required="no" default="">
+	<cfargument name="num_entries" type="any" required="no" default="">
+			<cfargument name="filterText" type="string" required="no" default="">
+	<cfargument name="filterVon" type="string" required="no" default="">
+	<cfargument name="filterBis" type="string" required="no" default="">
+		
+	<cfargument name="filterOrt" type="string" required="no" default="">
+	<cfargument name="filterBezirk" type="string" required="no" default="">
+  		<cfset var returnArray = ArrayNew(1)>
+	<cfset var tmpStruct = StructNew()>
+	<cfset var qSearch = QueryNew('id')>
+	<cfset var result = structNew() >
+
+
+		
+		<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">
+			<cfquery name="qSearch" datasource="#getConfig('DSN')#">
+				SELECT *, if(parent_fk is null,id,parent_fk) as finalid 
+				FROM veranstaltung 
+				WHERE 
+					1=1
+					<cfif arguments.filterText NEQ "">
+						AND name like '%#arguments.filterText#%'
+					</cfif>
+					<cfif arguments.filterVon NEQ "">
+						AND von >= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterVon#">
+					</cfif>
+					<cfif arguments.filterBis NEQ "">
+						AND von <= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterBis#">
+					</cfif>
+			</cfquery>
+		</cfif>
+		<cfquery name="qData" datasource="#getConfig('DSN')#">
+			SELECT 
+				v1.*, v2.name parent_name
+			FROM 
+				veranstaltung v1
+				LEFT JOIN veranstaltung v2 on v1.parent_fk = v2.id
+			WHERE
+				1=1
+				<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">	
+					<cfif qSearch.recordcount NEQ 0>
+						AND v1.id IN(#ValueList(qSearch.finalid)#) OR v1.parent_fk IN(#ValueList(qSearch.finalid)#)
+					<cfelse>
+						AND 1=2
+					</cfif>	
+				</cfif>	
+			ORDER BY 
+				v1.von, v1.uhrzeitvon
+		</cfquery>
+			
+		<cfquery name="qVATyp" datasource="#getConfig('DSN')#">
+			SELECT * FROM r_veranstaltung_typ 
+		</cfquery>
+		<cfquery name="qVARegion" datasource="#getConfig('DSN')#">
+			SELECT * FROM r_veranstaltung_region 
+		</cfquery>
+					
+		<cfloop query="qData">
+			
+			<cfif qData.parent_fk EQ "">
+			
+				<cfquery name="qSubData" dbtype="query">
+					SELECT * FROM qData WHERE parent_fk = '#qData.id#'
+				</cfquery>
+				<cfquery name="tmpVATyp" dbtype="query">
+					SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
+					<cfquery name="tmpRegion" dbtype="query">
+					SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
+				<cfquery name="RRegion" datasource="#getConfig('DSN')#">
+			SELECT * FROM region WHERE id ='#tmpRegion.region_fk#'
+		</cfquery>
+				<cfset tmpStruct = {}>
+				<cfset tmpStruct["recordid"] = qData.id>
+				<cfset tmpStruct["parent_fk"] = null>
+				<cfset tmpStruct["children"] = qSubData.recordcount>
+				<cfset tmpStruct["opened"] = 0>
+				<cfset tmpStruct["name"] = qData.name>
+				<cfset tmpStruct["parent_name"] = qData.parent_name>
+				<cfset tmpStruct["von"] = qData.von>
+				<cfset tmpStruct["bis"] = qData.bis>
+				<cfset tmpStruct["uhrzeitvon"] = qData.uhrzeitvon>
+				<cfset tmpStruct["uhrzeitbis"] = qData.uhrzeitbis>
+				<cfset tmpStruct["veranstaltungsort"] = qData.veranstaltungsort>
+				<cfset tmpStruct["adresse"] = qData.adresse>
+				<cfset tmpStruct["plz"] = qData.plz>
+				<cfset tmpStruct["ort"] = qData.ort>
+				<cfset tmpStruct["latitude"] = qData.latitude>
+				<cfset tmpStruct["longitude"] = qData.longitude>
+				<cfset tmpStruct["beschreibung"] = qData.beschreibung>
+				<cfset tmpStruct["preis"] = qData.preis>
+				<cfset tmpStruct["bilder"] = qData.bilder>
+				<cfset tmpStruct["link"] = qData.link>
+				<cfset tmpStruct["uploads"] = qData.uploads>
+				<cfset tmpStruct["optionstyle"]	= "font-weight: bold; border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px;">		
+				<cfset tmpStruct["region"]	= RRegion.name>
+				<cfset ArrayAppend(returnArray, tmpStruct)>
+				
+				<cfloop query="qSubData">
+					<cfquery name="tmpVATyp" dbtype="query">
+						SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qSubData.id#'
+					</cfquery>
+					<cfquery name="tmpVARegion" dbtype="query">
+						SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qSubData.id#'
+					</cfquery>
+
+						<cfquery name="VARRegion" datasource="#getConfig('DSN')#">
+			SELECT * FROM region WHERE id ='#tmpVARegion.region_fk#'
+		</cfquery>
+		<cfquery name="Ctyp" datasource="#getConfig('DSN')#">
+						SELECT * FROM typ WHERE id IN (#valueList(tmpVATyp.typ_fk)#)
+					</cfquery>
+					<cfset tmpStruct = {}>
+					<cfset tmpStruct["recordid"] = qSubData.id>
+					<cfset tmpStruct["parent_fk"] = qSubData.parent_fk>
+					<cfset tmpStruct["opened"] = 0>
+					<cfset tmpStruct["children"] = 0>
+					<cfset tmpStruct["name"] = qSubData.name>
+					<cfset tmpStruct["parent_name"] = qSubData.parent_name>
+					<cfset tmpStruct["von"] = qSubData.von>
+					<cfset tmpStruct["bis"] = qSubData.bis>
+					<cfset tmpStruct["uhrzeitvon"] = qSubData.uhrzeitvon>
+					<cfset tmpStruct["uhrzeitbis"] = qSubData.uhrzeitbis>
+					<cfset tmpStruct["veranstaltungsort"] = qSubData.veranstaltungsort>
+					<cfset tmpStruct["adresse"] = qSubData.adresse>
+					<cfset tmpStruct["plz"] = qSubData.plz>
+					<cfset tmpStruct["ort"] = qSubData.ort>
+					<cfset tmpStruct["latitude"] = qSubData.latitude>
+					<cfset tmpStruct["longitude"] = qSubData.longitude>
+					<cfset tmpStruct["beschreibung"] = qSubData.beschreibung>
+					<cfset tmpStruct["preis"] = qSubData.preis>
+					<cfset tmpStruct["bilder"] = qSubData.bilder>
+					<cfset tmpStruct["link"] = qSubData.link>
+					<cfset tmpStruct["uploads"] = qSubData.uploads>
+					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
+					<cfset tmpStruct["typ"]	= ValueArray (Ctyp.name)>
+					<cfset tmpStruct["region"]	= VARRegion.name>
+					<cfset ArrayAppend(returnArray, tmpStruct)>
+				</cfloop>		
+
+			</cfif>	
+				
+		</cfloop>
+			
+
+	<cfreturn returnArray>
+    
 </cffunction>	
 </cfsilent>
 
