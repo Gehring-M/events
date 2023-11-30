@@ -71,5 +71,9 @@
 		name: 'region_fk'
 	},{ 
 		name: 'region'
+	},{ 
+		name: 'tipp'
+	},{ 
+		name: 'kinder'
 	}]
 });

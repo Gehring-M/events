@@ -106,6 +106,18 @@
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
+		<field>
+			<name>kinder</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>tipp</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
 	</editfields>
 	<uploads>
 		<upload>
