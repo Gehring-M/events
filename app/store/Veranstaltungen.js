@@ -75,5 +75,7 @@
 		name: 'tipp'
 	},{ 
 		name: 'kinder'
+	},{ 
+		name: 'visible'
 	}]
 });

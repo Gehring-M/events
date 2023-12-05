@@ -118,6 +118,12 @@
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
+		<field>
+			<name>visible</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
 	</editfields>
 	<uploads>
 		<upload>

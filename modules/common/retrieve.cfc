@@ -381,6 +381,7 @@
 				<cfset tmpStruct["region"]	= RRegion.name>
 				<cfset tmpStruct["tipp"]	= qData.tipp>
 				<cfset tmpStruct["kinder"]	= qData.kinder>
+				<cfset tmpStruct["visible"]	= qData.visible>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				
 				<cfloop query="qSubData">

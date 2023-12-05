@@ -19,7 +19,7 @@
 		<name>region_fk</name>
 		<type>genericelement</type>
 		<element>region</element>
-		<required>yes</required>
+		<required>no</required>
 		<multiple>no</multiple>
 	</field>
 </editfields> 
