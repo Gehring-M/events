@@ -11,10 +11,10 @@ component rest="true" restpath="/v1" {
         for (var qEventsRow in qEvents) {
             if (qEventsRow.visible eq 1) {
                 var eventTags = [];
-                var qVeranstaltungTag = getStructuredContent(nodetype=2116, whereclause="veranstaltung_fk = #qEventsRow.node_fk#");
+                var qVeranstaltungTag = getStructuredContent(nodetype=2115, whereclause="veranstaltung_fk = #qEventsRow.node_fk#");
                 
                 for (var qVeranstaltungTagRow in qVeranstaltungTag) {
-                    var qTags = getStructuredContent(nodetype=2106, whereclause="id = #qVeranstaltungTagRow.tag_fk#");
+                    var qTags = getStructuredContent(nodetype=2105, whereclause="id = #qVeranstaltungTagRow.typ_fk#");
                     arrayAppend(eventTags, qTags.pagetitle);
                 }
                 
@@ -35,7 +35,7 @@ component rest="true" restpath="/v1" {
                 eventData['adresse'] = qEventsRow.adresse;
                 eventData['kinder'] = qEventsRow.kinder;
                 eventData['tipp'] = qEventsRow.tipp;
-                eventData['tags'] = arrayToList(eventTags, ',');
+                eventData['typs'] = arrayToList(eventTags, ',');
                 
                 arrayAppend(eventArray, eventData);
             }
