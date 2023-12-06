@@ -471,41 +471,36 @@
 
 	onClickButton: function(el,record) {
 		var me = this;
-		
 		if (el.hasOwnProperty('windowName')) {
 			myStore = el.up('form').down('grid').getStore();
 			myGrid = el.up('form').down('grid');
 			if (el.hasOwnProperty('gridNodeTypeForForeignKey')) {
 				myGrid = el.up('form').down('grid[nodeType='+el.gridNodeTypeForForeignKey+']');
 				myStore = myGrid.getStore();
-			}
-			
+			}			
 			if (!el.hasOwnProperty('nameForeignKey') || myStore.data.length > 0) {
 				myWindow = this.myFunctions.onOpenWindow(el,record);
-				myWindow.down('textfield').focus();
-				
+				myWindow.down('textfield').focus();			
 				if (el.hasOwnProperty('agVerknuepfungErstellen')) {
 					myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung);
-				}
-				
+				}		
 				if (el.hasOwnProperty('nameForeignKey')) {
 					myRecord = myGrid.getSelectionModel().getCurrentPosition().record.data,
-					recordID = myRecord.recordid;
-					
+					recordID = myRecord.recordid;					
 					myWindow.down('hiddenfield[name='+ el.nameForeignKey+']').setValue(recordID);
                     isteditierbar = myGrid.getSelectionModel().getCurrentPosition().record.data.editierbar;
                     if (isteditierbar!= undefined && isteditierbar == false) {
                         myWindow.down('button[name=btnSaveWindow]').setDisabled(true);
                         myWindow.down('button[name=btnSaveWindowAndNew]').setDisabled(true);
                         myWindow.down('button[name=btnDeleteWindow]').setDisabled(true);
-                    }
-					
+                    }	
 					if (el.nameForeignKey == 'parent_fk' && el.nodeType == 2102) {
 						myWindow.down('datefield[name=von]').setValue(myRecord.von);
 					}
-					
-				}
-				
+				}	
+			}
+			if(el.nodeType == 2102){
+			myWindow.down("checkbox[name='visible']").setValue(1)
 			}
 		}
 		
