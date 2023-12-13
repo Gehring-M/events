@@ -77,5 +77,7 @@
 		name: 'kinder'
 	},{ 
 		name: 'visible'
+	},{ 
+		name: 'extern'
 	}]
 });

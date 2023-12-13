@@ -382,6 +382,7 @@
 				<cfset tmpStruct["tipp"]	= qData.tipp>
 				<cfset tmpStruct["kinder"]	= qData.kinder>
 				<cfset tmpStruct["visible"]	= qData.visible>
+				<cfset tmpStruct["extern"]	= qData.extern>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				
 				<cfloop query="qSubData">
@@ -419,6 +420,10 @@
 					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
 					<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
 						<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
+						<cfset tmpStruct["extern"]	= qSubData.extern>
+						<cfset tmpStruct["tipp"]	= qSubData.tipp>
+						<cfset tmpStruct["kinder"]	= qSubData.kinder>
+						<cfset tmpStruct["visible"]	= qSubData.visible>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
 

@@ -77,15 +77,17 @@
 					{ text: 'Preis',  dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Region',  dataIndex: 'region', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
 			
-					{
+					/*{
 						xtype: 'componentcolumn', 
 						sortable: false,
 						menuDisabled: true,
 						dataIndex: 'button',
 						width: 190,
 						renderer: function(value,data,record) {
+						
 							if (record.data.parent_fk == null) {
 								return {
+								
 									xtype: 'button',
 									text: 'Neue Subveranstaltung',
 									agRecord: record,
@@ -97,6 +99,70 @@
 								};
 							}
 						}
+						
+					},*/
+					{
+						xtype: 'componentcolumn', 
+						sortable: false,
+						menuDisabled: true,
+						dataIndex: 'test',
+						width: 190,
+						
+						renderer: function(value,data,record) {
+					
+							if (record.data.parent_fk == null) {
+								return {
+									xtype: 'button',
+									text: 'Neue Subveranstaltung',
+									test:record.recordid,
+									agRecord: record,
+									windowWidth:'800px',
+									maxWindowHeight: '90%',
+									nodeType:2102,
+									nameForeignKey:'parent_fk',
+									listeners: {
+										click: function(value,data,record) {
+			
+											let scope=this
+											
+											console.log(this)
+										
+			
+											Ext.Ajax.request({
+										url: '/modules/common/create.cfc?method=duplicateVeranstaltungSub',
+										params: {
+									
+										veranstaltung_fk: this.agRecord.data.recordid,
+								
+										},
+										success: function(response,test,x) {
+								
+											var jsonParse = Ext.JSON.decode(response.responseText);
+											for(let a in jsonParse){
+											if(!jsonParse[a]){
+											delete jsonParse[a]
+											}
+										}
+										console.log(data)
+										jsonParse.recordid=jsonParse.id
+										jsonParse.uhrzeitvon=jsonParse.uhrzeitvon?.split("")[1]
+										jsonParse.uhrzeitbis=jsonParse.uhrzeitbis?.split("")[1]
+										myController.myFunctions.onOpenWindow(scope.up('grid'),{data:jsonParse},'')
+										scope.up('grid').store.reload()
+										
+									
+			
+										return jsonParse
+						
+									}
+							
+										})
+									}
+								}
+								};
+							}
+						},
+			
 						
 					},
 					

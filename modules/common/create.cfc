@@ -54,5 +54,33 @@
 	<cfreturn result>
 </cffunction>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="duplicateVeranstaltungSub" access="remote" returnFormat="json">
+	<cfargument name="veranstaltung_fk" type="numeric" required="yes">
+	<cfset var result		= {}>
+    <cfset result["success"] = false>
+	<cfif isAuth()>
+		<cfset myData = StructNew()>
+		<cfset myData['veranstaltung_fk'] = arguments.veranstaltung_fk>
+		<cfset todupe=getStructuredContent(nodetype=2102, instanceids=myData['veranstaltung_fk'])>
+		<cfset to=QueryGetRow(todupe, 1)>
+		<cfset StructDelete(to,"node_fk")>
+		<cfset StructDelete(to,"id")>
+		<cfset to["parent_fk"]=myData['veranstaltung_fk']>
+		<cfset to["veranstaltung_fk"]="">
+	<cfset save = saveStructuredContent(nodetype=2102,data=to)>
+
+	<cfset to["node_fk"]=save.nodeid>
+	<cfset to["id"]=save.nodeid>
+
+	<cfset typ=getStructuredContent(nodetype=2115, whereclause="veranstaltung_fk in (#myData['veranstaltung_fk']#)")>
+	<cfif typ.recordCount gt 0>
+	<cfset to["typ_fk"]=QueryGetRow(typ,1).typ_fk>
+	<cfelse>
+		<cfset to["typ_fk"]=1>
+</cfif>
+	</cfif>
+	<cfreturn to>
+</cffunction>
+<!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 </cfsilent>
 </cfcomponent>

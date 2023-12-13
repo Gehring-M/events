@@ -124,6 +124,12 @@
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
+		<field>
+			<name>extern</name>
+			<type>integer</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
 	</editfields>
 	<uploads>
 		<upload>
