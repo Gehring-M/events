@@ -209,4 +209,9 @@ div[id^=messagebox].x-form-display-field{
 	line-height: 20px;
 }
 
-
+.Cwp >td{
+	background-color: rgb(196, 0, 0) !important;
+}
+.Cwp:hover>td{
+	background-color: rgb(255, 0, 0) !important;
+}

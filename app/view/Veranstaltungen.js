@@ -30,6 +30,12 @@
 				agShowDuplicateButton: true,
 				nodeType:2102,
 				viewConfig: {
+					getRowClass: function (record, rowIndex, rowParams, store) {
+						return ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]
+						//you can also use
+						//record.data.isChecked == 1 ? 'child-row' : 'adult-row';
+			
+					},
             		enableTextSelection: true
 				},
 				plugins: [{
@@ -54,9 +60,12 @@
 					{ xtype:'checkcolumn', name:'checked', dataIndex: 'checked', width: 38, hideable: false, menuDisabled:true, resizable: false, sortable: false, menuDisabled: true, hidden: true }, 
 					{ text: 'Titel der Veranstaltung',  dataIndex: 'name', flex: 2, menuDisabled: true, sortable: false,
 						renderer: function(value,data,record) {
-							data.tdCls ='tdRootTag';
+							let color = ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]
+
+							data.tdCls ='tdRootTag '+color;
+							data.cls=color
 							if (record.data.parent_fk != null) {
-								data.tdCls ='tdSubTag';
+								data.tdCls ='tdSubTag '+color;
 								return value;
 							} else {
 								val = value;
@@ -125,7 +134,7 @@
 			
 											let scope=this
 											
-											console.log(this)
+										
 										
 			
 											Ext.Ajax.request({
@@ -143,7 +152,6 @@
 											delete jsonParse[a]
 											}
 										}
-										console.log(data)
 										jsonParse.recordid=jsonParse.id
 										jsonParse.uhrzeitvon=jsonParse.uhrzeitvon?.split("")[1]
 										jsonParse.uhrzeitbis=jsonParse.uhrzeitbis?.split("")[1]
