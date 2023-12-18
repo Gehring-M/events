@@ -2,7 +2,8 @@
 <cfinclude template="../functions.cfm" />
 <cfinclude template="../../ameisen/functions.cfm" />
 <cffunction  name="get" access="remote"  returnformat="JSON">
-    <cfset data=getStructuredContent(nodeType=2102, whereclause="veranstaltung.parent_fk is null")>
+    <cfif isAdmin() or true>
+    <cfset data=getStructuredContent(nodeType=2102, whereclause="veranstaltung.parent_fk is null AND veranstaltung.extern=1 AND visible=1")>
     <cfset outout=ArrayNew()>
     <cfloop query="data">
         <cfset out=structNew()>
@@ -34,11 +35,13 @@
         <cfset arrayAppend(outout, out)>
     </cfloop>
     <cfreturn outout>
+</cfif>
 </cffunction>
 
 
 <cffunction  name="_get"   returnformat="JSON">
     <cfargument  name="id">
+    <cfif isAdmin()  or true>
     <cfset data1=getStructuredContent(nodeType=2102, whereclause="veranstaltung.parent_fk = #id#")>
     <cfset outout1=ArrayNew()>
     <cfloop query="data1">
@@ -71,5 +74,6 @@
         <cfset arrayAppend(outout1, out1)>
     </cfloop>
     <cfreturn outout1>
+</cfif>
 </cffunction>
 </cfcomponent>

@@ -31,7 +31,7 @@
 				nodeType:2102,
 				viewConfig: {
 					getRowClass: function (record, rowIndex, rowParams, store) {
-						return ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]
+						return record.data.visible!==1 ? ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]: ["Cintern", "Cwpl" ,"Cextern"][record.data.extern-1]
 						//you can also use
 						//record.data.isChecked == 1 ? 'child-row' : 'adult-row';
 			
@@ -60,12 +60,12 @@
 					{ xtype:'checkcolumn', name:'checked', dataIndex: 'checked', width: 38, hideable: false, menuDisabled:true, resizable: false, sortable: false, menuDisabled: true, hidden: true }, 
 					{ text: 'Titel der Veranstaltung',  dataIndex: 'name', flex: 2, menuDisabled: true, sortable: false,
 						renderer: function(value,data,record) {
-							let color = ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]
+						
 
-							data.tdCls ='tdRootTag '+color;
-							data.cls=color
+							data.tdCls ='tdRootTag'
+							
 							if (record.data.parent_fk != null) {
-								data.tdCls ='tdSubTag '+color;
+								data.tdCls ='tdSubTag'
 								return value;
 							} else {
 								val = value;

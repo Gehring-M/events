@@ -92,7 +92,7 @@
 				
 				<!--- Daten eintragen --->
 					
-					<cfdump var="#result#">
+				
 				<cfset result["success"] = true>
 				<cfset saveStruct = saveStructuredContent(nodetype=arguments.nodeType,instance=instanceid,data=myData)>
 
