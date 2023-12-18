@@ -42,18 +42,22 @@
 				<cfset myData['ort_fk'] = qPLZ.id>
 			</cfif>	
 			<cfset save = saveStructuredContent(nodetype=2102,instance=arguments.instanceid,data=myData)>	
+			<cfif NOT StructKeyExists(data,'duplicate') OR data.duplicate eq 0> 
 			<cfquery name="qUpdate" datasource="#getConfig('DSN')#">
 				DELETE FROM r_veranstaltung_typ WHERE veranstaltung_fk = "#arguments.data.instance#"
 			</cfquery>
+			</cfif>
 			<cfloop list="#arguments.data.typ_fk#" index="cItem">
 				<cfset myData = StructNew()>
 				<cfset myData['veranstaltung_fk'] = arguments.instanceid>
 				<cfset myData['typ_fk'] = cItem>
 				<cfset save = saveStructuredContent(nodetype=2115,data=myData)>
 			</cfloop>
+			<cfif NOT StructKeyExists(data,'duplicate') OR data.duplicate eq 0> 
 			<cfquery name="qUpdate" datasource="#getConfig('DSN')#">
 				DELETE FROM r_veranstaltung_region WHERE veranstaltung_fk = "#arguments.data.instance#"
 			</cfquery>
+			</cfif>
 					<cfset myData = StructNew()>
 				<cfset myData['veranstaltung_fk'] = arguments.instanceid>
 				<cfset myData['region_fk'] = arguments.data.region_fk>

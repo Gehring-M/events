@@ -71,13 +71,17 @@
 
 	<cfset to["node_fk"]=save.nodeid>
 	<cfset to["id"]=save.nodeid>
-
+		<cfset out = structNew()>
 	<cfset typ=getStructuredContent(nodetype=2115, whereclause="veranstaltung_fk in (#myData['veranstaltung_fk']#)")>
 	<cfif typ.recordCount gt 0>
-	<cfset to["typ_fk"]=QueryGetRow(typ,1).typ_fk>
+		<cfset to["typ_fk"]=QueryGetRow(typ,1).typ_fk>
+	<cfset out["typ_fk"]=QueryGetRow(typ,1).typ_fk>
 	<cfelse>
+		<cfset out["typ_fk"]=1>
 		<cfset to["typ_fk"]=1>
 </cfif>
+<cfset out["veranstaltung_fk"]=myData['veranstaltung_fk']>
+<cfset save = saveStructuredContent(nodetype=2115,data=out)>
 	</cfif>
 	<cfreturn to>
 </cffunction>
