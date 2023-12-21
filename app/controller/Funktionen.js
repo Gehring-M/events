@@ -597,19 +597,26 @@
 		}
 		if (el.xtype=="button") {
 			var myGrid = el.up('grid');
+		
 			var myReloadStore = myGrid.getStore();
 		}
+
+		console.log(record?.data?.children,"test")
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
 		
 		Ext.each(myFieldStore.data.items,function(cItem,index){
+			
 			if (cItem.data.windowname == el.windowName) {
 				if (cItem.data.tab!="" && myTabs.indexOf(cItem.data.tab)==-1) {
 					myTabs.push(cItem.data.tab);
 				}
+				
 				if (cItem.data.xtype=="combobox" && cItem.data.valuefield!="") {
 					myComboboxen.push(cItem.data.name);
 				}
+				
+				
 			}
 		});
 		
@@ -660,7 +667,7 @@
 		
 		// Fenster erzeugen
 		var myWindow = this.createWindow(winwidth,winheight,el.text,'windowfields',maxwinheight,nodeType,modus,el,record);
-		console.log(myWindow)
+		
 		
 		if (myTabs[1] != undefined) {
 			
@@ -692,7 +699,8 @@
 				
 				// felder und values des tabs holen
 				var myFields = me.getWindowFields(el.windowName,record.data,modus,cTab,myWindow);
-				console.log(myFields)
+				//console.log(myFields)
+
 				myWindow.down('fieldcontainer[name=container_'+el.windowName+'_'+cTab+']').add(myFields);
 				
 			});
@@ -818,8 +826,13 @@
 				}
 			}
 		});
-		
-		
+		if(record?.data?.children!==undefined){
+		myWindow.down("[xtype=combobox]").up().setVisible(record?.data?.children!==undefined && record.data.children<1)
+		}
+	
+		if(record?.data?.children!==undefined){
+			myWindow.down("[xtype=combobox]").up().setVisible(record?.data?.children!==undefined && record.data.children<1)
+		}
 		// Fenster anzeigen
 		myWindow.show();
 		
@@ -859,7 +872,8 @@
 		}
 		// objekt für nicht ausgefüllte pflichtfelder erstellen
 		myMandatoryFields = [];
-
+	
+		let vmode = window.location.href.split("#!")[1]==="/common/Veranstalter"
 		// alle zu übermittelnden felder in params schreibem
 		Ext.each(myFields, function(element,index) {
 			
@@ -945,6 +959,32 @@
 				success: function(form,action) {
 					var jsonParse = Ext.JSON.decode(action.response.responseText);
 					if (jsonParse.success) {
+						let vid = jsonParse.recordid
+						if(vmode){
+						Ext.Ajax.request({
+							url: '/modules/common/create.cfc?method=addVeranstalterToVeranstaltung',
+							params: {
+								veranstaltung_fk: vid,
+								veranstalter_fk: myWindow.down("[xtype=hiddenfield]").getValue()
+							},
+							success: function(response) {
+								var jsonParse = Ext.JSON.decode(response.responseText);
+								if (!jsonParse['success']) {
+									Ext.Msg.alert('Systemnachricht','Bitte melden Sie sich an.');
+								} else {
+									myStore.load({
+										params: {
+											veranstaltung_fk:  me.cVeranstaltung,
+										}
+									});
+								}
+								el.previousSibling().setValue();
+							}
+						
+						});
+					}
+				}
+			
 						myReloadStore.reload({
 							callback: function(response) {
 								if (openedNodes.length > 0) {
@@ -983,7 +1023,7 @@
 							myWindow.close();
 						} 
 						
-					}
+					
 					myMask.hide();
 				},
 				failure: function(form, action) {

@@ -38,6 +38,46 @@
 					leadingBufferZone: 50  
 				}],	
 				columns: [
+					{
+						xtype: 'componentcolumn', 
+						sortable: false,
+						menuDisabled: true,
+						dataIndex: 'id',
+						width: 190,
+						
+						renderer: function(value1,data1,record1) {
+					
+							
+								return {
+								
+										xtype: 'button',
+										text: 'Neue Veranstaltung',
+										width: 200,
+										height: 24,
+										margin:'0 0 0 10',
+										cls: 'btn-gray',
+										windowWidth:'800px',
+										maxWindowHeight: '90%',
+										windowName:'veranstaltungen',
+										nodeType:2102,
+										listeners:{
+										click:function(value,data,record){
+											setTimeout(()=>console.log(Ext.ComponentQuery.query('[xtype=window]')[0].down("[xtype=hiddenfield]").setValue(record1.data.recordid)), 500)
+											
+										}
+									
+								
+									
+									}
+								
+									
+								
+								
+							}
+						},
+			
+						
+					},
 					{ text: 'Name',  dataIndex: 'name', flex: 1, },
 					{ text: 'Ansprechperson',  dataIndex: 'ansprechperson', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },

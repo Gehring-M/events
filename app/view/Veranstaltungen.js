@@ -31,12 +31,13 @@
 				nodeType:2102,
 				viewConfig: {
 					getRowClass: function (record, rowIndex, rowParams, store) {
-						return record.data.visible!==1 ? ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]: ["Cintern", "Cwpl" ,"Cextern"][record.data.extern-1]
+						return record.data.visible!==1 ? ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]: ["Cintern", "Cwpl" ,"Cextern"][record.data.extern-1] 
+
 						//you can also use
 						//record.data.isChecked == 1 ? 'child-row' : 'adult-row';
 			
 					},
-            		enableTextSelection: true
+				enableTextSelection: true,
 				},
 				plugins: [{
 					ptype: 'bufferedrenderer',
@@ -897,7 +898,9 @@
 				*/	
 			}]
 		});
+
 		me.callParent(arguments);
+	
 	}
 
 });

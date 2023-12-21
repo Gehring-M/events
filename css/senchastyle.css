@@ -210,8 +210,20 @@ div[id^=messagebox].x-form-display-field{
 }
 
 .Cwp >td{
-	background-color: rgb(196, 0, 0) !important;
+	border-color: #cc0000 !important;
+	background-color:#cc000033 !important;
 }
 .Cwp:hover>td{
-	background-color: rgb(255, 0, 0) !important;
+	background-color: #cc000088 !important;
+}
+.Cwpl >td{
+	border-color: #ffc107 !important;
+	background-color: #ffc10750!important;
+}
+.Cwpl:hover>td{
+	
+	background-color: #ffd000a0!important;
+}
+.x-datepicker-month  .x-btn-split-right{
+	background-image: url("/ext-4.2.1.883/resources/ext-theme-neptune/images/datepicker/month-arrow.png");
 }
