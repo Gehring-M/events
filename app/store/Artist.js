@@ -24,6 +24,8 @@
 	},{ 
 		name: 'name'	
 	},{ 
+		name: 'vorname'	
+	},{ 
 		name: 'ansprechperson'	
 	},{ 
 		name: 'adresse'

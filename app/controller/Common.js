@@ -563,7 +563,7 @@
 				});
 			}
 		}
-		if (el.name=='addArtist') {
+		if (el.name=='addArtist' || el.name=='addNewArtist') {
 			if (this.cVeranstaltung == 0 || el.previousSibling().getValue() == null) {
 				Ext.Msg.alert('Systemnachricht','Bitte wählen Sie eine Veranstaltung sowie einen Künstler aus.');
 			} else {
@@ -627,7 +627,7 @@
         }
         
 		if (el.up('grid').hasOwnProperty('windowName') && (!el.up('grid').hasOwnProperty('nameForeignKey') || myStore.data.length > 0)) {
-			console.log("test")
+	
 			if (editierbar) myWindow = this.myFunctions.onOpenWindow(el.up('grid'),record,'');
             if (!editierbar) {
                 myWindow.down('button[name=btnSaveWindow]').setDisabled(true);
@@ -754,7 +754,7 @@
 	},
 	
 	loadDetailsOnGridSelect: function(el,record) {
-		
+
 		var myGrid = el.up('grid'),
 			loadGridName = myGrid.agLoadDetailsOnSelect,
 			loadGrid = el.up('grid').up('container').down('grid[name='+loadGridName+']'),

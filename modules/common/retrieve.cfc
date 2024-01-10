@@ -5,7 +5,6 @@
 <cfsilent>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <cffunction name="getMainMenu" access="remote" returnFormat="json">
-
 	<!--- Return array erstellen --->
 	<cfset var mainmenu		= ArrayNew(1)>
 	<cfset var submenu		= ArrayNew(1)>
@@ -14,25 +13,18 @@
 	<cfset var subitem		= StructNew()>
 	<cfset var subsubitem	= StructNew()>
 	<cfset var result		= StructNew()>
-
 	<!--- Menü auslesen --->
 	<cfset qItems = getMenuItems(getNodeId(resolveVPath('verwaltungsclient')))>
-		
 	<!--- Handlernamen auslesen --->
 	<cfset qAdditionalInfos = getStructuredContent(templateid=2,whereclause="lhandlername.data!=''")>
-	
 	<!--- zum return array hinzufügen --->
 	<cfloop query="qItems">
-
 		<!--- Hauptmenü schreiben --->
 		<cfset item = StructNew()>
 		<cfset item["pagetitle"] = qItems.pagetitle>
 		<cfset item["node_fk"] = qItems.node_fk>
-
 		<!--- Handlername suchen --->
-
 		<cfset arraypos = ListFind(ValueList(qAdditionalInfos.id), ToString(qItems.id))>
-
 		<cfif arraypos gte 1>
 			<cfset item["handler"] = qAdditionalInfos['handlername'][arraypos]>
 			<cfset item["controller"] = qAdditionalInfos['controller'][arraypos]>
@@ -466,6 +458,7 @@
 			<cfset tmpStruct["recordid"] 	= qData.id>
 			<cfset tmpStruct["user_fk"] 	= qData.user_fk>
 			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["vorname"] 	= qData.vorname>
 			<cfset tmpStruct["ansprechperson"] 	= qData.ansprechperson>
 			<cfset tmpStruct["adresse"] 	= qData.adresse>
 			<cfset tmpStruct["plz"] 	= qData.plz>
@@ -590,7 +583,7 @@
 		
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
-				rva.*, a.name
+				rva.*, a.name, a.vorname
 			FROM 
 				r_veranstaltung_artist rva
 				LEFT JOIN artist a on rva.artist_fk = a.id
@@ -607,6 +600,7 @@
 			<cfset tmpStruct["artist_fk"] 	= qData.artist_fk>
 			<cfset tmpStruct["ort_fk"] 	= qData.ort_fk>
 			<cfset tmpStruct["name"] 	= qData.name>
+			<cfset tmpStruct["vorname"] 	= qData.vorname>
 			<cfset tmpStruct["uhrzeitvon"] 	= qData.uhrzeitvon>
 			<cfset tmpStruct["uhrzeitbis"] 	= qData.uhrzeitbis>
 			<cfset tmpStruct["veranstaltungsort"] 	= qData.veranstaltungsort>

@@ -43,7 +43,7 @@
 	onKeyUp: function(el,event){
 	
 		if (event.getCharCode() == 13) {
-		//	console.log(el);
+	
 		}
 		
 		
@@ -91,6 +91,7 @@
 				name: 'gelesen',
 				hidden: (modus!=undefined && modus!='') ? false : true,
 				handler: function() {
+			
 					myWindow.close();
 				}
 			},{
@@ -102,6 +103,7 @@
 				cls: 'btn-orange',
 				hidden: (modus!=undefined && modus!='' || ( el.hasOwnProperty('agShowAbortButton')&& !el.agShowAbortButton) ) ? true : false,
 				handler: function() {
+	
 					myWindow.close();
 				}
 			},{
@@ -147,7 +149,7 @@
 				}
 			}]
 		});
-		
+		myWindow.on("close",()=>rmChildFilter())
 		return myWindow;
 		
 	},
@@ -170,6 +172,7 @@
 						if (cItem.data.mehrfachauswahl=='ja' && rec != undefined && rec[cItem.data.name]!="" && rec[cItem.data.name].toString().indexOf(",")!=-1) {
 							myRec=[];
 							Ext.each(rec[cItem.data.name].split(","), function(cid) {
+						
 								if (cItem.data.mehrfachauswahl_convert==1) {
 									myRec.push(parseInt(cid));
 								} else {
@@ -177,22 +180,29 @@
 								}
 							});
 						} else if (rec != undefined) {
+						
 							if (rec[cItem.data.name]!="" && cItem.data.mehrfachauswahl_convert==1) {
 								myRec = parseInt(rec[cItem.data.name]);   
 							} else {
 								myRec = rec[cItem.data.name];
 							}
 						}
+				
 						
+						cItem.data.store==="Veranstaltungen" && Ext.data.StoreManager.lookup("Veranstaltungen").addFilter({
+							id:'isChild',
+							filterFn:(record) =>record.data.parent_fk ===null});
 						myFields.push({
 							xtype: 'fieldcontainer',
 							layout: 'hbox',
 							name: cItem.data.name,
+							
 							labelWidth: myWindow.agLabelWidth,
 							fieldLabel: cItem.data.fieldlabel,
 							disabled: (rec != undefined && rec[cItem.data.name+'_disabled'] != undefined && rec[cItem.data.name+'_disabled'] == true) ? true : false,
 							margin: '0 5 5 5',
 							items: [{
+								anyMatch:true,
 								xtype: cItem.data.xtype,
 								agFieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
 								name:cItem.data.name,
@@ -601,7 +611,7 @@
 			var myReloadStore = myGrid.getStore();
 		}
 
-		console.log(record?.data?.children,"test")
+	
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
 		
@@ -722,6 +732,7 @@
 		
 		// überprüfen, ob comboboxen mit relationen auf andere tabellen auch über die nötigen informationen verfügen
 		Ext.each(myComboboxen,function(cItem,index){
+			console.log(myWindow.down('combobox[name='+cItem+']'))
 			myField = myWindow.down('combobox[name='+cItem+']');
 			myFieldStore = myField.getStore();
 			myFieldValue = myField.getValue();
@@ -741,7 +752,9 @@
 		mySaveButton.on({
 			click: {
 				fn: function () {
+		
 					this.onSaveEntry(myMask,myWindow,el,record,myFields,mySaveButton);
+				
 				},
 				scope: this
 			}
@@ -750,6 +763,7 @@
 		mySaveAndNewButton.on({
 			click: {
 				fn: function () {
+	
 					this.onSaveEntry(myMask,myWindow,el,record,myFields,mySaveAndNewButton);
 				},
 				scope: this
@@ -808,6 +822,7 @@
 												}
 											}
 										});
+									
 										myWindow.close();
 										
 									} else {
@@ -1020,6 +1035,7 @@
 						});
 						if (!mySaveButton.createNewEntry) {
 							Ext.Msg.alert('Systemnachricht',jsonParse.message);
+		
 							myWindow.close();
 						} 
 						
@@ -1088,3 +1104,6 @@
 	}
 
 });
+const rmChildFilter = () => {			Ext.data.StoreManager.lookup("Veranstaltungen").removeFilter("isChild")
+Ext.data.StoreManager.lookup("Veranstaltungen").reload()
+}

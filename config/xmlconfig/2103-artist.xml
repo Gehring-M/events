@@ -21,6 +21,11 @@
 		<type>textshort</type>
 		<required>yes</required>
 	</field>
+		<field>
+		<name>vorname</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
 	<field>
 		<name>ansprechperson</name> 
 		<type>textshort</type>

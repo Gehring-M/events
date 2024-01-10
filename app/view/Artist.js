@@ -39,6 +39,7 @@
 				}],	
 				columns: [
 					{ text: 'Name',  dataIndex: 'name', flex: 1, },
+					{ text: 'Vorname',  dataIndex: 'vorname', flex: 1, },
 					{ text: 'Ansprechperson',  dataIndex: 'ansprechperson', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
 					{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },

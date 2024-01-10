@@ -62,7 +62,7 @@
 										nodeType:2102,
 										listeners:{
 										click:function(value,data,record){
-											setTimeout(()=>console.log(Ext.ComponentQuery.query('[xtype=window]')[0].down("[xtype=hiddenfield]").setValue(record1.data.recordid)), 500)
+											setTimeout(()=>Ext.ComponentQuery.query('[xtype=window]')[0].down("[xtype=hiddenfield]").setValue(record1.data.recordid), 500)
 											
 										}
 									

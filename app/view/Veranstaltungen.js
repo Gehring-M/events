@@ -170,6 +170,53 @@
 								}
 								};
 							}
+							else {
+								return {
+									xtype: 'button',
+									text: 'Zu Hauptveranstaltung',
+									test:record.recordid,
+									agRecord: record,
+									windowWidth:'800px',
+									maxWindowHeight: '90%',
+									nodeType:2102,
+									nameForeignKey:'parent_fk',
+									listeners: {
+										click: function(value,data,record) {
+			
+											let scope=this
+											
+										
+										
+			
+											Ext.Ajax.request({
+										url: '/modules/common/update.cfc?method=removeparent',
+										params: {
+									
+										id: this.agRecord.data.recordid,
+								
+										},
+										success: function(response,test,x) {
+								
+											var jsonParse = Ext.JSON.decode(response.responseText);
+											for(let a in jsonParse){
+											if(!jsonParse[a]){
+											delete jsonParse[a]
+											}
+										}
+	
+										scope.up('grid').store.reload()
+										
+									
+			
+										return jsonParse
+						
+									}
+							
+										})
+									}
+								}
+								};
+							}
 						},
 			
 						
@@ -409,7 +456,7 @@
 					},
 					columns: [
 						{ text: 'Künstler',  dataIndex: 'name', flex: 1, },
-						
+						{ text: 'Vorname',  dataIndex: 'vorname', flex: 1, },
 						{ text: 'Uhrzeit von',  dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
 						{ text: 'Uhrzeit bis',  dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
 						{ text: 'Veranstaltungsort',  dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },

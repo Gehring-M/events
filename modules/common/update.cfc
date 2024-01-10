@@ -117,6 +117,21 @@
     </cfif>
    	<cfreturn result>
 </cffunction>
+<cffunction  name="removeParent" access="remote" returnFormat="json" output="no">
+	<cfargument  name="id" required="yes" type="numeric">
+	<cfif isAuth()>
+	<cfset out=QueryGetRow(getStructuredContent(nodetype=2102, instanceids=id),1)>
+	<cfset region=QueryGetRow(getStructuredContent(nodetype=2117, whereclause="veranstaltung_fk = #out['parent_fk']#"),1)>
+	<cfset out["parent_fk"]=null>
+	<cfset region["veranstaltung_fk"]=id>
+	<cfset region["node_fk"]=null>
+	<cfset region["id"]=null>
+	<cfset saveStructuredContent(nodetype=2102, data=out, instance=id)>
+
+
+	<cfreturn region>
+	</cfif>
+</cffunction>
 </cfsilent>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 </cfcomponent>

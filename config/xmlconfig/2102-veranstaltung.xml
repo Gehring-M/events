@@ -127,7 +127,13 @@
 		<field>
 			<name>extern</name>
 			<type>integer</type>
-			<required>yes</required>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>remote_fk</name>
+			<type>integer</type>
+			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
 	</editfields>
