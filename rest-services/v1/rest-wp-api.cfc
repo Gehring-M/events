@@ -4,7 +4,7 @@ component rest="true" restpath="/v1" {
     url['neverdebug'] = "yes";
 
     remote string function regiosz() httpmethod="get" {
-        var qEvents = getStructuredContent(2102);
+        var qEvents = getStructuredContent(nodetype=2102,orderclause="von asc");
         var eventArray = [];
         var eventData = {};
 
@@ -35,7 +35,7 @@ component rest="true" restpath="/v1" {
                 eventData['adresse'] = qEventsRow.adresse;
                 eventData['kinder'] = qEventsRow.kinder;
                 eventData['tipp'] = qEventsRow.tipp;
-                eventData['typs'] = arrayToList(eventTags, ',');
+                eventData['typs'] = arrayToList(eventTags, ', ');
                 
                 arrayAppend(eventArray, eventData);
             }
