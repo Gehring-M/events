@@ -3,7 +3,7 @@ component rest="true" restpath="/v1" {
     include "../../ameisen/functions.cfm";
     url['neverdebug'] = "yes";
 
-    remote string function regiosz() httpmethod="get" {
+    remote  function regiosz() httpmethod="get" {
         var qEvents = getStructuredContent(nodetype=2102,orderclause="von asc");
         var eventArray = [];
         var eventData = {};
@@ -42,6 +42,6 @@ component rest="true" restpath="/v1" {
         }
 
         var jsonString = serializeJSON(eventArray);
-        return jsonString;
+        return eventArray;
     }
 }
