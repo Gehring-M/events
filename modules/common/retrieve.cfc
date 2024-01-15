@@ -1011,9 +1011,11 @@
 					<cfquery name="VARRegion" datasource="#getConfig('DSN')#">
 						SELECT * FROM region WHERE id ='#tmpVARegion.region_fk#'
 					</cfquery>
+					<cfif listlen(valueList(tmpVATyp.typ_fk))>
 					<cfquery name="Ctyp" datasource="#getConfig('DSN')#">
 						SELECT * FROM typ WHERE id IN (#valueList(tmpVATyp.typ_fk)#)
 					</cfquery>
+					</cfif>
 					<cfset tmpStruct = {}>
 					<cfset tmpStruct["recordid"] = qSubData.id>
 					<cfset tmpStruct["parent_fk"] = qSubData.parent_fk>
@@ -1037,7 +1039,9 @@
 					<cfset tmpStruct["link"] = qSubData.link>
 					<cfset tmpStruct["uploads"] = qSubData.uploads>
 					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
+					<cfif isDefined("Ctyp")>
 					<cfset tmpStruct["typ"]	= ValueArray (Ctyp.name)>
+					</cfif>
 					<cfset tmpStruct["region"]	= VARRegion.name>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
