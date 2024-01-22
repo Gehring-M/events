@@ -11,8 +11,14 @@
         <cfset form["latitude"]=0>
         <cfset kid=0>
         <cfif structKeyExists(form,"kname") AND not form["kname"] eq "" AND structKeyExists(form,"kmail") AND not form["kmail"] eq "" AND structKeyExists(form,"accepted_dp") AND not form["accepted_dp"] eq "" AND structKeyExists(form,"accepted_ds") AND not form["accepted_ds"] eq "">
-            <cfset kid= saveStructuredContent(nodeType=2120, data={"name"=form["kname"], "mail"=form["kmail"], "accepted_dp"=form["accepted_dp"], "accepted_ds"=form["accepted_ds"] })>
-        </cfelse>
+            <!---check if email already exists--->
+            <cfset check = getStructuredContent(nodeType=2120, whereclause="mail=#form["kmail"]#")>
+            <cfif check.recordCount gt 0>
+                <cfset kid=QueryGetRow(check,1)["id"]>
+            <cfelse>
+                <cfset kid= saveStructuredContent(nodeType=2120, data={"name"=form["kname"], "mail"=form["kmail"], "accepted_dp"=form["accepted_dp"], "accepted_ds"=form["accepted_ds"] })>
+            </cfif>
+            </cfelse>
         <cfreturn "error">
     </cfif>
 
