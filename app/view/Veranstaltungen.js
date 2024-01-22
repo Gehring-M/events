@@ -804,7 +804,6 @@
 						windowWidth: 600,
 						windowHeight: '',
 						maxWindowHeight: 500,
-						windowName: 'kontakt',
 						text: 'Kontakte ansehen',
 						nodeType: 2120,
 						agShowDeleteButton: false,
@@ -817,7 +816,7 @@
 							{ text: 'Name', dataIndex: 'name', align: 'center', width: 118 },
 							{ text: 'Email', dataIndex: 'mail', width: 150 },
 							{ text: 'Datenschutzhinweise', dataIndex: 'accepted_ds', flex: 1 },
-							{ text: 'Datenverarbeitung', dataIndex: 'accepted_dv', flex: 1 },
+							{ text: 'Datenverarbeitung', dataIndex: 'accepted_dp', flex: 1 },
 						],
 					}
 					
