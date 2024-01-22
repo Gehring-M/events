@@ -15,6 +15,7 @@
 		'Artist',
 		'Veranstalter',
 		'RVeranstaltungArtist',
+		"RVeranstaltungKontakt",
 		'RVeranstaltungVeranstalter',
 		'Tags',
 		'Bilder',
@@ -103,10 +104,13 @@
 		
 		this.inited = true;
 		
+
 		this.control({
 			
 			'gridview': {
 				drop: function(node, data, overModel, dropPosition, dropHandlers) {
+
+			
 					me.onChangeSort(data.records[0].data.recordid,overModel.data.recordid,dropPosition,data.view.up('grid').specialname,data.view.up('grid').getStore(),data.view.up('grid'));
 				}
 			},
@@ -114,7 +118,47 @@
 				itemdblclick: this.onDblClickGrid,
 				itemclick: this.onClickGrid,
 				select: this.onGridRowSelected,
-				cellclick:  this.onCellClicked
+				cellclick:  this.onCellClicked,
+				sortchange:function (grid, column, direction, eOpts) {
+		
+					// Custom sorting logic based on the clicked column
+					if (column.dataIndex === 'name') {
+						let childs = []
+						grid.up().store.each(record=>record.get("parent_fk")!==null?childs.push(record):0)
+						childs.forEach(record=>grid.up().store.remove(record,true))
+
+						// Custom sorting logic for the 'fieldName' column
+						grid.up().store.sort({
+							property: 'fieldName',
+							direction: direction,
+							sorterFn: function (item1, item2) {
+							
+
+								// Custom sorting function logic
+								// Return a negative value if item1 should come before item2
+								// Return a positive value if item1 should come after item2
+								// Return 0 if the order should remain unchanged
+							
+								return item1.get('name').localeCompare(item2.get('name'));
+								
+						
+								
+				
+
+								}
+							
+						});
+
+						childs.forEach(record=>{
+							let pfk = record.get("parent_fk")
+							let open = record.get("opened")
+							if(pfk!==null && open){
+								grid.up().store.insert( grid.up().store.find("recordid", pfk)+1,record)
+							}
+					
+					})
+				}
+				}
 			},
 			'button': {
 				click: this.onClickButton
@@ -219,6 +263,15 @@
 						}
 					}
 				});
+				gridview.up('grid').store.each(record=>{
+					let pfk = record.get("parent_fk")
+					let open = record.get("opened")
+					if(pfk!==null && open){
+						gridview.up('grid').store.remove(record,true)
+						gridview.up('grid').store.insert( gridview.up("grid").store.find("recordid", pfk)+1,record)
+					}
+			
+			})
 			}
 		}
 	
@@ -635,6 +688,7 @@
                 myWindow.down('button[name=btnDeleteWindow]').setDisabled(true);
             }
 		}
+		
 	},
 	
 	onClickGrid: function(el,record,row) {

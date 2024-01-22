@@ -18,6 +18,14 @@
 		</field>
 		<!-- ################################################################### -->
 		<field>
+			<name>duplicate_fk</name>
+			<type>genericelement</type>
+			<element>veranstaltung</element>
+			<required>no</required>
+			<multiple>no</multiple>
+		</field>
+		<!-- ################################################################### -->
+		<field>
 			<name>name</name>
 			<type>textshort</type>
 			<required>yes</required>
@@ -114,6 +122,12 @@
 		<!-- ################################################################### -->
 		<field>
 			<name>tipp</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+			<!-- ################################################################### -->
+		<field>
+			<name>ev_always_active</name>
 			<type>bool</type>
 			<required>no</required>
 		</field>

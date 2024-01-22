@@ -211,11 +211,11 @@
 								store: cItem.data.store,
 								displayField: cItem.data.displayfield,
 								valueField: cItem.data.valuefield,
-								editable: (cItem.data.querymode=='local') ? false : true,
+								editable: (cItem.data.querymode=='local' && cItem.data.name!=="parent_fk") ? false : true,
 								queryDelay: (cItem.data.querymode=='local') ? 0 : 700,
 								minChars: (cItem.data.querymode=='local') ? '' : 3,
 								typeAhead: (cItem.data.querymode=='local') ? false : true,
-								hideTrigger: (cItem.data.querymode=='local' || cItem.data.showselectallcombobutton==1 || cItem.data.showenptycombobutton==1) ? false : true,
+								hideTrigger: (cItem.data.querymode=='local' || cItem.data.showselectallcombobutton==1 || cItem.data.showenptycombobutton==1 ) ? false : true,
 								value: (rec != undefined) ? myRec : cItem.data.value,
 								queryMode: cItem.data.querymode,
 								queryParam: 'filterText',
@@ -848,6 +848,7 @@
 		if(record?.data?.children!==undefined){
 			myWindow.down("[xtype=combobox]").up().setVisible(record?.data?.children!==undefined && record.data.children<1)
 		}
+		
 		// Fenster anzeigen
 		myWindow.show();
 		
@@ -871,9 +872,9 @@
 		
 		var me = this;
 		var reloadDetailGrid = false;
-		
+	
 		myCommonController = myapp.app.getController('Common');
-		
+		let test =record.data.recordid
 		myForm = myWindow.down('form');
 		// objekt zum speichern der parameter erstellen
 		myParams = {};
@@ -884,6 +885,7 @@
 		// checken, ob neuer eintrag erstellt werden soll
 		if(mySaveButton.createNewEntry) {
 			myParams['duplicate'] = 1;
+			
 		}
 		// objekt für nicht ausgefüllte pflichtfelder erstellen
 		myMandatoryFields = [];
@@ -891,7 +893,7 @@
 		let vmode = window.location.href.split("#!")[1]==="/common/Veranstalter"
 		// alle zu übermittelnden felder in params schreibem
 		Ext.each(myFields, function(element,index) {
-			
+			console.log(element)
 			if (element.xtype!="image" && element.xtype!="fieldcontainer") {
 				// aktuellen wert finden
 				myTempVal = myWindow.down(element.xtype+'[name='+element.name+']').getValue();
@@ -966,6 +968,9 @@
 	
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
+			if(myWindow.duplicate_fk!==undefined){
+			myParams.duplicate_fk=myWindow.duplicate_fk
+			}
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',
 				submitEmptyText: false,
@@ -975,6 +980,9 @@
 					var jsonParse = Ext.JSON.decode(action.response.responseText);
 					if (jsonParse.success) {
 						let vid = jsonParse.recordid
+						if(mySaveButton.createNewEntry){
+							record.data.recordid=vid
+						}
 						if(vmode){
 						Ext.Ajax.request({
 							url: '/modules/common/create.cfc?method=addVeranstalterToVeranstaltung',
@@ -1022,13 +1030,14 @@
 									});
 								}
 								if (mySaveButton.createNewEntry) {
-									myWindow.close();
+									myWindow.duplicate_fk=test
 									Ext.each(response, function(cRec,index) {
 										if (cRec.data.recordid == jsonParse['recordid']) {
 											myGrid.getView().select(index)
 											myRecord = cRec;
 										}
 									});
+									myWindow.setTitle("Duplikat von: "+record.data.name)
 									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
 								}
 							}
@@ -1105,5 +1114,6 @@
 
 });
 const rmChildFilter = () => {			Ext.data.StoreManager.lookup("Veranstaltungen").removeFilter("isChild")
-Ext.data.StoreManager.lookup("Veranstaltungen").reload()
+document.getElementById("dirty123").click()
+
 }

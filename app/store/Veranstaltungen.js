@@ -1,6 +1,7 @@
 ﻿Ext.define('myapp.store.Veranstaltungen', {
   extend: 'Ext.data.Store',
 	autoLoad: false,
+	remoteSort: false,
 	storeId: 'Veranstaltungen',
 	proxy: {
 	type: 'ajax',
@@ -8,6 +9,7 @@
 	pageParam: false, 
     startParam: false, 
     limitParam: false,
+	groupField:"parent_fk",
 	noCache: true,
 	url: 'modules/common/retrieve.cfc?method=getVeranstaltungen',
 		reader: {
@@ -78,6 +80,10 @@
 	},{ 
 		name: 'visible'
 	},{ 
+		name: 'ev_always_active'
+	},{ 
 		name: 'extern'
+	},{ 
+		name: 'duplicate_fk'
 	}]
 });

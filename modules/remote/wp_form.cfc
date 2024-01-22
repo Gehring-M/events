@@ -9,6 +9,13 @@
         <cfset form["tipp"]=0>
         <cfset form["longitude"]=0>
         <cfset form["latitude"]=0>
+        <cfset kid=0>
+        <cfif structKeyExists(form,"kname") AND not form["kname"] eq "" AND structKeyExists(form,"kmail") AND not form["kmail"] eq "" AND structKeyExists(form,"accepted_dp") AND not form["accepted_dp"] eq "" AND structKeyExists(form,"accepted_ds") AND not form["accepted_ds"] eq "">
+            <cfset kid= saveStructuredContent(nodeType=2120, data={"name"=form["kname"], "mail"=form["kmail"], "accepted_dp"=form["accepted_dp"], "accepted_ds"=form["accepted_ds"] })>
+        </cfelse>
+        <cfreturn "error">
+    </cfif>
+
         <cfset region_fk="">
         <cfif structKeyExists(form,"region") AND not form["region"] eq "">
         <cfset region_fk=form.region>
@@ -21,6 +28,8 @@
         <cfif region_fk neq "">
       <cfset saveStructuredContent(nodeType=2117, data={"region_fk":region_fk, "veranstaltung_fk": id.nodeid})>
         </cfif>
+
+        <cfset saveStructuredContent(nodeType=2121, data={"kontakt_fk":kid, "veranstaltung_fk": id.nodeid})
         <cflocation url='https://www.regio-schwaz.tirol/kulturkalender/'>
 
     </cffunction>

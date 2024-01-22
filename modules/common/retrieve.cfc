@@ -373,7 +373,9 @@
 				<cfset tmpStruct["region"]	= RRegion.name>
 				<cfset tmpStruct["tipp"]	= qData.tipp>
 				<cfset tmpStruct["kinder"]	= qData.kinder>
+				<cfset tmpStruct["duplicate_fk"] = qData.duplicate_fk>
 				<cfset tmpStruct["visible"]	= qData.visible>
+				<cfset tmpStruct["ev_always_active"]	= qData.ev_always_active>
 				<cfset tmpStruct["extern"]	= qData.extern>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				
@@ -407,6 +409,7 @@
 					<cfset tmpStruct["beschreibung"] = qSubData.beschreibung>
 					<cfset tmpStruct["preis"] = qSubData.preis>
 					<cfset tmpStruct["bilder"] = qSubData.bilder>
+					<cfset tmpStruct["duplicate_fk"] = qSubData.duplicate_fk>
 					<cfset tmpStruct["link"] = qSubData.link>
 					<cfset tmpStruct["uploads"] = qSubData.uploads>
 					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
@@ -415,6 +418,7 @@
 						<cfset tmpStruct["extern"]	= qSubData.extern>
 						<cfset tmpStruct["tipp"]	= qSubData.tipp>
 						<cfset tmpStruct["kinder"]	= qSubData.kinder>
+						<cfset tmpStruct["ev_always_active"]	= qSubData.ev_always_active>
 						<cfset tmpStruct["visible"]	= qSubData.visible>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
@@ -1048,6 +1052,31 @@
 			</cfif>		
 		</cfloop>
 	<cfreturn returnArray>
-</cffunction>	
+</cffunction>
+<!--------------------------------------------------------------------------------->
+<cffunction name="RVeranstaltungKontakt" access="remote" returnFormat="json" output="no">
+	<cfargument name="veranstaltung_fk">
+
+	<cfset var returnArray = ArrayNew(1)>
+  <cfset var tmpStruct = StructNew()>
+	 
+  <cfif isAuth()>		
+	<cfquery name="qData" datasource="#getConfig('DSN')#">
+		SELECT r.id as id, k.name, k.mail, k.accepted_ds, k.accepted_dp FROM r_veranstaltung_kontakt as r JOIN kontakt as k ON r.kontakt_fk=k.id WHERE r.veranstaltung_fk ='#veranstaltung_fk#'
+	</cfquery>
+	  <cfloop query="qData">
+		  <cfset tmpStruct = {}>
+		  <cfset tmpStruct["recordid"] 	= qData.id>
+		  <cfset tmpStruct["name"] 	= qData.name>
+		  <cfset tmpStruct["mail"] 	= qData.mail>
+		  <cfset tmpStruct["accepted_ds"] 	= qData.accepted_ds>
+		  <cfset tmpStruct["accepted_dp"] 	= qData.accepted_dp>
+		  <cfset ArrayAppend(returnArray, tmpStruct)>
+	  </cfloop>
+	  
+  </cfif> 
+  <cfreturn returnArray>
+  
+</cffunction>		
 </cfsilent>
 </cfcomponent>

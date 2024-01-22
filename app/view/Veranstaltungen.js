@@ -7,9 +7,9 @@
 	flex: 1,
 	style: 'backgroundColor: #d1d1d1',
 
-	initComponent: function(){
+	initComponent: function () {
 		var me = this,
-		myController = myapp.app.getController('Common');
+			myController = myapp.app.getController('Common');
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'grid',
@@ -22,71 +22,74 @@
 				autoScroll: true,
 				collapsible: true,
 				store: 'Veranstaltungen',
-				windowWidth:'800px',
+				windowWidth: '800px',
+
 				maxWindowHeight: '90%',
-				windowName:'veranstaltungen',
-				text:'Veranstaltung bearbeiten',
+				windowName: 'veranstaltungen',
+				text: 'Veranstaltung bearbeiten',
 				agShowDeleteButton: true,
 				agShowDuplicateButton: true,
-				nodeType:2102,
+				nodeType: 2102,
 				viewConfig: {
 					getRowClass: function (record, rowIndex, rowParams, store) {
-						return record.data.visible!==1 ? ["Cintern", "Cwp" ,"Cextern"][record.data.extern-1]: ["Cintern", "Cwpl" ,"Cextern"][record.data.extern-1] 
+						return record.data.visible !== 1 ? ["Cintern", "Cwp", "Cextern"][record.data.extern - 1] : ["Cintern", "Cwpl", "Cextern"][record.data.extern - 1]
 
 						//you can also use
 						//record.data.isChecked == 1 ? 'child-row' : 'adult-row';
-			
+
 					},
-				enableTextSelection: true,
+					enableTextSelection: true,
 				},
 				plugins: [{
 					ptype: 'bufferedrenderer',
-					trailingBufferZone: 20, 
-					leadingBufferZone: 50  
-				}],	
+					trailingBufferZone: 20,
+					leadingBufferZone: 50
+				}],
 				columns: [
-					{ 
-						width:16, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'opened', sortable: false,
-						renderer: function(value,data,record) {
+					{
+						width: 16, hideable: false, menuDisabled: true, resizable: false, dataIndex: 'opened', sortable: false,
+						renderer: function (value, data, record) {
 							if (record.data.parent_fk == null && record.data.children > 0) {
-								data.tdCls ='tdPointer';
+								data.tdCls = 'tdPointer';
 								if (record.data.opened) {
-									return'<img src="img/opened.png" style="margin-left: -2px; margin-top: 6px">';
+									return '<img src="img/opened.png" style="margin-left: -2px; margin-top: 6px">';
 								} else {
 									return '<img src="/img/closed.gif" style="margin-left: -2px; margin-top: 6px">';
 								}
 							}
 						}
 					},
-					{ xtype:'checkcolumn', name:'checked', dataIndex: 'checked', width: 38, hideable: false, menuDisabled:true, resizable: false, sortable: false, menuDisabled: true, hidden: true }, 
-					{ text: 'Titel der Veranstaltung',  dataIndex: 'name', flex: 2, menuDisabled: true, sortable: false,
-						renderer: function(value,data,record) {
-						
+					{ xtype: 'checkcolumn', name: 'checked', dataIndex: 'checked', width: 38, hideable: false, menuDisabled: true, resizable: false, sortable: false, menuDisabled: true, hidden: true },
+					{
+						text: 'Titel der Veranstaltung', dataIndex: 'name', flex: 2, menuDisabled: true, sortable: true,
+						renderer: function (value, data, record) {
 
-							data.tdCls ='tdRootTag'
-							
+
+							data.tdCls = 'tdRootTag'
+
 							if (record.data.parent_fk != null) {
-								data.tdCls ='tdSubTag'
+								data.tdCls = 'tdSubTag'
 								return value;
 							} else {
 								val = value;
-								if (record.data.children > 0) val = val+' ('+record.data.children+')';
+								if (record.data.children > 0) val = val + ' (' + record.data.children + ')';
 								return val;
 							}
 						}
+
 					},
-					
-					{ text: 'Daum von',  dataIndex: 'von', width: 110, xtype: 'datecolumn', format:'d.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Datum bis',  dataIndex: 'bis', width: 110, xtype: 'datecolumn', format:'d.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Uhrzeit von',  dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Uhrzeit bis',  dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Veranstaltungsort',  dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Preis',  dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
-					{ text: 'Region',  dataIndex: 'region', width: 150, menuDisabled: true, menuDisabled: true, sortable: false  },
-			
+
+					{ text: 'Daum von', dataIndex: 'von', width: 110, xtype: 'datecolumn', format: 'd.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Datum bis', dataIndex: 'bis', width: 110, xtype: 'datecolumn', format: 'd.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Uhrzeit von', dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Uhrzeit bis', dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Veranstaltungsort', dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Preis', dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Region', dataIndex: 'region', width: 150, menuDisabled: true, menuDisabled: true, sortable: false },
+
 					/*{
 						xtype: 'componentcolumn', 
 						sortable: false,
@@ -112,117 +115,117 @@
 						
 					},*/
 					{
-						xtype: 'componentcolumn', 
+						xtype: 'componentcolumn',
 						sortable: false,
 						menuDisabled: true,
 						dataIndex: 'test',
 						width: 190,
-						
-						renderer: function(value,data,record) {
-					
+
+						renderer: function (value, data, record) {
+
 							if (record.data.parent_fk == null) {
 								return {
 									xtype: 'button',
 									text: 'Neue Subveranstaltung',
-									test:record.recordid,
+									test: record.recordid,
 									agRecord: record,
-									windowWidth:'800px',
+									windowWidth: '800px',
 									maxWindowHeight: '90%',
-									nodeType:2102,
-									nameForeignKey:'parent_fk',
+									nodeType: 2102,
+									nameForeignKey: 'parent_fk',
 									listeners: {
-										click: function(value,data,record) {
-			
-											let scope=this
-											
-										
-										
-			
+										click: function (value, data, record) {
+
+											let scope = this
+
+
+
+
 											Ext.Ajax.request({
-										url: '/modules/common/create.cfc?method=duplicateVeranstaltungSub',
-										params: {
-									
-										veranstaltung_fk: this.agRecord.data.recordid,
-								
-										},
-										success: function(response,test,x) {
-								
-											var jsonParse = Ext.JSON.decode(response.responseText);
-											for(let a in jsonParse){
-											if(!jsonParse[a]){
-											delete jsonParse[a]
-											}
+												url: '/modules/common/create.cfc?method=duplicateVeranstaltungSub',
+												params: {
+
+													veranstaltung_fk: this.agRecord.data.recordid,
+
+												},
+												success: function (response, test, x) {
+
+													var jsonParse = Ext.JSON.decode(response.responseText);
+													for (let a in jsonParse) {
+														if (!jsonParse[a]) {
+															delete jsonParse[a]
+														}
+													}
+													jsonParse.recordid = jsonParse.id
+													jsonParse.uhrzeitvon = jsonParse.uhrzeitvon?.split("")[1]
+													jsonParse.uhrzeitbis = jsonParse.uhrzeitbis?.split("")[1]
+													myController.myFunctions.onOpenWindow(scope.up('grid'), { data: jsonParse }, '')
+
+
+
+
+													return jsonParse
+
+												}
+
+											})
 										}
-										jsonParse.recordid=jsonParse.id
-										jsonParse.uhrzeitvon=jsonParse.uhrzeitvon?.split("")[1]
-										jsonParse.uhrzeitbis=jsonParse.uhrzeitbis?.split("")[1]
-										myController.myFunctions.onOpenWindow(scope.up('grid'),{data:jsonParse},'')
-										scope.up('grid').store.reload()
-										
-									
-			
-										return jsonParse
-						
 									}
-							
-										})
-									}
-								}
 								};
 							}
 							else {
 								return {
 									xtype: 'button',
-									text: 'Zu Hauptveranstaltung',
-									test:record.recordid,
+									text: 'Umwandeln in Hautpv.',
+									test: record.recordid,
 									agRecord: record,
-									windowWidth:'800px',
+									windowWidth: '800px',
 									maxWindowHeight: '90%',
-									nodeType:2102,
-									nameForeignKey:'parent_fk',
+									nodeType: 2102,
+									nameForeignKey: 'parent_fk',
 									listeners: {
-										click: function(value,data,record) {
-			
-											let scope=this
-											
-										
-										
-			
+										click: function (value, data, record) {
+
+											let scope = this
+
+
+
+
 											Ext.Ajax.request({
-										url: '/modules/common/update.cfc?method=removeparent',
-										params: {
-									
-										id: this.agRecord.data.recordid,
-								
-										},
-										success: function(response,test,x) {
-								
-											var jsonParse = Ext.JSON.decode(response.responseText);
-											for(let a in jsonParse){
-											if(!jsonParse[a]){
-											delete jsonParse[a]
-											}
+												url: '/modules/common/update.cfc?method=removeparent',
+												params: {
+
+													id: this.agRecord.data.recordid,
+
+												},
+												success: function (response, test, x) {
+
+													var jsonParse = Ext.JSON.decode(response.responseText);
+													for (let a in jsonParse) {
+														if (!jsonParse[a]) {
+															delete jsonParse[a]
+														}
+													}
+
+													scope.up('grid').store.reload()
+
+
+
+													return jsonParse
+
+												}
+
+											})
 										}
-	
-										scope.up('grid').store.reload()
-										
-									
-			
-										return jsonParse
-						
 									}
-							
-										})
-									}
-								}
 								};
 							}
 						},
-			
-						
+
+
 					},
-					
-					
+
+
 					/*
 					
 					{ align: 'center' , width: 60, text: 'Login',
@@ -233,7 +236,7 @@
 							} else {
 								return'<img src="img/unlock.png" title="Dokument scheint auch OHNE Login Zustand auf." alt="Dokument scheint auch OHNE Login Zustand auf.">';
 							}
-					 	} 
+						  } 
 					},
 					{ text: 'Gehört zu',  dataIndex: 'parent_name', flex: 2, menuDisabled: true},
 					{ text: 'Kategorie',  dataIndex: 'kategorienamen', flex: 2, menuDisabled: true, tdCls: 'tdKategorie'	},
@@ -254,7 +257,7 @@
 							} else {
 								return'<img src="img/private.png" title="Dokument scheint NICHT in anderen Portalen auf." alt="Dokument scheint NICHT in anderen Portalen auf.">';
 							}
-					 	} 
+						  } 
 					},
 					
 					{ align: 'center' , width: 60,
@@ -263,17 +266,17 @@
 								data.tdCls = 'tdHover';
 								return'<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
 							}
-					 	} 
+						  } 
 					}
 					*/
-					
-					
+
+
 				],
-				
-				tools:[{
+
+				tools: [{
 					xtype: 'textfield',
 					labelSeparator: ' ',
-					name:'filterText',
+					name: 'filterText',
 					width: 210,
 					padding: '0px 0px 0px 7px',
 					labelClsExtra: 'whiteBold',
@@ -281,116 +284,119 @@
 					enableKeyEvents: true,
 					listeners: {
 						keyup: {
-							fn: function(el,event) {
+							fn: function (el, event) {
 								if (event.getCharCode() == 13) {
 									myController.onEnterSuchen(el);
 								}
 							}
 						}
 					}
-				},{		
+				}, {
 					xtype: 'datefield',
 					name: 'filterVon',
 					submitFormat: 'Y-m-d',
 					width: 100,
-					labelSeparator:'',
+					labelSeparator: '',
 					emptyText: 'Beginn',
-					margin:'0 0 0 5',
+					value: new Date(new Date().getFullYear(), 0, 1),
+					margin: '0 0 0 5',
 					plugins: [Ext.create('Ext.ux.field.date.plugin.CalendarWeek')]
-				},{		
+				}, {
 					xtype: 'datefield',
 					name: 'filterBis',
 					submitFormat: 'Y-m-d',
 					width: 100,
-					labelSeparator:'',
+					labelSeparator: '',
+					value: new Date(new Date().getFullYear(), 11, 31),
 					emptyText: 'Ende',
-					margin:'0 0 0 5',
+					margin: '0 0 0 5',
 					plugins: [Ext.create('Ext.ux.field.date.plugin.CalendarWeek')]
-				},{
+				}, {
 					xtype: 'button',
 					text: 'Veranstaltungen suchen',
 					width: 180,
 					height: 24,
-					name:'btnSuche',
-					agAction:'suchen',
-					margin:'0 0 0 5',
+					id: "dirty123",
+					name: 'btnSuche',
+					agAction: 'suchen',
+					margin: '0 0 0 5',
 					cls: 'btn-gray'
-				},{	
+				}, {
 					xtype: 'button',
 					text: 'Reset',
 					width: 65,
 					height: 24,
-					name:'btnReset',
-					agAction:'reset',
-					margin:'0 0 0 5',
+					name: 'btnReset',
+					agAction: 'reset',
+					margin: '0 0 0 5',
 					cls: 'btn-red'
-				},{
+				}, {
 					xtype: 'button',
 					text: 'Export',
 					name: 'btnExport',
 					width: 60,
 					height: 24,
-					margin:'0 0 0 5',
+					margin: '0 0 0 5',
 					cls: 'btn-gray',
-				},{
+				}, {
 					xtype: 'displayfield',
 					width: 2,
 					height: 24,
-					margin:'0 3 0 12',
+					margin: '0 3 0 12',
 					cls: 'button-grey'
-				},{
+				}, {
 					xtype: 'button',
 					text: 'Neue Veranstaltung',
 					width: 200,
 					height: 24,
-					margin:'0 0 0 10',
+					margin: '0 0 0 10',
 					cls: 'btn-gray',
-					windowWidth:'800px',
+					windowWidth: '800px',
 					maxWindowHeight: '90%',
-					windowName:'veranstaltungen',
-					nodeType:2102
+					windowName: 'veranstaltungen',
+					nodeType: 2102
 				}]
-				
-			},{		
-				
+
+			}, {
+
 				xtype: 'tabpanel',
 				border: false,
 				flex: 2,
 				region: 'south',
 				split: true,
-				margin:'0 0 0 0',
-					bodyStyle: {
-						backgroundColor: '#bcbbc3'
-					},
-				name:'veranstaltungsdetails',
+				margin: '0 0 0 0',
+				bodyStyle: {
+					backgroundColor: '#bcbbc3'
+				},
+				name: 'veranstaltungsdetails',
 				items: [{
 					xtype: 'grid',
 					border: true,
 					flex: 1,
-					title:'Veranstalter',
+					title: 'Veranstalter',
 					store: 'RVeranstaltungVeranstalter',
 					name: 'RVeranstaltungVeranstalter',
-					windowName:'rveranstaltungveranstalter',
-					text:'Verknüpfung löschen',
-					windowWidth:'200px',
-					nodeType:2111,
+					windowName: 'rveranstaltungveranstalter',
+					text: 'Verknüpfung löschen',
+					windowWidth: '200px',
+					nodeType: 2111,
 					agShowDeleteButton: true,
 					agShowAbortButton: false,
 					agDoNotShowSaveButton: true,
-					margin:'0 0 0 0',
+					margin: '0 0 0 0',
 					viewConfig: {
 						enableTextSelection: false,
 					},
 					columns: [
-						{ text: 'Veranstalter',  dataIndex: 'name', flex: 1 },
-						{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Telefon',  dataIndex: 'telefon', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Email',  dataIndex: 'email', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Web',  dataIndex: 'web', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+						{ text: 'Veranstalter', dataIndex: 'name', flex: 1 },
+						{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Telefon', dataIndex: 'telefon', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Email', dataIndex: 'email', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Web', dataIndex: 'web', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
 					],
-					bbar:[{
+					bbar: [{
 						xtype: 'combobox',
 						width: 350,
 						name: 'addVeranstalter',
@@ -399,7 +405,7 @@
 						valueField: 'recordid',
 						queryMode: 'remote',
 						queryDelay: 700,
-						minChars:3,
+						minChars: 3,
 						typeAhead: true,
 						hideTrigger: true,
 						multiSelect: false,
@@ -407,64 +413,64 @@
 						emptyText: 'Veranstalter suchen und hinzufügen',
 						tpl: Ext.create('Ext.XTemplate',
 							'<ul class="x-list-plain"><tpl for=".">',
-								'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
+							'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
 							'</tpl></ul>'
 						)
-					},{ 
+					}, {
 						xtype: 'button',
 						name: 'addVeranstalter',
 						text: ' Veranstalter verknüpfen',
-						margin:'0 5 0 0',
+						margin: '0 5 0 0',
 						width: 250,
 						cls: 'btn-green'
-					},{ 
+					}, {
 						xtype: 'displayfield',
 						flex: 1
-					},{ 	
+					}, {
 						xtype: 'button',
 						text: 'Veranstalter nicht gefunden? - Neuen Veranstalter hinzufügen',
-						margin:'0 5 0 0',
+						margin: '0 5 0 0',
 						width: 400,
-						windowWidth:'800px',
+						windowWidth: '800px',
 						maxWindowHeight: '90%',
-						windowName:'veranstalter',
+						windowName: 'veranstalter',
 						agVerknuepfungErstellen: true,
-						nodeType:2101,
+						nodeType: 2101,
 						cls: 'btn-orange',
 						name: 'addNewVeranstalter'
 					}]
-				
-				
-					
-				},{ 
+
+
+
+				}, {
 					xtype: 'grid',
 					border: true,
 					flex: 1,
-					title:'Künstler',
+					title: 'Künstler',
 					store: 'RVeranstaltungArtist',
 					name: 'RVeranstaltungArtist',
-					windowWidth:800,
-					windowHeight:'',
+					windowWidth: 800,
+					windowHeight: '',
 					maxWindowHeight: 800,
-					windowName:'rveranstaltungartist',
-					text:'Details bearbeiten',
-					nodeType:2110,
+					windowName: 'rveranstaltungartist',
+					text: 'Details bearbeiten',
+					nodeType: 2110,
 					agShowDeleteButton: true,
-					margin:'0 0 0 0',
+					margin: '0 0 0 0',
 					viewConfig: {
 						enableTextSelection: false,
 					},
 					columns: [
-						{ text: 'Künstler',  dataIndex: 'name', flex: 1, },
-						{ text: 'Vorname',  dataIndex: 'vorname', flex: 1, },
-						{ text: 'Uhrzeit von',  dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Uhrzeit bis',  dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format:'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Veranstaltungsort',  dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Adresse',  dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'PLZ',  dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false  },
-						{ text: 'Ort',  dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false  },
+						{ text: 'Künstler', dataIndex: 'name', flex: 1, },
+						{ text: 'Vorname', dataIndex: 'vorname', flex: 1, },
+						{ text: 'Uhrzeit von', dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Uhrzeit bis', dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Veranstaltungsort', dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
 					],
-					bbar:[{
+					bbar: [{
 						xtype: 'combobox',
 						width: 350,
 						name: 'addArtist',
@@ -473,7 +479,7 @@
 						valueField: 'recordid',
 						queryMode: 'remote',
 						queryDelay: 700,
-						minChars:3,
+						minChars: 3,
 						typeAhead: true,
 						hideTrigger: true,
 						multiSelect: false,
@@ -481,37 +487,37 @@
 						emptyText: 'Künstler suchen und hinzufügen',
 						tpl: Ext.create('Ext.XTemplate',
 							'<ul class="x-list-plain"><tpl for=".">',
-								'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
+							'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
 							'</tpl></ul>'
 						)
-					},{ 
+					}, {
 						xtype: 'button',
 						name: 'addArtist',
 						text: ' Künstler verknüpfen',
-						margin:'0 5 0 0',
+						margin: '0 5 0 0',
 						width: 250,
 						cls: 'btn-green'
-					},{ 
+					}, {
 						xtype: 'displayfield',
 						flex: 1
-					},{ 	
+					}, {
 						xtype: 'button',
 						text: 'Künstler nicht gefunden? - Neuen Künstler hinzufügen',
-						margin:'0 5 0 0',
+						margin: '0 5 0 0',
 						width: 400,
-						windowWidth:'800px',
+						windowWidth: '800px',
 						maxWindowHeight: '90%',
-						windowName:'artist',
-						nodeType:2103,
+						windowName: 'artist',
+						nodeType: 2103,
 						cls: 'btn-orange',
 						name: 'addNewArtist'
 					}]
-					
-					
-				
-				},{ 
+
+
+
+				}, {
 					xtype: 'grid',
-					name:'tagzuweisung',
+					name: 'tagzuweisung',
 					flex: 1,
 					split: true,
 					autoScroll: true,
@@ -520,68 +526,68 @@
 					store: 'Tags',
 					plugins: [{
 						ptype: 'bufferedrenderer',
-						trailingBufferZone: 20, 
-						leadingBufferZone: 50  
-					}],	
+						trailingBufferZone: 20,
+						leadingBufferZone: 50
+					}],
 					columns: [{
-							width:28, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'checked', sortable: false,
-							renderer: function(value,data,record) {
-								data.tdCls ='tdPointer';
-								if (record.data.checked) {
-									return'<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 1px">';
-								} else {
-									return'<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 1px">';
-								}
+						width: 28, hideable: false, menuDisabled: true, resizable: false, dataIndex: 'checked', sortable: false,
+						renderer: function (value, data, record) {
+							data.tdCls = 'tdPointer';
+							if (record.data.checked) {
+								return '<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 1px">';
+							} else {
+								return '<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 1px">';
 							}
-						},{ 
-							text: 'Tags', dataIndex: 'name', flex: 1, menuDisabled: true, sortable: false
 						}
+					}, {
+						text: 'Tags', dataIndex: 'name', flex: 1, menuDisabled: true, sortable: false
+					}
 					],
-					bbar:[{
+					bbar: [{
 						xtype: 'textfield',
 						labelSeparator: ' ',
 						labelWidth: 140,
 						width: 360,
-						name:'gridFilter',
-						margin:'0 0 0 0',
+						name: 'gridFilter',
+						margin: '0 0 0 0',
 						labelClsExtra: 'whiteBold',
 						emptyText: 'Schnellfilter nach Tags',
 						enableKeyEvents: true,
 						agSearchFields: 'name',
 						listeners: {
 							keyup: {
-								fn: function(el,event) {
+								fn: function (el, event) {
 									if (event.getCharCode() == 27) {
 										el.setValue('');
 									}
 								}
 							}
 						}
-					},{		
+					}, {
 						xtype: 'button',
 						text: 'X',
 						width: 27,
 						height: 24,
-						name:'gridFilterReset',
-						margin:'0 0 0 0',
+						name: 'gridFilterReset',
+						margin: '0 0 0 0',
 						cls: 'btn-red'
-					},{	
+					}, {
 						xtype: 'displayfield',
 						flex: 1
-					},{	
+					}, {
 						xtype: 'button',
 						text: 'Neuen Tag hinzufügen',
 						height: 24,
-						margin:'0 5 0 0',
+						margin: '0 5 0 0',
 						width: 200,
-						windowWidth:400,
-						windowHeight:'',
+						windowWidth: 400,
+						windowHeight: '',
 						maxWindowHeight: 400,
-						windowName:'tag',
-						nodeType:2106,
+						windowName: 'tag',
+						nodeType: 2106,
 						cls: 'btn-orange'
 					}]
-				},{ 	
+				}, {
 					xtype: 'fieldcontainer',
 					layout: 'hbox',
 					margin: '0 0 0 5',
@@ -595,88 +601,91 @@
 						store: 'Bilder',
 						name: 'Bilder',
 						height: '100%',
-						windowWidth:600,
-						windowHeight:'',
+						windowWidth: 600,
+						windowHeight: '',
 						maxWindowHeight: 500,
-						windowName:'bilder',
-						text:'Bilder  bearbeiten / löschen',
-						nodeType:1,
+						windowName: 'bilder',
+						text: 'Bilder  bearbeiten / löschen',
+						nodeType: 1,
 						agShowDeleteButton: true,
-						margin:'0 0 0 0',
+						margin: '0 0 0 0',
 						viewConfig: {
 							enableTextSelection: false,
 						},
 						columns: [
-							{ text: 'Vorschau',  dataIndex: 'vorschaubild', align: 'center', width: 118,
-								renderer: function(value){
-									if (value!="") {
+							{
+								text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
+								renderer: function (value) {
+									if (value != "") {
 										return '<div><span></span><img src="' + value + '" class="pointer"/></div>';
 									} else {
 										return 'Nicht verfübar';
 									}
 								}
 							},
-							{ text: 'Hochgeladen am',  dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
-							{ text: 'Titel',  dataIndex: 'titel', flex: 1 },
-							{ text: 'Beschreibung',  dataIndex: 'beschreibung', flex: 1 },
-							{ text: 'Auflösung',  dataIndex: 'resolution', width: 110, align: 'center' },
-							{ text: 'Ansehen', align: 'center' , width: 90,
-								renderer: function(value,data,record) { 
+							{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
+							{ text: 'Titel', dataIndex: 'titel', flex: 1 },
+							{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
+							{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
+							{
+								text: 'Ansehen', align: 'center', width: 90,
+								renderer: function (value, data, record) {
 									data.tdCls = 'tdHover';
-									return'<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
-								} 
+									return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+								}
 							},
-							{ text: 'Download', align: 'center' , width: 90,
-								renderer: function(value,data,record) { 
+							{
+								text: 'Download', align: 'center', width: 90,
+								renderer: function (value, data, record) {
 									data.tdCls = 'tdHover';
-									return'<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
-								} 
+									return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+								}
 							}
 						],
-						bbar:[{
+						bbar: [{
 							xtype: 'textfield',
 							labelSeparator: ' ',
 							labelWidth: 140,
 							width: 360,
-							name:'gridFilter',
-							margin:'0 0 0 0',
+							name: 'gridFilter',
+							margin: '0 0 0 0',
 							labelClsExtra: 'whiteBold',
 							emptyText: 'Schnellfilter für Bilder',
 							enableKeyEvents: true,
 							agSearchFields: 'beschreibung,titel',
 							listeners: {
 								keyup: {
-									fn: function(el,event) {
+									fn: function (el, event) {
 										if (event.getCharCode() == 27) {
 											el.setValue('');
 										}
 									}
 								}
 							}
-						},{		
+						}, {
 							xtype: 'button',
 							text: 'X',
 							width: 27,
 							height: 24,
-							name:'gridFilterReset',
-							margin:'0 0 0 0',
+							name: 'gridFilterReset',
+							margin: '0 0 0 0',
 							cls: 'btn-red'
-						},{	
+						}, {
 							xtype: 'displayfield',
 							flex: 1
-						
+
 						}]
-					},{	
+					}, {
 						xtype: 'panel',
 						border: false,
 						height: 1000,
-						margin:'0 0 0 0',
-						padding:'0 0 0 0',
+						margin: '0 0 0 0',
+						padding: '0 0 0 0',
 						width: 480,
 						html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="490" height="1000"></iframe>'
 					}]
 
-				},{ 	
+				}, {
 					xtype: 'fieldcontainer',
 					layout: 'hbox',
 					margin: '0 0 0 5',
@@ -690,264 +699,144 @@
 						store: 'Downloads',
 						name: 'Downloads',
 						height: '100%',
-						windowWidth:600,
-						windowHeight:'',
+						windowWidth: 600,
+						windowHeight: '',
 						maxWindowHeight: 500,
-						windowName:'downloads',
-						text:'Download bearbeiten / löschen',
-						nodeType:2,
+						windowName: 'downloads',
+						text: 'Download bearbeiten / löschen',
+						nodeType: 2,
 						agShowDeleteButton: true,
-						margin:'0 0 0 0',
+						margin: '0 0 0 0',
 						viewConfig: {
 							enableTextSelection: false,
 						},
-					
+
 						columns: [
-							{ text: 'Vorschau',  dataIndex: 'vorschaubild', align: 'center', width: 118,
-								renderer: function(value){
+							{
+								text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
+								renderer: function (value) {
 									return '<div style="text-align: center" ><img src="' + value + '" /></div>';
 								}
 							},
-							{ text: 'Hochgeladen am',  dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format:'d.m.Y', align: 'center'},
-							{ text: 'Titel',  dataIndex: 'titel', flex: 1 },
-							{ text: 'Beschreibung',  dataIndex: 'beschreibung', flex: 1 },
-							{ text: 'Auflösung',  dataIndex: 'resolution', width: 110, align: 'center' },
-							{ text: 'Dateityp',  dataIndex: 'extension', width: 80, align: 'center'},
-							{ text: 'Ansehen', align: 'center' , width: 90,
-								renderer: function(value,data,record) { 
-									if (record.data.previewable=="yes") {
+							{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
+							{ text: 'Titel', dataIndex: 'titel', flex: 1 },
+							{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
+							{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
+							{ text: 'Dateityp', dataIndex: 'extension', width: 80, align: 'center' },
+							{
+								text: 'Ansehen', align: 'center', width: 90,
+								renderer: function (value, data, record) {
+									if (record.data.previewable == "yes") {
 										data.tdCls = 'tdHover';
-										return'<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+										return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
 									} else {
-										return'<img src="img/noeye.png" title="Diese Datei laden" alt="Diese Datei laden">';
+										return '<img src="img/noeye.png" title="Diese Datei laden" alt="Diese Datei laden">';
 									}
-								} 
+								}
 							},
-							{ text: 'Download', align: 'center' , width: 90,
-								renderer: function(value,data,record) { 
+							{
+								text: 'Download', align: 'center', width: 90,
+								renderer: function (value, data, record) {
 									data.tdCls = 'tdHover';
-									return'<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
-								} 
+									return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+								}
 							}
 						],
-						bbar:[{
+						bbar: [{
 							xtype: 'textfield',
 							labelSeparator: ' ',
 							labelWidth: 140,
 							width: 360,
-							name:'gridFilter',
-							margin:'0 0 0 0',
+							name: 'gridFilter',
+							margin: '0 0 0 0',
 							labelClsExtra: 'whiteBold',
 							emptyText: 'Schnellfilter für Dokumente',
 							enableKeyEvents: true,
 							agSearchFields: 'beschreibung,titel',
 							listeners: {
 								keyup: {
-									fn: function(el,event) {
+									fn: function (el, event) {
 										if (event.getCharCode() == 27) {
 											el.setValue('');
 										}
 									}
 								}
 							}
-						},{		
+						}, {
 							xtype: 'button',
 							text: 'X',
 							width: 27,
 							height: 24,
-							name:'gridFilterReset',
-							margin:'0 0 0 0',
+							name: 'gridFilterReset',
+							margin: '0 0 0 0',
 							cls: 'btn-red'
-						},{	
+						}, {
 							xtype: 'displayfield',
 							flex: 1
-						
+
 						}]
-					},{
+					}, {
 						xtype: 'panel',
 						border: false,
 						height: 1000,
-						margin:'0 0 0 0',
-						padding:'0 0 0 0',
+						margin: '0 0 0 0',
+						padding: '0 0 0 0',
 						width: 480,
 						html: '<iframe src="/modules/multiupload.cfm?typ=uploads&bereich=veranstaltung" width="490" height="1000"></iframe>'
-					}]
+					}
+					]
+				}
 
-				}]
-				
-				
-				
-				
-				/*
-			},{	
-				xtype: 'grid',
-				region: 'east',
-				name:'kategorienbaum',
-				flex: 1,
-				split: true,
-				autoScroll: true,
-				title: 'Kategorien',
-				collapsible: true,
-				store: 'RKategorienSubkategorien',
-				plugins: [{
-					ptype: 'bufferedrenderer',
-					trailingBufferZone: 20, 
-					leadingBufferZone: 50  
-				}],	
-				columns: [{
-						xtype:'checkcolumn', name:'checked', dataIndex: 'checked', width: 38,  menuDisabled:true, resizable: false, sortable: false, hidden: true
-					},{ 
-						width:16, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'opened', sortable: false,
-						renderer: function(value,data,record) {
-							if (record.data.parent_fk == null && record.data.children > 0) {
-								data.tdCls ='tdPointer';
-								if (record.data.opened) {
-									return'<img src="img/opened.png" style="margin-left: -2px; margin-top: 6px">';
-								} else {
-									return '<img src="/img/closed.gif" style="margin-left: -2px; margin-top: 6px">';
-								}
-								
-							}
-						}
-					},{ 	
-						text: 'Kategorien',  dataIndex: 'name',  flex: 1, menuDisabled: true, sortable: false,
-						renderer: function(value,data,record) {
-							data.tdCls ='tdRootTag';
-							if (record.data.parent_fk != null) {
-								data.tdCls ='tdSubTag';
-								return value;
-							} else {
-								val = value;
-								if (record.data.children > 0) val = val+' ('+record.data.children+')';
-								return val;
-							}
-						}
-					},{ 
-						width:40, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'kategorieChecked', sortable: false,
-						renderer: function(value,data,record) {
-							if (record.data.parent_fk != null) {
-								data.tdCls ='tdPointer';
-								if (record.data.kategorieChecked) {
-									return'<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 4px">';
-								} else {
-									return'<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 4px">';
-								}
-							}
-						}
+					, {
+					xtype: 'fieldcontainer',
+					layout: 'hbox',
+					margin: '0 0 0 5',
+					title: 'Kontakte',
+					width: '100%',
+					height: '100%',
+					items: [{
+						xtype: 'grid',
+						border: true,
+						flex: 1,
+						store: 'RVeranstaltungKontakt',
+						name: 'Kontakte',
+						height: '100%',
+						windowWidth: 600,
+						windowHeight: '',
+						maxWindowHeight: 500,
+						windowName: 'kontakt',
+						text: 'Kontakte ansehen',
+						nodeType: 2120,
+						agShowDeleteButton: false,
+						margin: '0 0 0 0',
+						viewConfig: {
+							enableTextSelection: false,
+						},
+
+						columns: [
+							{ text: 'Name', dataIndex: 'name', align: 'center', width: 118 },
+							{ text: 'Email', dataIndex: 'mail', width: 150 },
+							{ text: 'Datenschutzhinweise', dataIndex: 'accepted_ds', flex: 1 },
+							{ text: 'Datenverarbeitung', dataIndex: 'accepted_dv', flex: 1 },
+						],
 					}
-				],
-				tools:[{
-					xtype: 'textfield',
-					labelSeparator: ' ',
-					labelWidth: 140,
-					width: 160,
-					name:'gridFilter',
-					padding: '0px 0px 0px 7px',
-					labelClsExtra: 'whiteBold',
-					emptyText: 'Tabellenfilter',
-					enableKeyEvents: true,
-					agSearchFields: 'name,subnames',
-					listeners: {
-						keyup: {
-							fn: function(el,event) {
-								if (event.getCharCode() == 27) {
-									el.setValue('');
-								}
-							}
-						}
-					}
-				},{		
-					xtype: 'button',
-					text: 'X',
-					width: 27,
-					height: 24,
-					name:'gridFilterReset',
-					margin:'0 0 0 0',
-					cls: 'btn-gray'
-				}]
+					
+					]
+				}
 				
-				
-			},{
-				
-				
-				xtype: 'grid',
-				region: 'east',
-				name:'tagzuweisung',
-				flex: 1,
-				split: true,
-				autoScroll: true,
-				title: 'Tags',
-				collapsible: true,
-				store: 'Laender',
-				plugins: [{
-					ptype: 'bufferedrenderer',
-					trailingBufferZone: 20, 
-					leadingBufferZone: 50  
-				}],	
-				columns: [{
-						text: 'Tags',  dataIndex: 'name',  flex: 1, menuDisabled: true, sortable: false
-					},{ 
-						width:40, hideable: false, menuDisabled:true, resizable: false, dataIndex: 'tagChecked', sortable: false,
-						renderer: function(value,data,record) {
-							data.tdCls ='tdPointer';
-							if (record.data.tagChecked) {
-								return'<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 2px">';
-							} else {
-								return'<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 2px">';
-							}
-						}
-					}
-				],
-				tools:[{
-					xtype: 'textfield',
-					labelSeparator: ' ',
-					labelWidth: 140,
-					width: 160,
-					name:'gridFilter',
-					padding: '0px 0px 0px 7px',
-					labelClsExtra: 'whiteBold',
-					emptyText: 'Tabellenfilter',
-					enableKeyEvents: true,
-					agSearchFields: 'name',
-					listeners: {
-						keyup: {
-							fn: function(el,event) {
-								if (event.getCharCode() == 27) {
-									el.setValue('');
-								}
-							}
-						}
-					}
-				},{		
-					xtype: 'button',
-					text: 'X',
-					width: 27,
-					height: 24,
-					name:'gridFilterReset',
-					margin:'0 0 0 0',
-					cls: 'btn-gray'
-				}],
-				
-				bbar:[{
-					xtype: 'button',
-					text: 'Neuen Tag hinzufügen',
-					height: 30,
-					margin:'0 5 0 0',
-					flex: 1,
-					windowWidth:400,
-					windowHeight:'',
-					maxWindowHeight: 400,
-					windowName:'tags',
-					nodeType:2106,
-					cls: 'btn-gray'
-				}]
+
 			
-				*/	
-			}]
+
+
+
+			]}]
 		});
 
 		me.callParent(arguments);
-	
+
 	}
 
+
 });
+setTimeout(() =>
+	document.getElementById("dirty123").click(), 200)
