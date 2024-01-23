@@ -26,7 +26,9 @@ component rest="true" restpath="/v1" {
                 eventData = {};
                 eventData['id'] = qEventsRow.id;
                 eventData['parent_fk'] = qEventsRow.parent_fk;
-                eventData['parent_event'] = qParentEvent.name;
+                if (!isNull(qEventsRow.parent_fk)){
+                    eventData['parent_event'] = qParentEvent.name;
+                }
                 eventData['pagetitle'] = qEventsRow.pagetitle;
                 eventData['beschreibung'] = qEventsRow.beschreibung;
                 eventData['preis'] = qEventsRow.preis;
@@ -40,6 +42,7 @@ component rest="true" restpath="/v1" {
                 eventData['ortplz'] = qEventsRow.plz;
                 eventData['adresse'] = qEventsRow.adresse;
                 eventData['kinder'] = qEventsRow.kinder;
+                eventData['ev_always_active'] = qEventsRow.ev_always_active;
                 eventData['tipp'] = qEventsRow.tipp;
                 eventData['typs'] = arrayToList(eventTags, ', ');
                 
