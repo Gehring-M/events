@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>veranstaltungsort</overview>
+	<pagetitle>#veranstaltungsort#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+    <editfields> 
+        <field>
+			<name>veranstaltungsort</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>adresse</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>plz</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>ort</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>latitude</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>longitude</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+    </editfields> 
+</ameisen-node>

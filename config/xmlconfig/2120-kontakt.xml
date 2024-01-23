@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>name</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+    <editfields> 
+        <field>
+			<name>name</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>mail</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>accepted_dp</name>
+			<type>datetime</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>accepted_ds</name>
+			<type>datetime</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+    </editfields> 
+</ameisen-node>

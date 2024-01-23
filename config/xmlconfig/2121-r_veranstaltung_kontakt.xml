@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>none</listtype>
+	<overview>veranstaltung_fk,kontakt_fk</overview>
+	<pagetitle>#veranstaltung_fk#-#kontakt_fk#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>veranstaltung_fk</name>
+		<type>genericelement</type>
+		<element>veranstaltung</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>kontakt_fk</name>
+		<type>genericelement</type>
+		<element>kontakt</element>
+		<required>no</required>
+		<multiple>no</multiple>
+	</field>
+</editfields> 
+</ameisen-node>
