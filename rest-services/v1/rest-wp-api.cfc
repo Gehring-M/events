@@ -43,6 +43,7 @@ component rest="true" restpath="/v1" {
                 eventData['adresse'] = qEventsRow.adresse;
                 eventData['kinder'] = qEventsRow.kinder;
                 eventData['ev_always_active'] = qEventsRow.ev_always_active;
+                eventData['visible'] = qEventsRow.visible;
                 eventData['tipp'] = qEventsRow.tipp;
                 eventData['typs'] = arrayToList(eventTags, ', ');
                 
