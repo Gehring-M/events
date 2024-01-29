@@ -13,16 +13,19 @@
         <cfset form["latitude"]=0>
 
         <cfset kid=Structnew()>
-        <cfif structKeyExists(form,"kname") AND form["kname"] neq "" AND structKeyExists(form,"kmail") AND form["kmail"] neq "" AND structKeyExists(form,"accepted_dp") AND form["accepted_dp"] neq "" AND structKeyExists(form,"accepted_ds") AND form["accepted_ds"] neq "">
+        
+        <cfif structKeyExists(form,"kname") AND form["kname"] neq "" AND structKeyExists(form,"kmail") AND form["kmail"] neq "" AND structKeyExists(form,"accepted_dp") AND form["accepted_dp"] neq "" AND structKeyExists(form,"accepted_ds") AND form["accepted_ds"] neq "" AND  isCorrectEmail(form["kmail"])>
             <!---check if email already exists--->
-            <cfset check = getStructuredContent(nodeType=2120, whereclause="mail='#form["kmail"]#'")>
-            <cfif check.recordCount gt 0>
-                <cfset kid=QueryGetRow(check,1)>
+            <cfset check = getStructuredContent(nodeType=2120)>
+            <cfquery dbtype="query" name="kexists">
+            SELECT * FROM check WHERE mail='#form["kmail"]#'
+            </cfquery>
+            <cfif kexists.recordCount gt 0>
+                <cfset kid=QueryGetRow(kexists,1).node_fk>
             <cfelse>
-                <cfset kid= saveStructuredContent(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] })>
+                <cfset kid= saveStructuredContent(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] }).nodeid>
             </cfif>
         <cfelse>
-            <cfreturn form>
         </cfif>
  
         <cfset region_fk="">
@@ -37,7 +40,8 @@
         <cfif region_fk neq "">
             <cfset saveStructuredContent(nodeType=2117, data={"region_fk":region_fk, "veranstaltung_fk": id.nodeid})>
         </cfif>
-        <cfset saveStructuredContent(nodeType=2121, data={"kontakt_fk":kid.id, "veranstaltung_fk": id.nodeid})>
+    
+        <cfset saveStructuredContent(nodeType=2121, data={"kontakt_fk":kid, "veranstaltung_fk": id.nodeid})>
         <cflocation url='https://www.regio-schwaz.tirol/kulturkalender/danke'>
 
     </cffunction>
