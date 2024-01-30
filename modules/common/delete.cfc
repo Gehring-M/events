@@ -20,7 +20,7 @@
 		<cfif arguments.nodeType LTE 2><!--- Bilder oder Uploads --->
 			<!--- Bereinigung: Bei allen Einträgen, wo die Datei dranhängt, Zuordnung entfernen --->
 			<cfset whereclause = ListAppendComplex(whereclause,"FIND_IN_SET(#arguments.records#,bilder)"," OR ")>
-			<cfset whereclause = ListAppendComplex(whereclause,"FIND_IN_SET(#arguments.uploads#,bilder)"," OR ")>
+			<cfset whereclause = ListAppendComplex(whereclause,"FIND_IN_SET(#arguments.records#,uploads)"," OR ")>
 			<!--- Veranstalter / Veranstaltungen / Artisten --->
 			<cfloop list="2101,2102,2103" index="cNodetype">
 				<cfset qItems = getStructuredContent(nodetype=cNodetype,whereclause=whereclause)>
@@ -29,6 +29,7 @@
 					<cfset removeMediaArchiveUploadFlat(qItems.id, 'uploads', arguments.records, cNodetype)>
 				</cfloop>
 			</cfloop>
+			<cfset deleteStructuredContent(arguments.records)>
 			<cfelse>
 				<cfif arguments.nodeType EQ 2102>
 					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
@@ -116,6 +117,7 @@
 			<cfelse>
 			<cfset result["success"] = false>
 		</cfif>
+	</cfif>
 
 	<cfreturn result>
     
