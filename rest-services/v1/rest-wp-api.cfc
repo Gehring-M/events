@@ -11,6 +11,7 @@ component rest="true" restpath="/v1" {
 			whereclause = whereclause & " von <= #heute# AND bis >= #heute# ";
 			whereclause = whereclause & " OR ( von >= #heute# AND bis >= #heute# ) ";
 			whereclause = whereclause & " OR ( von >= #heute# AND bis IS NULL ) ";
+			whereclause = whereclause & " OR ( ev_always_active = 1 ) ";
 			whereclause = whereclause & " ) ";
 		var qEvents = getStructuredContent(nodetype=2102, whereclause=#whereclause#, orderclause="von asc");
 		
