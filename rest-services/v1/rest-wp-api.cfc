@@ -61,5 +61,5 @@ component rest="true" restpath="/v1" {
 			arrayAppend(eventArray, eventData);
 		}
 		return eventArray;
-}	
+	}	
 }
