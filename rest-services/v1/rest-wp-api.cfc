@@ -6,6 +6,15 @@ component rest="true" restpath="/v1" {
 	remote function regiosz() httpmethod="get" {
 		
 		var heute = now();
+		var eventArray = [];
+		var eventData = {};
+		var eventTags = [];
+		var qEvents = queryNew('id');
+		var qEventsRow = queryNew('id');
+		var qVeranstaltungTagRow = queryNew('id');
+		var qTags = queryNew('id');
+		var qVeranstaltungTag = queryNew('id');
+		var qParentEvent = queryNew('id');
 		var whereclause = "visible = 1";
 			whereclause = whereclause & " AND ( ";
 			whereclause = whereclause & " von <= #heute# AND bis >= #heute# ";
@@ -13,21 +22,14 @@ component rest="true" restpath="/v1" {
 			whereclause = whereclause & " OR ( von >= #heute# AND bis IS NULL ) ";
 			whereclause = whereclause & " OR ( ev_always_active = 1 ) ";
 			whereclause = whereclause & " ) ";
-		var qEvents = getStructuredContent(nodetype=2102, whereclause=#whereclause#, orderclause="von asc");
-		
-		var eventArray = [];
-		var eventData = {};
-		var eventTags = [];
-		var qTags = queryNew('id');
-		var qVeranstaltungTag = queryNew('id');
-		var qParentEvent = queryNew('id');
+			qEvents = getStructuredContent(nodetype=2102, whereclause=#whereclause#, orderclause="von asc");
 
-		for (var qEventsRow in qEvents) {
+		for (qEventsRow in qEvents) {
 			eventTags = [];
 			qVeranstaltungTag = getStructuredContent(nodetype=2115, whereclause="veranstaltung_fk = #qEventsRow.node_fk#");
 			qParentEvent = getStructuredContent(nodetype=2102,nodeids=qEventsRow.parent_fk);
 
-			for (var qVeranstaltungTagRow in qVeranstaltungTag) {
+			for (qVeranstaltungTagRow in qVeranstaltungTag) {
 				qTags = getStructuredContent(nodetype=2105, whereclause="id = #qVeranstaltungTagRow.typ_fk#");
 				arrayAppend(eventTags, qTags.pagetitle);
 			}
