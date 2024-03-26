@@ -6,6 +6,7 @@ component rest="true" restpath="/v1" {
 	remote function regiosz() httpmethod="get" {
 		
 		var heute = now();
+		var heuteJahr = createDateTime(year(heute), 1, 1, 0, 0, 0);
 		var eventArray = [];
 		var eventData = {};
 		var eventTags = [];
@@ -17,9 +18,9 @@ component rest="true" restpath="/v1" {
 		var qParentEvent = queryNew('id');
 		var whereclause = "visible = 1";
 			whereclause = whereclause & " AND ( ";
-			whereclause = whereclause & " von <= #heute# AND bis >= #heute# ";
-			whereclause = whereclause & " OR ( von >= #heute# AND bis >= #heute# ) ";
-			whereclause = whereclause & " OR ( von >= #heute# AND bis IS NULL ) ";
+			whereclause = whereclause & " von <= #heuteJahr# AND bis >= #heuteJahr# ";
+			whereclause = whereclause & " OR ( von >= #heuteJahr# AND bis >= #heuteJahr# ) ";
+			whereclause = whereclause & " OR ( von >= #heuteJahr# AND bis IS NULL ) ";
 			whereclause = whereclause & " OR ( ev_always_active = 1 ) ";
 			whereclause = whereclause & " ) ";
 			qEvents = getStructuredContent(nodetype=2102, whereclause=#whereclause#, orderclause="von asc");
