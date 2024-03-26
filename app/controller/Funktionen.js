@@ -187,11 +187,10 @@
 								myRec = rec[cItem.data.name];
 							}
 						}
-				
 						
 						cItem.data.store==="Veranstaltungen" && Ext.data.StoreManager.lookup("Veranstaltungen").addFilter({
 							id:'isChild',
-							filterFn:(record) =>record.data.parent_fk ===null});
+							filterFn:(record) =>record.data.parent_fk ===null && record.data.recordid!==rec.recordid});
 						myFields.push({
 							xtype: 'fieldcontainer',
 							layout: 'hbox',
@@ -874,7 +873,6 @@
 		var reloadDetailGrid = false;
 	
 		myCommonController = myapp.app.getController('Common');
-		let test =record.data.recordid
 		myForm = myWindow.down('form');
 		// objekt zum speichern der parameter erstellen
 		myParams = {};
