@@ -18,11 +18,12 @@
             <!---check if email already exists--->
             <cfset check = getStructuredContent(nodeType=2120)>
             <cfquery dbtype="query" name="kexists">
-            SELECT * FROM check WHERE mail='#form["kmail"]#'
+            SELECT * FROM check WHERE mail=<cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#form["kmail"]#">
             </cfquery>
             <cfif kexists.recordCount gt 0>
                 <cfset kid=QueryGetRow(kexists,1).node_fk>
             <cfelse>
+                <cfset test = formatAndValidateStructuredFields(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] })>
                 <cfset kid= saveStructuredContent(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] }).nodeid>
             </cfif>
         <cfelse>
@@ -34,7 +35,7 @@
         </cfif>
         <cfset test = formatAndValidateStructuredFields(nodeType=2102, data=form)>
         <cfset id= saveStructuredContent(nodeType=2102, data=form)>
-        <cfmail from="#getConfig('mail.from')#" to="#getConfig('mail.to.freigabe')#"  subject="Neue Veranstaltung wurde eingetragen." type="HTML">	
+        <cfmail from="#getConfig('mail.from')#" to="#getConfig('mail.to.freigabe')#"  subject="[Regio Schwaz Kulturkalender] Neue Veranstaltung wurde online eingetragen." type="HTML">	
             Es wurde eine neue Veranstaltung mit dem Namen: <a href="https://events.agindo-services.info/">#form["name"]# über das Formular eingetragen, bitte diese Veranstaltung prüfen.</a>
         </cfmail>
         <cfif region_fk neq "">
