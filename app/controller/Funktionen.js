@@ -190,7 +190,7 @@
 						
 						cItem.data.store==="Veranstaltungen" && Ext.data.StoreManager.lookup("Veranstaltungen").addFilter({
 							id:'isChild',
-							filterFn:(record) =>record.data.parent_fk ===null && record.data.recordid!==rec.recordid});
+							filterFn:(record) =>record.data.parent_fk ===null && record.data.recordid!==rec?.recordid});
 						myFields.push({
 							xtype: 'fieldcontainer',
 							layout: 'hbox',
@@ -215,7 +215,7 @@
 								minChars: (cItem.data.querymode=='local') ? '' : 3,
 								typeAhead: (cItem.data.querymode=='local') ? false : true,
 								hideTrigger: (cItem.data.querymode=='local' || cItem.data.showselectallcombobutton==1 || cItem.data.showenptycombobutton==1 ) ? false : true,
-								value: (rec != undefined) ? myRec : cItem.data.value,
+								value: (rec != undefined) ? myRec!==-1?myRec:"" : cItem.data.value!==-1?cItem.data.value:"",
 								queryMode: cItem.data.querymode,
 								queryParam: 'filterText',
 								agPflichtfeld: (cItem.data.mandatory==1) ? true : false,
