@@ -149,7 +149,7 @@
 				}
 			}]
 		});
-		myWindow.on("close",()=>rmChildFilter())
+		
 		return myWindow;
 		
 	},
@@ -195,7 +195,7 @@
 							xtype: 'fieldcontainer',
 							layout: 'hbox',
 							name: cItem.data.name,
-							
+							width:"100%",
 							labelWidth: myWindow.agLabelWidth,
 							fieldLabel: cItem.data.fieldlabel,
 							disabled: (rec != undefined && rec[cItem.data.name+'_disabled'] != undefined && rec[cItem.data.name+'_disabled'] == true) ? true : false,
@@ -222,7 +222,7 @@
 								multiSelect: (cItem.data.mehrfachauswahl=='ja') ? true : false,
 								readOnly: (cItem.data.readonly==1 || modus=='read' || (rec != undefined && cItem.data.flags != null && cItem.data.flags.indexOf("readonlyineditmodus")!=-1) ) ? true : false,
 								flex: 1,
-								width: (tabname!='') ? '694px' : '',
+								//width: (tabname!='') ? '694px' : '',
 								disabled: (rec != undefined && rec[cItem.data.name+'_disabled'] != undefined && rec[cItem.data.name+'_disabled'] == true || (rec != undefined && cItem.data.flags != null && cItem.data.flags.indexOf("disableineditmodus")!=-1)) ? true : false,
 								queryCaching: false
 							},{
@@ -305,6 +305,7 @@
 							myFields.push({
 								xtype: 'fieldcontainer',
 								agCkEditor: true,
+								width:"100%",
 								labelWidth: myWindow.agLabelWidth,
 								fieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
 								layout: 'hbox',
@@ -500,6 +501,7 @@
 							margin: '0 5 5 5',
                             flex: 1,
                             increment: 15,
+							width:"100%",
                             emptyText: (cItem.data.mandatory==1) ? (cItem.data.emptytext!='') ? cItem.data.emptytext :'Pflichtfeld' :'',
                             value: (rec != undefined) ? rec[cItem.data.name] : cItem.data.value,
                             agPflichtfeld: (cItem.data.mandatory==1) ? true : false,
@@ -613,12 +615,13 @@
 	
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
-		
+	
 		Ext.each(myFieldStore.data.items,function(cItem,index){
 			
 			if (cItem.data.windowname == el.windowName) {
-				if (cItem.data.tab!="" && myTabs.indexOf(cItem.data.tab)==-1) {
-					myTabs.push(cItem.data.tab);
+				console.log(cItem)
+				if (cItem.raw.tab!="" && myTabs.indexOf(cItem.raw.tab)==-1) {
+					myTabs.push(cItem.raw.tab);
 				}
 				
 				if (cItem.data.xtype=="combobox" && cItem.data.valuefield!="") {
@@ -677,62 +680,529 @@
 		// Fenster erzeugen
 		var myWindow = this.createWindow(winwidth,winheight,el.text,'windowfields',maxwinheight,nodeType,modus,el,record);
 		
-		
-		if (myTabs[1] != undefined) {
-			
-			// tabpanel in window einhängen
+		console.log(myWindow)
+		if (myWindow.nodeType === 2102) {
+			myWindow.width="90%"
 			myWindow.down('fieldcontainer[name=windowFields]').add({
 				xtype: 'tabpanel',
 				border: false,
 				flex: 1,
+				width: "100%",
 				height: '100%',
 				margin:'0 5 0 0',
 				margin:'0',
 				name:'tabpanel_'+el.windowName
+			});		// felder und values des tabs holen
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
+				xtype: 'fieldcontainer',
+				layout: 'vbox',
+				flex: 1,
+				width: '100%',
+				height: '100%',
+				margin: '5 5 5 0',
+				title: "Main",
+				name: 'container_'+el.windowName+'_main'
+				//,hidden: (cTab=="ebene3") ? true : false
 			});
-			
-			Ext.each(myTabs,function(cTab,index){
-				myRow = myFieldStore.findExact('tab',cTab),
-				myTabNameRecord = myFieldStore.getAt(myRow);
-				myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
-					xtype: 'fieldcontainer',
-					layout: 'vbox',
-					flex: 1,
-					width: '100%',
-					height: '100%',
-					margin: '5 5 5 0',
-					title: (myTabNameRecord.data.tabname!='') ? myTabNameRecord.data.tabname : cTab,
-					name: 'container_'+el.windowName+'_'+cTab
-					//,hidden: (cTab=="ebene3") ? true : false
-				});
-				
-				// felder und values des tabs holen
-				var myFields = me.getWindowFields(el.windowName,record.data,modus,cTab,myWindow);
-				//console.log(myFields)
-
-				myWindow.down('fieldcontainer[name=container_'+el.windowName+'_'+cTab+']').add(myFields);
-				
-			});
-			
-			var myTabPanel = myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']');
-			var myCard =  myWindow.down('fieldcontainer[name=container_'+el.windowName+'_'+myTabs[0]+']');
-			myTabPanel.setActiveTab(myCard);
 			var myFields = me.getWindowFields(el.windowName,record.data,modus,'',myWindow,ckConfig);
-			
-		} else {
 		
-			// felder und values des tabs holen
+			// felder in window einhängen
+			myWindow.down('fieldcontainer[name=container_'+el.windowName+'_main]').add(myFields);
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
+					disabled:myWindow.title==="Neue Veranstaltung"||myWindow.title==="Neue Subveranstaltung",
+					xtype: 'grid',
+					border: true,
+					flex: 1,
+					title: 'Veranstalter',
+					store: 'RVeranstaltungVeranstalter',
+					name: 'RVeranstaltungVeranstalter',
+					windowName: 'rveranstaltungveranstalter',
+					text: 'Verknüpfung löschen',
+					windowWidth: '200px',
+					nodeType: 2111,
+					minHeight: 500,
+					width:"100%",
+					agShowDeleteButton: true,
+					agShowAbortButton: false,
+					agDoNotShowSaveButton: true,
+					margin: '0 0 0 0',
+					viewConfig: {
+						enableTextSelection: false,
+					},
+					columns: [
+						{ text: 'Veranstalter', dataIndex: 'name', flex: 1 },
+						{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Telefon', dataIndex: 'telefon', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Email', dataIndex: 'email', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Web', dataIndex: 'web', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					],
+					bbar: [{
+						xtype: 'combobox',
+						width: 350,
+						name: 'addVeranstalter',
+						store: 'Veranstalter',
+						displayField: 'name',
+						valueField: 'recordid',
+						queryMode: 'remote',
+						queryDelay: 700,
+						minChars: 3,
+						typeAhead: true,
+						hideTrigger: true,
+						multiSelect: false,
+						queryParam: 'filterText',
+						emptyText: 'Veranstalter suchen und hinzufügen',
+						tpl: Ext.create('Ext.XTemplate',
+							'<ul class="x-list-plain"><tpl for=".">',
+							'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
+							'</tpl></ul>'
+						)
+					}, {
+						xtype: 'button',
+						name: 'addVeranstalter',
+						text: ' Veranstalter verknüpfen',
+						margin: '0 5 0 0',
+						width: 250,
+						cls: 'btn-green'
+					}, {
+						xtype: 'displayfield',
+						flex: 1
+					}, {
+						xtype: 'button',
+						text: 'Veranstalter nicht gefunden? - Neuen Veranstalter hinzufügen',
+						margin: '0 5 0 0',
+						width: 400,
+						windowWidth: '800px',
+						maxWindowHeight: '90%',
+						windowName: 'veranstalter',
+						agVerknuepfungErstellen: true,
+						nodeType: 2101,
+						cls: 'btn-orange',
+						name: 'addNewVeranstalter'
+					}]
+
+
+
+				
+				
+				//,hidden: (cTab=="ebene3") ? true : false
+			});
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
+				disabled:myWindow.title==="Neue Veranstaltung",
+				xtype: 'grid',
+				border: true,
+				flex: 1,
+				title: 'Künstler',
+				store: 'RVeranstaltungArtist',
+				name: 'RVeranstaltungArtist',
+				windowWidth: 800,
+				windowHeight: '',
+				maxWindowHeight: 800,
+				height:500,
+				width:"100%",
+				windowName: 'rveranstaltungartist',
+				text: 'Details bearbeiten',
+				nodeType: 2110,
+				agShowDeleteButton: true,
+				margin: '0 0 0 0',
+				viewConfig: {
+					enableTextSelection: false,
+				},
+				columns: [
+					{ text: 'Künstler', dataIndex: 'name', flex: 1, },
+					{ text: 'Vorname', dataIndex: 'vorname', flex: 1, },
+					{ text: 'Uhrzeit von', dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Uhrzeit bis', dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Veranstaltungsort', dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
+					{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+				],
+				bbar: [{
+					xtype: 'combobox',
+					width: 350,
+					name: 'addArtist',
+					store: 'Artist',
+					displayField: 'name',
+					valueField: 'recordid',
+					queryMode: 'remote',
+					queryDelay: 700,
+					minChars: 3,
+					typeAhead: true,
+					hideTrigger: true,
+					multiSelect: false,
+					queryParam: 'filterText',
+					emptyText: 'Künstler suchen und hinzufügen',
+					tpl: Ext.create('Ext.XTemplate',
+						'<ul class="x-list-plain"><tpl for=".">',
+						'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
+						'</tpl></ul>'
+					)
+				}, {
+					xtype: 'button',
+					name: 'addArtist',
+					text: ' Künstler verknüpfen',
+					margin: '0 5 0 0',
+					width: 250,
+					cls: 'btn-green'
+				}, {
+					xtype: 'displayfield',
+					flex: 1
+				}, {
+					xtype: 'button',
+					text: 'Künstler nicht gefunden? - Neuen Künstler hinzufügen',
+					margin: '0 5 0 0',
+					width: 400,
+					windowWidth: '800px',
+					maxWindowHeight: '90%',
+					windowName: 'artist',
+					nodeType: 2103,
+					cls: 'btn-orange',
+					name: 'addNewArtist'
+				}]
+
+
+
+			})
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
+				disabled:myWindow.title==="Neue Veranstaltung",
+				xtype: 'grid',
+				name: 'tagzuweisung',
+				minHeight: 500,
+				width:"100%",
+				flex: 1,
+				split: true,
+				autoScroll: true,
+				title: 'Tags',
+				collapsible: true,
+				store: 'Tags',
+				plugins: [{
+					ptype: 'bufferedrenderer',
+					trailingBufferZone: 20,
+					leadingBufferZone: 50
+				}],
+				columns: [{
+					width: 28, hideable: false, menuDisabled: true, resizable: false, dataIndex: 'checked', sortable: false,
+					renderer: function (value, data, record) {
+						data.tdCls = 'tdPointer';
+						if (record.data.checked) {
+							return '<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 1px">';
+						} else {
+							return '<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 1px">';
+						}
+					}
+				}, {
+					text: 'Tags', dataIndex: 'name', flex: 1, menuDisabled: true, sortable: false
+				}
+				],
+				bbar: [{
+					xtype: 'textfield',
+					labelSeparator: ' ',
+					labelWidth: 140,
+					width: 360,
+					name: 'gridFilter',
+					margin: '0 0 0 0',
+					labelClsExtra: 'whiteBold',
+					emptyText: 'Schnellfilter nach Tags',
+					enableKeyEvents: true,
+					agSearchFields: 'name',
+					listeners: {
+						keyup: {
+							fn: function (el, event) {
+								if (event.getCharCode() == 27) {
+									el.setValue('');
+								}
+							}
+						}
+					}
+				}, {
+					xtype: 'button',
+					text: 'X',
+					width: 27,
+					height: 24,
+					name: 'gridFilterReset',
+					margin: '0 0 0 0',
+					cls: 'btn-red'
+				}, {
+					xtype: 'displayfield',
+					flex: 1
+				}, {
+					xtype: 'button',
+					text: 'Neuen Tag hinzufügen',
+					height: 24,
+					margin: '0 5 0 0',
+					width: 200,
+					windowWidth: 400,
+					windowHeight: '',
+					maxWindowHeight: 400,
+					windowName: 'tag',
+					nodeType: 2106,
+					cls: 'btn-orange'
+				}]
+			})
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add( {
+				disabled:myWindow.title==="Neue Veranstaltung",
+				xtype: 'fieldcontainer',
+				layout: 'hbox',
+				margin: '0 0 0 5',
+				title: 'Bilder',
+				minHeight: 500,
+		
+				width:"100%",
+				items: [{
+					xtype: 'grid',
+					border: true,
+					flex: 1,
+					store: 'Bilder',
+					name: 'Bilder',
+					height: '100%',
+					windowWidth: 600,
+					windowHeight: '',
+					maxWindowHeight: 500,
+					windowName: 'bilder',
+					text: 'Bilder  bearbeiten / löschen',
+					nodeType: 1,
+					agShowDeleteButton: true,
+					margin: '0 0 0 0',
+					viewConfig: {
+						enableTextSelection: false,
+					},
+					columns: [
+						{
+							text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
+							renderer: function (value) {
+								if (value != "") {
+									return '<div><span></span><img src="' + value + '" class="pointer"/></div>';
+								} else {
+									return 'Nicht verfübar';
+								}
+							}
+						},
+						{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
+						{ text: 'Titel', dataIndex: 'titel', flex: 1 },
+						{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
+						{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
+						{
+							text: 'Ansehen', align: 'center', width: 90,
+							renderer: function (value, data, record) {
+								data.tdCls = 'tdHover';
+								return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+							}
+						},
+						{
+							text: 'Download', align: 'center', width: 90,
+							renderer: function (value, data, record) {
+								data.tdCls = 'tdHover';
+								return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+							}
+						}
+					],
+					bbar: [{
+						xtype: 'textfield',
+						labelSeparator: ' ',
+						labelWidth: 140,
+						width: 360,
+						name: 'gridFilter',
+						margin: '0 0 0 0',
+						labelClsExtra: 'whiteBold',
+						emptyText: 'Schnellfilter für Bilder',
+						enableKeyEvents: true,
+						agSearchFields: 'beschreibung,titel',
+						listeners: {
+							keyup: {
+								fn: function (el, event) {
+									if (event.getCharCode() == 27) {
+										el.setValue('');
+									}
+								}
+							}
+						}
+					}, {
+						xtype: 'button',
+						text: 'X',
+						width: 27,
+						height: 24,
+						name: 'gridFilterReset',
+						margin: '0 0 0 0',
+						cls: 'btn-red'
+					}, {
+						xtype: 'displayfield',
+						flex: 1
+
+					}]
+				}, {
+					xtype: 'panel',
+					border: false,
+					height: "100%",
+					margin: '0 0 0 0',
+					padding: '0 0 0 0',
+					width: "20%",
+					html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="100%" height="100%"></iframe>'
+				}]
+
+			})
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
+				disabled:myWindow.title==="Neue Veranstaltung",
+				xtype: 'fieldcontainer',
+				layout: 'hbox',
+				margin: '0 0 0 5',
+				title: 'Downloads',
+				minHeight: 500,
+				width: '100%',
+				maxHeight: 800,
+				items: [{
+					xtype: 'grid',
+					border: true,
+					flex: 1,
+					store: 'Downloads',
+					name: 'Downloads',
+					windowWidth: 600,
+					windowHeight: '',
+					maxWindowHeight: 500,
+					windowName: 'downloads',
+					text: 'Download bearbeiten / löschen',
+					minHeight: 500,
+					idth: '100%',
+					nodeType: 2,
+					agShowDeleteButton: true,
+					margin: '0 0 0 0',
+					viewConfig: {
+						enableTextSelection: false,
+					},
+
+					columns: [
+						{
+							text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
+							renderer: function (value) {
+								return '<div style="text-align: center" ><img src="' + value + '" /></div>';
+							}
+						},
+						{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
+						{ text: 'Titel', dataIndex: 'titel', flex: 1 },
+						{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
+						{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
+						{ text: 'Dateityp', dataIndex: 'extension', width: 80, align: 'center' },
+						{
+							text: 'Ansehen', align: 'center', width: 90,
+							renderer: function (value, data, record) {
+								if (record.data.previewable == "yes") {
+									data.tdCls = 'tdHover';
+									return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
+								} else {
+									return '<img src="img/noeye.png" title="Diese Datei laden" alt="Diese Datei laden">';
+								}
+							}
+						},
+						{
+							text: 'Download', align: 'center', width: 90,
+							renderer: function (value, data, record) {
+								data.tdCls = 'tdHover';
+								return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
+							}
+						}
+					],
+					bbar: [{
+						xtype: 'textfield',
+						labelSeparator: ' ',
+						labelWidth: 140,
+						width: 360,
+						name: 'gridFilter',
+						margin: '0 0 0 0',
+						labelClsExtra: 'whiteBold',
+						emptyText: 'Schnellfilter für Dokumente',
+						enableKeyEvents: true,
+						agSearchFields: 'beschreibung,titel',
+						listeners: {
+							keyup: {
+								fn: function (el, event) {
+									if (event.getCharCode() == 27) {
+										el.setValue('');
+									}
+								}
+							}
+						}
+					}, {
+						xtype: 'button',
+						text: 'X',
+						width: 27,
+						height: 24,
+						name: 'gridFilterReset',
+						margin: '0 0 0 0',
+						cls: 'btn-red'
+					}, {
+						xtype: 'displayfield',
+						flex: 1
+
+					}]
+				}, {
+					xtype: 'panel',
+					border: false,
+					height: "100%",
+					margin: '0 0 0 0',
+					padding: '0 0 0 0',
+					width: "20%",
+					html: '<iframe src="/modules/multiupload.cfm?typ=uploads&bereich=veranstaltung" width="100%" height="100%"></iframe>'
+				}
+				]
+			})
+			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add( {
+				disabled:myWindow.title==="Neue Veranstaltung" || myWindow.title==="Neue Veranstaltung",
+				xtype: 'fieldcontainer',
+				layout: 'hbox',
+				margin: '0 0 0 5',
+				title: 'Kontakte',
+				minHeight: 500,
+				width:"100%",
+				height: '100%',
+				items: [{
+					xtype: 'grid',
+					border: true,
+					flex: 1,
+					store: 'RVeranstaltungKontakt',
+					name: 'Kontakte',
+					height: '100%',
+					windowWidth: 600,
+					windowHeight: '',
+					maxWindowHeight: 500,
+					text: 'Kontakte ansehen',
+					nodeType: 2120,
+					agShowDeleteButton: false,
+					margin: '0 0 0 0',
+					viewConfig: {
+						enableTextSelection: false,
+					},
+
+					columns: [
+						{ text: 'Name', dataIndex: 'name', align: 'center', width: 118 },
+						{ text: 'Email', dataIndex: 'mail', width: 150 },
+						{ text: 'Datenschutzhinweise', dataIndex: 'accepted_ds', flex: 1 },
+						{ text: 'Datenverarbeitung', dataIndex: 'accepted_dp', flex: 1 },
+					],
+				}
+				
+				]
+			})
+			// // felder und values des tabs holen
+			// var myFields = me.getWindowFields(el.windowName,record.data,modus,'',myWindow,ckConfig);
+		
+			// // felder in window einhängen
+			// myWindow.down('fieldcontainer[name=windowFields]').add(myFields);
+			
+		}
+		else{
 			var myFields = me.getWindowFields(el.windowName,record.data,modus,'',myWindow,ckConfig);
 		
 			// felder in window einhängen
 			myWindow.down('fieldcontainer[name=windowFields]').add(myFields);
-			
 		}
 		
 		// überprüfen, ob comboboxen mit relationen auf andere tabellen auch über die nötigen informationen verfügen
 		Ext.each(myComboboxen,function(cItem,index){
-			console.log(myWindow.down('combobox[name='+cItem+']'))
+		
 			myField = myWindow.down('combobox[name='+cItem+']');
+
+			myField.flex=1
 			myFieldStore = myField.getStore();
 			myFieldValue = myField.getValue();
 			myRow = myFieldStore.findExact(myField.valueField,myFieldValue);
@@ -891,7 +1361,7 @@
 		let vmode = window.location.href.split("#!")[1]==="/common/Veranstalter"
 		// alle zu übermittelnden felder in params schreibem
 		Ext.each(myFields, function(element,index) {
-			console.log(element)
+	
 			if (element.xtype!="image" && element.xtype!="fieldcontainer") {
 				// aktuellen wert finden
 				myTempVal = myWindow.down(element.xtype+'[name='+element.name+']').getValue();
@@ -969,6 +1439,7 @@
 			if(myWindow.duplicate_fk!==undefined){
 			myParams.duplicate_fk=myWindow.duplicate_fk
 			}
+			
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',
 				submitEmptyText: false,
@@ -1028,7 +1499,7 @@
 									});
 								}
 								if (mySaveButton.createNewEntry) {
-									myWindow.duplicate_fk=test
+									myWindow.duplicate_fk=0
 									Ext.each(response, function(cRec,index) {
 										if (cRec.data.recordid == jsonParse['recordid']) {
 											myGrid.getView().select(index)
@@ -1038,12 +1509,30 @@
 									myWindow.setTitle("Duplikat von: "+record.data.name)
 									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
 								}
+								if (myWindow.title==="Neue Veranstaltung") {
+						
+									Ext.each(response, function(cRec,index) {
+										if (cRec.data.recordid == jsonParse['recordid']) {
+											myGrid.getView().select(index)
+											myRecord = cRec;
+											myWindow.setTitle("Veranstaltung bearbeiten")
+											console.log(myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').items.items)
+											myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').items.items.forEach(x=>x.enable())
+											
+										}
+									});
+									
+									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
+								}
 							}
 						});
 						if (!mySaveButton.createNewEntry) {
 							Ext.Msg.alert('Systemnachricht',jsonParse.message);
-		
+							if(myWindow.title!=="Neue Veranstaltung"){
 							myWindow.close();
+							}
+							
+							
 						} 
 						
 					
@@ -1111,7 +1600,3 @@
 	}
 
 });
-const rmChildFilter = () => {			Ext.data.StoreManager.lookup("Veranstaltungen").removeFilter("isChild")
-document.getElementById("dirty123").click()
-
-}

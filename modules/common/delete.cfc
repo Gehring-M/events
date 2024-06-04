@@ -4,32 +4,77 @@
 <cfsilent>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <cffunction name="deleteRecord" access="remote" returnFormat="json">
+
 	<cfargument name="records" required="yes" type="string">
-	<cfargument name="nodeType" required="yes" type="numeric">
-
-	<cfset var result		= {}>
-	<cfset var qItems = QueryNew('id')>
-	<cfset var whereclause = "0=1">
-	<cfset var cNodetype = 0>
+    <cfargument name="nodeType" required="yes" type="numeric">
 	
-	<cfset result["success"] = false>
+	<cfset var result		= {}>
+    <cfset result["success"] = false>
 	<cfset result["message"] = "Der Datensatz konnte nicht gelöscht werden.">
-
-	<cfif isAuth()>
-	<cfif arguments.nodeType LT 2100>
-		<cfif arguments.nodeType LTE 2><!--- Bilder oder Uploads --->
-			<!--- Bereinigung: Bei allen Einträgen, wo die Datei dranhängt, Zuordnung entfernen --->
-			<cfset whereclause = ListAppendComplex(whereclause,"FIND_IN_SET(#arguments.records#,bilder)"," OR ")>
-			<cfset whereclause = ListAppendComplex(whereclause,"FIND_IN_SET(#arguments.records#,uploads)"," OR ")>
-			<!--- Veranstalter / Veranstaltungen / Artisten --->
-			<cfloop list="2101,2102,2103" index="cNodetype">
-				<cfset qItems = getStructuredContent(nodetype=cNodetype,whereclause=whereclause)>
-				<cfloop query="qItems">
-					<cfset removeMediaArchiveUploadFlat(qItems.id, 'bilder', arguments.records, cNodetype)>
-					<cfset removeMediaArchiveUploadFlat(qItems.id, 'uploads', arguments.records, cNodetype)>
+		
+    <cfset allowed = true>
+	<cfif isAuth()>	
+        <cfif allowed>
+			<cfif arguments.nodeType LT 2100>
+				<cfif arguments.nodeType LTE 2>
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM veranstaltung WHERE id = '#session['vaid']#'
+					</cfquery>
+					<cfif ListFind(qCheck.bilder,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE veranstaltung SET bilder = '#ListDeleteAt(qCheck.bilder,ListFind(qCheck.bilder,'#arguments.records#'))#' WHERE id = '#session['vaid']#'
+						</cfquery>
+					</cfif>		
+					<cfif ListFind(qCheck.uploads,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE veranstaltung SET uploads = '#ListDeleteAt(qCheck.uploads,ListFind(qCheck.uploads,'#arguments.records#'))#' WHERE id = '#session['vaid']#'
+						</cfquery>
+					</cfif>		
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM artist WHERE id = '#session['aid']#'
+					</cfquery>
+					<cfif ListFind(qCheck.bilder,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE artist SET bilder = '#ListDeleteAt(qCheck.bilder,ListFind(qCheck.bilder,'#arguments.records#'))#' WHERE id = '#session['aid']#'
+						</cfquery>
+					</cfif>		
+					<cfif ListFind(qCheck.uploads,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE artist SET uploads = '#ListDeleteAt(qCheck.uploads,ListFind(qCheck.uploads,'#arguments.records#'))#' WHERE id = '#session['aid']#'
+						</cfquery>
+					</cfif>		
+					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM veranstalter  WHERE id = '#session['vid']#'
+					</cfquery>
+					<cfif ListFind(qCheck.bilder,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE veranstalter SET bilder = '#ListDeleteAt(qCheck.bilder,ListFind(qCheck.bilder,'#arguments.records#'))#' WHERE id = '#session['vid']#'
+						</cfquery>
+					</cfif>		
+					<cfif ListFind(qCheck.uploads,'#arguments.records#') GT 0>
+						<cfquery datasource="#getConfig('DSN')#">
+							UPDATE veranstalter SET uploads = '#ListDeleteAt(qCheck.uploads,ListFind(qCheck.uploads,'#arguments.records#'))#' WHERE id = '#session['vid']#'
+						</cfquery>
+					</cfif>		
+				</cfif>	
+				<cfloop list="#arguments.records#" index="cRecord">
+					<cfquery name="qDelCheck" datasource="#getConfig('DSN')#">
+						SELECT * FROM veranstaltung WHERE FIND_IN_SET("#cRecord#",bilder) OR FIND_IN_SET("#cRecord#",uploads)
+					</cfquery>
+					<cfif qDelCheck.recordcount EQ 0>
+						<cfquery name="qDelCheck" datasource="#getConfig('DSN')#">
+							SELECT * FROM artist WHERE FIND_IN_SET("#cRecord#",bilder) OR FIND_IN_SET("#cRecord#",uploads)
+						</cfquery>
+						<cfif qDelCheck.recordcount EQ 0>
+							<cfquery name="qDelCheck" datasource="#getConfig('DSN')#">
+								SELECT * FROM veranstalter WHERE FIND_IN_SET("#cRecord#",bilder) OR FIND_IN_SET("#cRecord#",uploads)
+							</cfquery>
+							<cfif qDelCheck.recordcount EQ 0>
+								<cfset deleteStructuredContent(cRecord)>
+							</cfif>	
+						</cfif>	
+					</cfif>	
 				</cfloop>
-			</cfloop>
-			<cfset deleteStructuredContent(arguments.records)>
 			<cfelse>
 				<cfif arguments.nodeType EQ 2102>
 					<cfquery name="qCheck" datasource="#getConfig('DSN')#">
@@ -112,14 +157,14 @@
 					</cfloop>
 				</cfif>		
 			</cfif>	
-			<cfset result["success"] = true>
-			<cfset result["message"] = "Der Datensatz wurde erfolgreich gelöscht.">
-			<cfelse>
-			<cfset result["success"] = false>
-		</cfif>
-	</cfif>
-
-	<cfreturn result>
+            <cfset result["success"] = true>
+            <cfset result["message"] = "Der Datensatz wurde erfolgreich gelöscht.">
+        <cfelse>
+            <cfset result["success"] = false>
+        </cfif>
+    </cfif>
+	
+   	<cfreturn result>
     
 </cffunction>
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->

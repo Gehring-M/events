@@ -46,20 +46,18 @@
 					leadingBufferZone: 50
 				}],
 				columns: [
+					
 					{
-						width: 16, hideable: false, menuDisabled: true, resizable: false, dataIndex: 'opened', sortable: false,
+						width: 16, hideable: false, menuDisabled: true, resizable: false, sortable: false,
 						renderer: function (value, data, record) {
 							if (record.data.parent_fk == null && record.data.children > 0) {
 								data.tdCls = 'tdPointer';
-								if (record.data.opened) {
-									return '<img src="img/opened.png" style="margin-left: -2px; margin-top: 6px">';
-								} else {
+					
 									return '<img src="/img/closed.gif" style="margin-left: -2px; margin-top: 6px">';
-								}
+								
 							}
 						}
 					},
-					{ xtype: 'checkcolumn', name: 'checked', dataIndex: 'checked', width: 38, hideable: false, menuDisabled: true, resizable: false, sortable: false, menuDisabled: true, hidden: true },
 					{
 						text: 'Titel der Veranstaltung', dataIndex: 'name', flex: 2, menuDisabled: true, sortable: true,
 						renderer: function (value, data, record) {
@@ -124,6 +122,7 @@
 						renderer: function (value, data, record) {
 
 							if (record.data.parent_fk == null) {
+								
 								return {
 									xtype: 'button',
 									text: 'Neue Subveranstaltung',
@@ -159,7 +158,22 @@
 													jsonParse.recordid = jsonParse.id
 													jsonParse.uhrzeitvon = jsonParse.uhrzeitvon?.split("")[1]
 													jsonParse.uhrzeitbis = jsonParse.uhrzeitbis?.split("")[1]
-													myController.myFunctions.onOpenWindow(scope.up('grid'), { data: jsonParse }, '')
+													let myWindow =myController.myFunctions.onOpenWindow(scope.up('grid'), { data: jsonParse }, '')
+													
+													console.log(jsonParse)
+															let store = scope.up("grid").up().down("grid[name=SubVeranstaltungen]").getStore()
+															console.log(store)
+															console.log(store.find("recordid", jsonParse.recordid))
+															scope.up("grid").getView().select(scope.up("grid").getStore().find("recordid", jsonParse.parent_fk))
+															store.reload({callback:()=>scope.up("grid").up().down("grid[name=SubVeranstaltungen]").getView().select(store.find("recordid", jsonParse.recordid))})
+															
+															//scope.up("grid").up().down("grid[name=SubVeranstaltungen]").getView().select(store.find("recordid", jsonParse.recordid))
+															
+											
+															
+														
+													
+										
 
 
 
@@ -182,7 +196,7 @@
 									windowWidth: '800px',
 									maxWindowHeight: '90%',
 									nodeType: 2102,
-									nameForeignKey: 'parent_fk',
+									//nameForeignKey: 'parent_fk',
 									listeners: {
 										click: function (value, data, record) {
 
@@ -365,463 +379,51 @@
 				region: 'south',
 				split: true,
 				margin: '0 0 0 0',
+	
 				bodyStyle: {
 					backgroundColor: '#bcbbc3'
 				},
 				name: 'veranstaltungsdetails',
 				items: [{
+					
 					xtype: 'grid',
 					border: true,
 					flex: 1,
-					title: 'Veranstalter',
-					store: 'RVeranstaltungVeranstalter',
-					name: 'RVeranstaltungVeranstalter',
-					windowName: 'rveranstaltungveranstalter',
-					text: 'Verknüpfung löschen',
-					windowWidth: '200px',
-					nodeType: 2111,
+					title: 'Sub Veranstaltungen',
+					store:"SubVeranstaltungen",
+					name: 'SubVeranstaltungen',
+					windowName: 'veranstaltungen',
+					text: 'Sub Veranstaltung bearbeiten',
+					windowWidth: '800px',
+
+					nodeType: 2102,
 					agShowDeleteButton: true,
-					agShowAbortButton: false,
-					agDoNotShowSaveButton: true,
+					agShowAbortButton: true,
+					agDoNotShowSaveButton: false,
 					margin: '0 0 0 0',
 					viewConfig: {
 						enableTextSelection: false,
 					},
 					columns: [
-						{ text: 'Veranstalter', dataIndex: 'name', flex: 1 },
-						{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
-						{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
-						{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
-						{ text: 'Telefon', dataIndex: 'telefon', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
-						{ text: 'Email', dataIndex: 'email', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
-						{ text: 'Web', dataIndex: 'web', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
-					],
-					bbar: [{
-						xtype: 'combobox',
-						width: 350,
-						name: 'addVeranstalter',
-						store: 'Veranstalter',
-						displayField: 'name',
-						valueField: 'recordid',
-						queryMode: 'remote',
-						queryDelay: 700,
-						minChars: 3,
-						typeAhead: true,
-						hideTrigger: true,
-						multiSelect: false,
-						queryParam: 'filterText',
-						emptyText: 'Veranstalter suchen und hinzufügen',
-						tpl: Ext.create('Ext.XTemplate',
-							'<ul class="x-list-plain"><tpl for=".">',
-							'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
-							'</tpl></ul>'
-						)
-					}, {
-						xtype: 'button',
-						name: 'addVeranstalter',
-						text: ' Veranstalter verknüpfen',
-						margin: '0 5 0 0',
-						width: 250,
-						cls: 'btn-green'
-					}, {
-						xtype: 'displayfield',
-						flex: 1
-					}, {
-						xtype: 'button',
-						text: 'Veranstalter nicht gefunden? - Neuen Veranstalter hinzufügen',
-						margin: '0 5 0 0',
-						width: 400,
-						windowWidth: '800px',
-						maxWindowHeight: '90%',
-						windowName: 'veranstalter',
-						agVerknuepfungErstellen: true,
-						nodeType: 2101,
-						cls: 'btn-orange',
-						name: 'addNewVeranstalter'
-					}]
-
-
-
-				}, {
-					xtype: 'grid',
-					border: true,
-					flex: 1,
-					title: 'Künstler',
-					store: 'RVeranstaltungArtist',
-					name: 'RVeranstaltungArtist',
-					windowWidth: 800,
-					windowHeight: '',
-					maxWindowHeight: 800,
-					windowName: 'rveranstaltungartist',
-					text: 'Details bearbeiten',
-					nodeType: 2110,
-					agShowDeleteButton: true,
-					margin: '0 0 0 0',
-					viewConfig: {
-						enableTextSelection: false,
-					},
-					columns: [
-						{ text: 'Künstler', dataIndex: 'name', flex: 1, },
-						{ text: 'Vorname', dataIndex: 'vorname', flex: 1, },
+						{ text: 'Titel', dataIndex: 'name', flex: 1 },
+						{ text: 'Daum von', dataIndex: 'von', width: 110, xtype: 'datecolumn', format: 'd.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Datum bis', dataIndex: 'bis', width: 110, xtype: 'datecolumn', format: 'd.m.Y', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'Uhrzeit von', dataIndex: 'uhrzeitvon', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'Uhrzeit bis', dataIndex: 'uhrzeitbis', width: 110, xtype: 'datecolumn', format: 'H:i', align: 'center', menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'Veranstaltungsort', dataIndex: 'veranstaltungsort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'Adresse', dataIndex: 'adresse', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'PLZ', dataIndex: 'plz', width: 80, menuDisabled: true, menuDisabled: true, sortable: false },
 						{ text: 'Ort', dataIndex: 'ort', flex: 1, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Preis', dataIndex: 'preis', width: 150, menuDisabled: true, menuDisabled: true, sortable: false },
+						{ text: 'Region', dataIndex: 'region', width: 150, menuDisabled: true, menuDisabled: true, sortable: false },
 					],
-					bbar: [{
-						xtype: 'combobox',
-						width: 350,
-						name: 'addArtist',
-						store: 'Artist',
-						displayField: 'name',
-						valueField: 'recordid',
-						queryMode: 'remote',
-						queryDelay: 700,
-						minChars: 3,
-						typeAhead: true,
-						hideTrigger: true,
-						multiSelect: false,
-						queryParam: 'filterText',
-						emptyText: 'Künstler suchen und hinzufügen',
-						tpl: Ext.create('Ext.XTemplate',
-							'<ul class="x-list-plain"><tpl for=".">',
-							'<li role="option" class="x-boundlist-item" style="{optionstyle}">{name}<br>{adresse}<br>{plz} {ort}<hr></li>',
-							'</tpl></ul>'
-						)
-					}, {
-						xtype: 'button',
-						name: 'addArtist',
-						text: ' Künstler verknüpfen',
-						margin: '0 5 0 0',
-						width: 250,
-						cls: 'btn-green'
-					}, {
-						xtype: 'displayfield',
-						flex: 1
-					}, {
-						xtype: 'button',
-						text: 'Künstler nicht gefunden? - Neuen Künstler hinzufügen',
-						margin: '0 5 0 0',
-						width: 400,
-						windowWidth: '800px',
-						maxWindowHeight: '90%',
-						windowName: 'artist',
-						nodeType: 2103,
-						cls: 'btn-orange',
-						name: 'addNewArtist'
-					}]
+					bbar: []
 
 
 
-				}, {
-					xtype: 'grid',
-					name: 'tagzuweisung',
-					flex: 1,
-					split: true,
-					autoScroll: true,
-					title: 'Tags',
-					collapsible: true,
-					store: 'Tags',
-					plugins: [{
-						ptype: 'bufferedrenderer',
-						trailingBufferZone: 20,
-						leadingBufferZone: 50
-					}],
-					columns: [{
-						width: 28, hideable: false, menuDisabled: true, resizable: false, dataIndex: 'checked', sortable: false,
-						renderer: function (value, data, record) {
-							data.tdCls = 'tdPointer';
-							if (record.data.checked) {
-								return '<img src="img/icons/checked.png" style="margin-left: 1px; margin-top: 1px">';
-							} else {
-								return '<img src="img/icons/unchecked.png" style="margin-left: 1px; margin-top: 1px">';
-							}
-						}
-					}, {
-						text: 'Tags', dataIndex: 'name', flex: 1, menuDisabled: true, sortable: false
-					}
-					],
-					bbar: [{
-						xtype: 'textfield',
-						labelSeparator: ' ',
-						labelWidth: 140,
-						width: 360,
-						name: 'gridFilter',
-						margin: '0 0 0 0',
-						labelClsExtra: 'whiteBold',
-						emptyText: 'Schnellfilter nach Tags',
-						enableKeyEvents: true,
-						agSearchFields: 'name',
-						listeners: {
-							keyup: {
-								fn: function (el, event) {
-									if (event.getCharCode() == 27) {
-										el.setValue('');
-									}
-								}
-							}
-						}
-					}, {
-						xtype: 'button',
-						text: 'X',
-						width: 27,
-						height: 24,
-						name: 'gridFilterReset',
-						margin: '0 0 0 0',
-						cls: 'btn-red'
-					}, {
-						xtype: 'displayfield',
-						flex: 1
-					}, {
-						xtype: 'button',
-						text: 'Neuen Tag hinzufügen',
-						height: 24,
-						margin: '0 5 0 0',
-						width: 200,
-						windowWidth: 400,
-						windowHeight: '',
-						maxWindowHeight: 400,
-						windowName: 'tag',
-						nodeType: 2106,
-						cls: 'btn-orange'
-					}]
-				}, {
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					margin: '0 0 0 5',
-					title: 'Bilder',
-					width: '100%',
-					height: '100%',
-					items: [{
-						xtype: 'grid',
-						border: true,
-						flex: 1,
-						store: 'Bilder',
-						name: 'Bilder',
-						height: '100%',
-						windowWidth: 600,
-						windowHeight: '',
-						maxWindowHeight: 500,
-						windowName: 'bilder',
-						text: 'Bilder  bearbeiten / löschen',
-						nodeType: 1,
-						agShowDeleteButton: true,
-						margin: '0 0 0 0',
-						viewConfig: {
-							enableTextSelection: false,
-						},
-						columns: [
-							{
-								text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
-								renderer: function (value) {
-									if (value != "") {
-										return '<div><span></span><img src="' + value + '" class="pointer"/></div>';
-									} else {
-										return 'Nicht verfübar';
-									}
-								}
-							},
-							{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
-							{ text: 'Titel', dataIndex: 'titel', flex: 1 },
-							{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
-							{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
-							{
-								text: 'Ansehen', align: 'center', width: 90,
-								renderer: function (value, data, record) {
-									data.tdCls = 'tdHover';
-									return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
-								}
-							},
-							{
-								text: 'Download', align: 'center', width: 90,
-								renderer: function (value, data, record) {
-									data.tdCls = 'tdHover';
-									return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
-								}
-							}
-						],
-						bbar: [{
-							xtype: 'textfield',
-							labelSeparator: ' ',
-							labelWidth: 140,
-							width: 360,
-							name: 'gridFilter',
-							margin: '0 0 0 0',
-							labelClsExtra: 'whiteBold',
-							emptyText: 'Schnellfilter für Bilder',
-							enableKeyEvents: true,
-							agSearchFields: 'beschreibung,titel',
-							listeners: {
-								keyup: {
-									fn: function (el, event) {
-										if (event.getCharCode() == 27) {
-											el.setValue('');
-										}
-									}
-								}
-							}
-						}, {
-							xtype: 'button',
-							text: 'X',
-							width: 27,
-							height: 24,
-							name: 'gridFilterReset',
-							margin: '0 0 0 0',
-							cls: 'btn-red'
-						}, {
-							xtype: 'displayfield',
-							flex: 1
-
-						}]
-					}, {
-						xtype: 'panel',
-						border: false,
-						height: 1000,
-						margin: '0 0 0 0',
-						padding: '0 0 0 0',
-						width: 480,
-						html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="490" height="1000"></iframe>'
-					}]
-
-				}, {
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					margin: '0 0 0 5',
-					title: 'Downloads',
-					width: '100%',
-					height: '100%',
-					items: [{
-						xtype: 'grid',
-						border: true,
-						flex: 1,
-						store: 'Downloads',
-						name: 'Downloads',
-						height: '100%',
-						windowWidth: 600,
-						windowHeight: '',
-						maxWindowHeight: 500,
-						windowName: 'downloads',
-						text: 'Download bearbeiten / löschen',
-						nodeType: 2,
-						agShowDeleteButton: true,
-						margin: '0 0 0 0',
-						viewConfig: {
-							enableTextSelection: false,
-						},
-
-						columns: [
-							{
-								text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
-								renderer: function (value) {
-									return '<div style="text-align: center" ><img src="' + value + '" /></div>';
-								}
-							},
-							{ text: 'Hochgeladen am', dataIndex: 'createdwhen', width: 150, xtype: 'datecolumn', format: 'd.m.Y', align: 'center' },
-							{ text: 'Titel', dataIndex: 'titel', flex: 1 },
-							{ text: 'Beschreibung', dataIndex: 'beschreibung', flex: 1 },
-							{ text: 'Auflösung', dataIndex: 'resolution', width: 110, align: 'center' },
-							{ text: 'Dateityp', dataIndex: 'extension', width: 80, align: 'center' },
-							{
-								text: 'Ansehen', align: 'center', width: 90,
-								renderer: function (value, data, record) {
-									if (record.data.previewable == "yes") {
-										data.tdCls = 'tdHover';
-										return '<img src="img/eye.png" title="Diese Datei ansehen" alt="Diese Datei ansehen">';
-									} else {
-										return '<img src="img/noeye.png" title="Diese Datei laden" alt="Diese Datei laden">';
-									}
-								}
-							},
-							{
-								text: 'Download', align: 'center', width: 90,
-								renderer: function (value, data, record) {
-									data.tdCls = 'tdHover';
-									return '<img src="img/download.png" title="Diese Datei laden" alt="Diese Datei laden">';
-								}
-							}
-						],
-						bbar: [{
-							xtype: 'textfield',
-							labelSeparator: ' ',
-							labelWidth: 140,
-							width: 360,
-							name: 'gridFilter',
-							margin: '0 0 0 0',
-							labelClsExtra: 'whiteBold',
-							emptyText: 'Schnellfilter für Dokumente',
-							enableKeyEvents: true,
-							agSearchFields: 'beschreibung,titel',
-							listeners: {
-								keyup: {
-									fn: function (el, event) {
-										if (event.getCharCode() == 27) {
-											el.setValue('');
-										}
-									}
-								}
-							}
-						}, {
-							xtype: 'button',
-							text: 'X',
-							width: 27,
-							height: 24,
-							name: 'gridFilterReset',
-							margin: '0 0 0 0',
-							cls: 'btn-red'
-						}, {
-							xtype: 'displayfield',
-							flex: 1
-
-						}]
-					}, {
-						xtype: 'panel',
-						border: false,
-						height: 1000,
-						margin: '0 0 0 0',
-						padding: '0 0 0 0',
-						width: 480,
-						html: '<iframe src="/modules/multiupload.cfm?typ=uploads&bereich=veranstaltung" width="490" height="1000"></iframe>'
-					}
-					]
 				}
 
-					, {
-					xtype: 'fieldcontainer',
-					layout: 'hbox',
-					margin: '0 0 0 5',
-					title: 'Kontakte',
-					width: '100%',
-					height: '100%',
-					items: [{
-						xtype: 'grid',
-						border: true,
-						flex: 1,
-						store: 'RVeranstaltungKontakt',
-						name: 'Kontakte',
-						height: '100%',
-						windowWidth: 600,
-						windowHeight: '',
-						maxWindowHeight: 500,
-						text: 'Kontakte ansehen',
-						nodeType: 2120,
-						agShowDeleteButton: false,
-						margin: '0 0 0 0',
-						viewConfig: {
-							enableTextSelection: false,
-						},
-
-						columns: [
-							{ text: 'Name', dataIndex: 'name', align: 'center', width: 118 },
-							{ text: 'Email', dataIndex: 'mail', width: 150 },
-							{ text: 'Datenschutzhinweise', dataIndex: 'accepted_ds', flex: 1 },
-							{ text: 'Datenverarbeitung', dataIndex: 'accepted_dp', flex: 1 },
-						],
-					}
 					
-					]
-				}
 				
 
 			
@@ -837,5 +439,3 @@
 
 
 });
-setTimeout(() =>
-	document.getElementById("dirty123").click(), 200)

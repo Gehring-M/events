@@ -275,6 +275,7 @@
 		
 	<cfargument name="filterOrt" type="string" required="no" default="">
 	<cfargument name="filterBezirk" type="string" required="no" default="">
+	<cfargument name="sub" required="no" default="">
 		
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
@@ -298,6 +299,7 @@
 					<cfif arguments.filterBis NEQ "">
 						AND von <= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterBis#">
 					</cfif>
+					
 			</cfquery>
 		</cfif>
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
@@ -314,11 +316,14 @@
 					<cfelse>
 						AND 1=2
 					</cfif>	
-				</cfif>	
+				</cfif>
+				<cfif arguments.sub NEQ "">
+						AND v1.parent_fk = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.sub#">
+					</cfif>	
 			ORDER BY 
 				v1.von, v1.uhrzeitvon
 		</cfquery>
-			
+		
 		<cfquery name="qVATyp" datasource="#getConfig('DSN')#">
 			SELECT * FROM r_veranstaltung_typ 
 		</cfquery>
@@ -328,7 +333,7 @@
 					
 		<cfloop query="qData">
 			
-			<cfif qData.parent_fk EQ "">
+			<cfif qData.parent_fk EQ "" OR arguments.sub neq "">
 			
 				<cfquery name="qSubData" dbtype="query">
 					SELECT * FROM qData WHERE parent_fk = '#qData.id#'
@@ -344,7 +349,7 @@
 		</cfquery>
 				<cfset tmpStruct = {}>
 				<cfset tmpStruct["recordid"] = qData.id>
-				<cfset tmpStruct["parent_fk"] = null>
+				<cfset tmpStruct["parent_fk"] = qData.parent_fk>
 				<cfset tmpStruct["children"] = qSubData.recordcount>
 				<cfset tmpStruct["opened"] = 0>
 				<cfset tmpStruct["name"] = qData.name>
@@ -378,7 +383,7 @@
 				<cfset tmpStruct["ev_always_active"]	= qData.ev_always_active>
 				<cfset tmpStruct["extern"]	= qData.extern>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
-				
+				<cfif arguments.sub neq "">
 				<cfloop query="qSubData">
 					<cfquery name="tmpVATyp" dbtype="query">
 						SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qSubData.id#'
@@ -422,7 +427,7 @@
 						<cfset tmpStruct["visible"]	= qSubData.visible>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
-
+			</cfif>	
 			</cfif>	
 				
 		</cfloop>
