@@ -188,9 +188,7 @@
 							}
 						}
 						
-						cItem.data.store==="Veranstaltungen" && Ext.data.StoreManager.lookup("Veranstaltungen").addFilter({
-							id:'isChild',
-							filterFn:(record) =>record.data.parent_fk ===null && record.data.recordid!==rec?.recordid});
+						//cItem.data.store==="Veranstaltungen" && Ext.data.StoreManager.lookup("Veranstaltungen").addFilter({	id:'isChild',filterFn:(record) =>record.data.parent_fk ===null && record.data.recordid!==rec?.recordid});
 						myFields.push({
 							xtype: 'fieldcontainer',
 							layout: 'hbox',
@@ -1207,7 +1205,7 @@
 			myFieldValue = myField.getValue();
 			myRow = myFieldStore.findExact(myField.valueField,myFieldValue);
 			if (myRow == -1) {
-				myFieldStore.load();
+			//	myFieldStore.load();
 			}
 			
 		});
@@ -1267,22 +1265,13 @@
 											callback: function(response) {
 												if (openedNodes.length > 0) {
 													var tmpStore = myCommonController.getVeranstaltungenStore();
-													tmpStore.removeFilter('filterOpened');
+													//tmpStore.removeFilter('filterOpened');
 													Ext.Array.each(tmpStore.data.items,function(cItem) {
 														if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
 															cItem.set('opened',true);
 														}
 													});
-													tmpStore.addFilter({
-														id:'filterOpened',
-														filterFn:function(record) {
-															if (record.data.opened || record.data.parent_fk == "") {
-																return true;
-															} else {
-																return false;
-															}
-														}
-													});
+													
 												}
 												if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
 													setTimeout(function(){
@@ -1425,14 +1414,6 @@
 			reloadDetailGrid = true;
 		}
 		
-		openedNodes = [];
-		if (el.nodeType == 2102) {
-			Ext.Array.each(myCommonController.getVeranstaltungenStore().data.items,function(cItem) {
-				if (cItem.data.parent_fk == null && cItem.data.opened) {
-					openedNodes.push(cItem.data.recordid);
-				}
-			});
-		}
 	
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
@@ -1479,25 +1460,7 @@
 			
 						myReloadStore.reload({
 							callback: function(response) {
-								if (openedNodes.length > 0) {
-									var tmpStore = myCommonController.getVeranstaltungenStore();
-									tmpStore.removeFilter('filterOpened');
-									Ext.Array.each(tmpStore.data.items,function(cItem) {
-										if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
-											cItem.set('opened',true);
-										}
-									});
-									tmpStore.addFilter({
-										id:'filterOpened',
-										filterFn:function(record) {
-											if (record.data.opened || record.data.parent_fk == null) {
-												return true;
-											} else {
-												return false;
-											}
-										}
-									});
-								}
+							
 								if (mySaveButton.createNewEntry) {
 									myWindow.duplicate_fk=0
 									Ext.each(response, function(cRec,index) {

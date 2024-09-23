@@ -488,6 +488,8 @@
 		var me = this;
 		if (el.hasOwnProperty('windowName')) {
 			myStore = el.up('form').down('grid').getStore();
+			//reset store filter
+			myStore.clearFilter(true);
 			myGrid = el.up('form').down('grid');
 			if (el.hasOwnProperty('gridNodeTypeForForeignKey')) {
 				myGrid = el.up('form').down('grid[nodeType=' + el.gridNodeTypeForForeignKey + ']');
