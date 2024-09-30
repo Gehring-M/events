@@ -54,7 +54,7 @@ component rest="true" restpath="/v1" {
 			eventData['uhrzeitbis'] = qEventsRow.uhrzeitbis;
 			eventData['veranstaltungsort'] = qEventsRow.veranstaltungsort;
 			eventData['ort'] = qEventsRow.ort;
-			eventData['ortplz'] = qEventsRow.plz;
+			eventData['plz'] = qEventsRow.plz;
 			eventData['adresse'] = qEventsRow.adresse;
 			eventData['kinder'] = qEventsRow.kinder;
 			eventData['ev_always_active'] = qEventsRow.ev_always_active;
