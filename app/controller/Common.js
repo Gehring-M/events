@@ -59,6 +59,10 @@
 			this.myAuthStore = authStore
 		this.myFunctions = myapp.app.getController('Funktionen');
 		this.isAdministrator = (authStore.findExact('administrator', true) == 0) ? true : false;
+		this.getTagsStore().load();
+		this.getKategorienStore().load();
+		this.getTypStore().load();
+		this.getRegionStore().load();
 		this.user_fk = authStore.getAt(0).data.user_fk;
 		this.cVeranstaltung = 0;
 		this.cArtist = 0;
