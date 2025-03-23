@@ -1,4 +1,16 @@
+<<<<<<< HEAD
 *.svn-base
 /ext-4.2.1.883/*
 /WEB-INF/*
 /ameisen/*
+=======
+ameisen
+media/*
+!media/.gitkeep
+!media/.htaccess
+temp/*
+!temp/.gitkeep
+WEB-INF
+.vscode
+ext-4.2.1.883
+>>>>>>> 0c5a949 (gitignor eund getkeep)
