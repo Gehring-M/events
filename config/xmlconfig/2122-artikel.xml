@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ameisen-node>
 	<config>
-		<listtype>both</listtype>
-		<overview>datum,titel</overview>
-		<autopublish>yes</autopublish>
-		<usehistory>no</usehistory>
+		<listtype>fieldorder</listtype>
+		<overview>titel</overview>
+		<orderfields>id</orderfields>
 		<pagetitle>#titel#</pagetitle>
-		<defaultdateoffset>29000</defaultdateoffset>
-		<orderfields>datum DESC,createdwhen DESC</orderfields>
+		<keytype>id</keytype>
 	</config>
 	<editfields>
-		<!-- ########################################## -->
+		<!-- ################################################################### -->
 		<field>
-			<name>datum</name>
-			<type>date</type>
+			<name>parent_fk</name>
+			<type>genericelement</type>
+			<element>artikel</element>
+			<required>no</required>
+			<multiple>no</multiple>
 		</field>
 		<!-- ################################################################### -->
 		<field>
@@ -23,48 +24,101 @@
 		</field>
 		<!-- ################################################################### -->
 		<field>
-			<name>teaser</name>
+			<name>teaserbild</name>
 			<type>image</type>
 			<image>
-				<category>ma-wartbare-inhalte/ma-teaser/</category>
-				<onlycategory>yes</onlycategory>
-			</image>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>bilder</name>
-			<type>image</type>
-			<image>
-				<category>ma-wartbare-inhalte/ma-news/ma-newsbilder/</category>
+				<category>ma-artikelfotos</category>
 				<onlycategory>no</onlycategory>
 			</image>
 		</field>
 		<!-- ################################################################### -->
 		<field>
 			<name>anriss</name>
-			<type>textlong</type>
+			<type>richtext</type>
+			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
 		<field>
 			<name>inhalt</name>
 			<type>richtext</type>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>tag_fk</name>
-	        <type>genericelement</type>
-			<element>tag</element>
-			<multiple>no</multiple>
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
 		<field>
-			<name>link</name>
-			<type>textlong</type>
+			<name>von</name>
+			<type>date</type>
+			<required>yes</required>
 		</field>
 		<!-- ################################################################### -->
-    	</editfields>
-        <uploads>
+		<field>
+			<name>bis</name>
+			<type>date</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>uhrzeitvon</name>
+			<type>datetime</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>uhrzeitbis</name>
+			<type>datetime</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>ort_fk</name>
+			<type>genericelement</type>
+			<element>ort</element>
+			<required>no</required>
+			<multiple>no</multiple>
+		</field>
+	
+		<!-- ################################################################### -->
+		<field>
+			<name>latitude</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>longitude</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+
+		<!-- ################################################################### -->
+		<field>
+			<name>link</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>tipp</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+			<!-- ################################################################### -->
+		<field>
+			<name>ev_always_active</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>visible</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>extern</name>
+			<type>integer</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+	<uploads>
 		<upload>
 			<name>uploads</name>
 			<type>medienarchiveintrag</type>
@@ -72,7 +126,7 @@
 			<multiple>no</multiple>
 		</upload>
 		<upload>
-			<name>bilde</name>
+			<name>bilder</name>
 			<type>medienarchiveintrag</type>
 			<category>ma-droploader</category>
 			<multiple>no</multiple>
