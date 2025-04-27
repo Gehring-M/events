@@ -121,6 +121,12 @@
 		</field>
 		<!-- ################################################################### -->
 		<field>
+			<name>showteasertext</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
 			<name>tipp</name>
 			<type>bool</type>
 			<required>no</required>

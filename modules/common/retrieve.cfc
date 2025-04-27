@@ -378,6 +378,7 @@
 				<cfset tmpStruct["region"]	= RRegion.name>
 				<cfset tmpStruct["tipp"]	= qData.tipp>
 				<cfset tmpStruct["kinder"]	= qData.kinder>
+				<cfset tmpStruct["showteasertext"]	= qData.showteasertext>
 				<cfset tmpStruct["duplicate_fk"] = qData.duplicate_fk>
 				<cfset tmpStruct["visible"]	= qData.visible>
 				<cfset tmpStruct["ev_always_active"]	= qData.ev_always_active>
@@ -423,6 +424,7 @@
 						<cfset tmpStruct["extern"]	= qSubData.extern>
 						<cfset tmpStruct["tipp"]	= qSubData.tipp>
 						<cfset tmpStruct["kinder"]	= qSubData.kinder>
+						<cfset tmpStruct["showteasertext"]	= qSubData.showteasertext>
 						<cfset tmpStruct["ev_always_active"]	= qSubData.ev_always_active>
 						<cfset tmpStruct["visible"]	= qSubData.visible>
 					<cfset ArrayAppend(returnArray, tmpStruct)>

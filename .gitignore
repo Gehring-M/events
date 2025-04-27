@@ -1,0 +1,4 @@
+*.svn-base
+/ext-4.2.1.883/*
+/WEB-INF/*
+/ameisen/*

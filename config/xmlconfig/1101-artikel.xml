@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+	<config>
+		<listtype>both</listtype>
+		<overview>datum,titel</overview>
+		<autopublish>yes</autopublish>
+		<usehistory>no</usehistory>
+		<pagetitle>#titel#</pagetitle>
+		<defaultdateoffset>29000</defaultdateoffset>
+		<orderfields>datum DESC,createdwhen DESC</orderfields>
+	</config>
+	<editfields>
+		<!-- ########################################## -->
+		<field>
+			<name>datum</name>
+			<type>date</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>titel</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>teaser</name>
+			<type>image</type>
+			<image>
+				<category>ma-wartbare-inhalte/ma-teaser/</category>
+				<onlycategory>yes</onlycategory>
+			</image>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>bilder</name>
+			<type>image</type>
+			<image>
+				<category>ma-wartbare-inhalte/ma-news/ma-newsbilder/</category>
+				<onlycategory>no</onlycategory>
+			</image>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>anriss</name>
+			<type>textlong</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>inhalt</name>
+			<type>richtext</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>tag_fk</name>
+	        <type>genericelement</type>
+			<element>tag</element>
+			<multiple>no</multiple>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>link</name>
+			<type>textlong</type>
+		</field>
+		<!-- ################################################################### -->
+    	</editfields>
+        <uploads>
+		<upload>
+			<name>uploads</name>
+			<type>medienarchiveintrag</type>
+			<category>ma-droploader</category>
+			<multiple>no</multiple>
+		</upload>
+		<upload>
+			<name>bilde</name>
+			<type>medienarchiveintrag</type>
+			<category>ma-droploader</category>
+			<multiple>no</multiple>
+		</upload>
+	</uploads>
+</ameisen-node>

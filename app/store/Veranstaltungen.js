@@ -78,6 +78,8 @@
 	},{ 
 		name: 'kinder'
 	},{ 
+		name: 'showteasertext'
+	},{ 
 		name: 'visible'
 	},{ 
 		name: 'ev_always_active'

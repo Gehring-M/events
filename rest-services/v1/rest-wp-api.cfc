@@ -57,6 +57,7 @@ component rest="true" restpath="/v1" {
 			eventData['ortplz'] = qEventsRow.plz;
 			eventData['adresse'] = qEventsRow.adresse;
 			eventData['kinder'] = qEventsRow.kinder;
+			eventData['showteasertext'] = qEventsRow.showteasertext;
 			eventData['ev_always_active'] = qEventsRow.ev_always_active;
 			eventData['visible'] = qEventsRow.visible;
 			eventData['tipp'] = qEventsRow.tipp;
