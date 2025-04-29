@@ -51,16 +51,11 @@
 		</field>
 		<!-- ################################################################### -->
 		<field>
-			<name>von</name>
-			<type>date</type>
-			<required>yes</required>
+			<name>showinslider</name>
+			<type>bool</type>
+			<required>no</required>
 		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>bis</name>
-			<type>date</type>
-		</field>
-
+		
 		<!-- ################################################################### -->
 		<field>
 			<name>link</name>
