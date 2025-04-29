@@ -24,6 +24,12 @@
 		</field>
 		<!-- ################################################################### -->
 		<field>
+			<name>untertitel</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
 			<name>teaserbild</name>
 			<type>image</type>
 			<image>
@@ -54,66 +60,11 @@
 			<name>bis</name>
 			<type>date</type>
 		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>uhrzeitvon</name>
-			<type>datetime</type>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>uhrzeitbis</name>
-			<type>datetime</type>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>ort_fk</name>
-			<type>genericelement</type>
-			<element>ort</element>
-			<required>no</required>
-			<multiple>no</multiple>
-		</field>
-	
-		<!-- ################################################################### -->
-		<field>
-			<name>latitude</name>
-			<type>textshort</type>
-			<required>no</required>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>longitude</name>
-			<type>textshort</type>
-			<required>no</required>
-		</field>
 
 		<!-- ################################################################### -->
 		<field>
 			<name>link</name>
 			<type>textshort</type>
-			<required>no</required>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>tipp</name>
-			<type>bool</type>
-			<required>no</required>
-		</field>
-			<!-- ################################################################### -->
-		<field>
-			<name>ev_always_active</name>
-			<type>bool</type>
-			<required>no</required>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>visible</name>
-			<type>bool</type>
-			<required>no</required>
-		</field>
-		<!-- ################################################################### -->
-		<field>
-			<name>extern</name>
-			<type>integer</type>
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
