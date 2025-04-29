@@ -55,11 +55,16 @@
 			<type>bool</type>
 			<required>no</required>
 		</field>
-		
 		<!-- ################################################################### -->
 		<field>
 			<name>link</name>
 			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>credits</name>
+			<type>textlong</type>
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
