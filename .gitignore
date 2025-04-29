@@ -13,4 +13,8 @@ temp/*
 WEB-INF
 .vscode
 ext-4.2.1.883
+<<<<<<< HEAD
 >>>>>>> 0c5a949 (gitignor eund getkeep)
+=======
+media/.htaccess
+>>>>>>> fce37b2 (CKEditor)
