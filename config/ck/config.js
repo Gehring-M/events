@@ -29,19 +29,19 @@ config.stylesSet = [
 		name: 'Bild linksbündig',
 		element: 'img',
 		attributes: {
-			'class': 'ag-img-left'
+			'style':"float: left; display: margin-right: 1em; margin-bottom: 0.67em; max-width: 50%; height: auto;"
 		}
 	},{
 		name: 'Bild zentriert',
 		element: 'img',
 		attributes: {
-			'class': 'ag-img-center'
+			'style':"display: block; margin-left: auto; margin-right: auto; margin-bottom: 0.67em; max-width: 100%, height: auto;"
 		}
 	},{
 		name: 'Bild rechtsbündig',
 		element: 'img',
 		attributes: {
-			'class': 'ag-img-right'
+			'style':"float: right; margin-left: 1em; margin-bottom: 0.67em; max-width: 50%; height: auto;"
 		}
 	},{
 		name: 'Special Container',
