@@ -55,12 +55,12 @@
 	</field>
 	<field>
 		<name>latitude</name> 
-		<type>textshort</type>
+		<type>float</type>
 		<required>no</required>
 	</field>
 	<field>
 		<name>longitude</name> 
-		<type>textshort</type>
+		<type>float</type>
 		<required>no</required>
 	</field>
 	<field>
@@ -99,13 +99,13 @@
 		<name>uploads</name>
 		<type>medienarchiveintrag</type>
 		<category>ma-droploader</category>
-		<multiple>no</multiple>
+		<multiple>yes</multiple>
 	</upload>
 	<upload>
 		<name>bilder</name>
 		<type>medienarchiveintrag</type>
 		<category>ma-droploader</category>
-		<multiple>no</multiple>
+		<multiple>yes</multiple>
 	</upload>
 </uploads>	
 </ameisen-node>

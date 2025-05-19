@@ -38,12 +38,12 @@
 	</field>
 	<field>
 		<name>latitude</name> 
-		<type>textshort</type>
+		<type>float</type>
 		<required>no</required>
 	</field>
 	<field>
 		<name>longitude</name> 
-		<type>textshort</type>
+		<type>float</type>
 		<required>no</required>
 	</field>
 	<field>

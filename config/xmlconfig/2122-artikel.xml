@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+	<config>
+		<listtype>fieldorder</listtype>
+		<overview>titel</overview>
+		<orderfields>id</orderfields>
+		<pagetitle>#titel#</pagetitle>
+		<keytype>id</keytype>
+	</config>
+	<editfields>
+		<!-- ################################################################### -->
+		<field>
+			<name>parent_fk</name>
+			<type>genericelement</type>
+			<element>artikel</element>
+			<required>no</required>
+			<multiple>no</multiple>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>titel</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>untertitel</name>
+			<type>textshort</type>
+			<required>yes</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>teaserbild</name>
+			<type>image</type>
+			<image>
+				<category>ma-artikelfotos</category>
+				<onlycategory>no</onlycategory>
+			</image>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>anriss</name>
+			<type>richtext</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>inhalt</name>
+			<type>richtext</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>showinslider</name>
+			<type>bool</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>link</name>
+			<type>textshort</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>credits</name>
+			<type>textlong</type>
+			<required>no</required>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+	<uploads>
+		<upload>
+			<name>uploads</name>
+			<type>medienarchiveintrag</type>
+			<category>ma-droploader</category>
+			<multiple>no</multiple>
+		</upload>
+		<upload>
+			<name>bilder</name>
+			<type>medienarchiveintrag</type>
+			<category>ma-droploader</category>
+			<multiple>no</multiple>
+		</upload>
+	</uploads>
+</ameisen-node>
