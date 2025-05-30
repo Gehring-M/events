@@ -27,8 +27,8 @@ component rest="true" restpath="/artist" {
         var veranstaltungen = queryExecute(
             "SELECT v.* 
              FROM veranstaltung v 
-             INNER JOIN r_veranstaltung_artist va ON v.id = va.veranstaltung_id 
-             WHERE va.artist_id = :id 
+             INNER JOIN r_veranstaltung_artist va ON v.id = va.veranstaltung_fk 
+             WHERE va.artist_fk = :id 
              ORDER BY v.von DESC",
             {id={value=arguments.id, cfsqltype="cf_sql_integer"}},
             {datasource="#getConfig('DSN')#"}
