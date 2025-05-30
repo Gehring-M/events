@@ -21,6 +21,82 @@
   - Inkl. Veranstalter
   - Response: `{ success: true, veranstaltung: {...}, artists: [...], veranstalter: {...} }`
 
+#### Filter-Endpoints
+
+##### Datum und Zeitraum Filter
+
+- `GET /rest/v3/veranstaltung/filter/date`
+
+  ```bash
+  # Events zwischen zwei Daten
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/date?fromDate=2025-06-01&toDate=2025-06-30"
+  ```
+
+  - Parameter:
+    - `fromDate` - Startdatum im Format YYYY-MM-DD (Pflichtfeld)
+    - `toDate` - Enddatum im Format YYYY-MM-DD (Pflichtfeld)
+
+- `GET /rest/v3/veranstaltung/filter/year/{year}`
+
+  ```bash
+  # Events eines bestimmten Jahres
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/year/2025"
+  
+  # Events des Jahres 2023
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/year/2023"
+  ```
+
+  - Parameter:
+    - `year` - Jahreszahl (z.B. 2023, 2025, 2026)
+
+- `GET /rest/v3/veranstaltung/filter/next/{days}`
+
+  ```bash
+  # Events der nächsten 7 Tage
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/7"
+  
+  # Events der nächsten 30 Tage
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/30"
+  
+  # Events der nächsten 90 Tage
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/90"
+  ```
+
+  - Parameter:
+    - `days` - Anzahl der Tage (nur 7, 30 oder 90 erlaubt)
+
+##### Veranstaltungstyp Filter
+
+- `GET /rest/v3/veranstaltung/filter/typ/{typId}`
+
+  ```bash
+  # Events einer bestimmten Kategorie
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/typ/2"
+  ```
+
+  - Parameter:
+    - `typId` - ID des Veranstaltungstyps (aus der Tabelle typ)
+
+Response Format
+
+```json
+{
+  "success": true,
+  "veranstaltungen": [
+    {
+      "id": 123,
+      "name": "Beispiel Event",
+      "von": "2025-06-01",
+      "bis": "2025-06-02",
+      "beschreibung": "...",
+      "ort": "Innsbruck",
+      "plz": "6020",
+      "visible": 1
+    }
+  ]
+}
+```
+
 ### Veranstalter
 - `GET /rest/v3/veranstalter` - Liste aller Veranstalter
   - Sortiert nach Name
