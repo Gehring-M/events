@@ -68,6 +68,20 @@
   - Parameter:
     - `days` - Beliebige positive Anzahl von Tagen (maximal 365)
 
+- `GET /rest/v3/veranstaltung/filter/next/{days}/{regionId}`
+
+  ```bash
+  # Events der nächsten 30 Tage in Region 2
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/30/2"
+  
+  # Events der nächsten 7 Tage in Region 5
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/7/5"
+  ```
+
+  - Parameter:
+    - `days` - Beliebige positive Anzahl von Tagen (maximal 365)
+    - `regionId` - ID der Region (aus der Tabelle `region`)
+
 ##### Veranstaltungstyp Filter
 
 - `GET /rest/v3/veranstaltung/filter/typ/{typId}`

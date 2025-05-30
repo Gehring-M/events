@@ -178,6 +178,73 @@ component rest="true" restpath="/veranstaltung" {
         return formattedResponse;
     }
 
+    // Veranstaltungen der nächsten X Tage nach Region filtern
+    remote struct function getNextDaysByRegion(
+        numeric days restargsource="Path",
+        numeric regionId restargsource="Path"
+    ) httpmethod="GET" restpath="filter/next/{days}/{regionId}" returnformat="json" {
+        // Sicherstellen, dass days eine positive Zahl ist
+        if (arguments.days <= 0) {
+            return {
+                success: false,
+                message: "Bitte eine positive Anzahl von Tagen angeben"
+            };
+        }
+        
+        // Optional: Maximale Anzahl von Tagen begrenzen, um Performance-Probleme zu vermeiden
+        if (arguments.days > 365) {
+            return {
+                success: false,
+                message: "Die maximale Anzahl von Tagen ist auf 365 begrenzt"
+            };
+        }
+        
+        // Datumsbereich berechnen
+        var startDate = now();
+        var endDate = dateAdd("d", arguments.days, startDate);
+        
+        var veranstaltungen = queryExecute(
+            "SELECT v.* 
+             FROM veranstaltung v
+             INNER JOIN r_veranstaltung_region vr ON v.id = vr.veranstaltung_fk
+             WHERE v.visible = 1
+             AND vr.region_fk = :regionId
+             AND (
+                /* Veranstaltung beginnt im Zeitraum */
+                (v.von >= :startDate AND v.von <= :endDate)
+                /* Veranstaltung endet im Zeitraum */
+                OR (v.bis IS NOT NULL AND v.bis >= :startDate AND v.bis <= :endDate)
+                /* Veranstaltung umfasst den gesamten Zeitraum */
+                OR (v.von <= :startDate AND (v.bis IS NOT NULL AND v.bis >= :endDate))
+             )
+             ORDER BY v.von ASC",
+            {
+                regionId={value=arguments.regionId, cfsqltype="cf_sql_integer"},
+                startDate={value=startDate, cfsqltype="cf_sql_date"},
+                endDate={value=endDate, cfsqltype="cf_sql_date"}
+            },
+            {datasource="#getConfig('DSN')#"}
+        );
+        
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
+        };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
+    }
+    
     // Veranstaltungen nach Typ/Kategorie filtern
     remote struct function getByTyp(
         numeric typId restargsource="Path"
