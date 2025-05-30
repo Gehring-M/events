@@ -82,6 +82,36 @@
     - `days` - Beliebige positive Anzahl von Tagen (maximal 365)
     - `regionId` - ID der Region (aus der Tabelle `region`)
 
+- `GET /rest/v3/veranstaltung/filter/region/{regionId}/upcomming`
+
+  ```bash
+  # Nächste bevorstehende Veranstaltung in Region 2
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/region/2/upcomming"
+  
+  # Nächste bevorstehende Veranstaltung in Region 5
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/region/5/upcomming"
+  ```
+
+  - Parameter:
+    - `regionId` - ID der Region (aus der Tabelle `region`)
+  - Response: Gibt nur eine einzelne Veranstaltung zurück (die nächste)
+  
+    ```json
+    {
+      "success": true,
+      "veranstaltung": {
+        "id": 123,
+        "name": "Beispiel Event",
+        "von": "2025-06-01",
+        "bis": "2025-06-02",
+        "beschreibung": "...",
+        "ort": "Innsbruck",
+        "plz": "6020",
+        "visible": 1
+      }
+    }
+    ```
+
 ##### Veranstaltungstyp Filter
 
 - `GET /rest/v3/veranstaltung/filter/typ/{typId}`

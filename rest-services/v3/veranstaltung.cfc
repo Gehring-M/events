@@ -278,6 +278,47 @@ component rest="true" restpath="/veranstaltung" {
         return formattedResponse;
     }
 
+    // Nächste bevorstehende Veranstaltung nach Region
+    remote struct function getNextUpcomingByRegion(
+        numeric regionId restargsource="Path"
+    ) httpmethod="GET" restpath="filter/region/{regionId}/upcomming" returnformat="json" {
+        // Aktuelles Datum für Vergleich
+        var currentDate = now();
+        
+        // Nur die nächste bevorstehende Veranstaltung für die angegebene Region laden
+        var veranstaltungen = queryExecute(
+            "SELECT v.* 
+             FROM veranstaltung v
+             INNER JOIN r_veranstaltung_region vr ON v.id = vr.veranstaltung_fk
+             WHERE v.visible = 1
+             AND vr.region_fk = :regionId
+             AND (v.von >= :currentDate OR (v.bis IS NOT NULL AND v.bis >= :currentDate))
+             ORDER BY v.von ASC
+             LIMIT 1",
+            {
+                regionId={value=arguments.regionId, cfsqltype="cf_sql_integer"},
+                currentDate={value=currentDate, cfsqltype="cf_sql_date"}
+            },
+            {datasource="#getConfig('DSN')#"}
+        );
+        
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltung": {}
+        };
+        
+        // Wenn eine Veranstaltung gefunden wurde, diese formatieren
+        if (veranstaltungen.recordCount > 0) {
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                formattedResponse.veranstaltung[lCase(col)] = veranstaltungen[col][1];
+            }
+        }
+        
+        return formattedResponse;
+    }
+
     remote struct function get(numeric id restargsource="Path") httpmethod="GET" restpath="/{id}" returnformat="json" {
         // Einzelne Veranstaltung laden
         var veranstaltung = queryExecute(
