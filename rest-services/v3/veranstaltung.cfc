@@ -292,7 +292,7 @@ component rest="true" restpath="/veranstaltung" {
              INNER JOIN r_veranstaltung_region vr ON v.id = vr.veranstaltung_fk
              WHERE v.visible = 1
              AND vr.region_fk = :regionId
-             AND v.von >= :currentDate
+             AND v.von > :currentDate
              ORDER BY v.von ASC
              LIMIT 1",
             {
