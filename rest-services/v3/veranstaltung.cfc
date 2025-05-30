@@ -8,10 +8,23 @@ component rest="true" restpath="/veranstaltung" {
             [],
             {datasource="#getConfig('DSN')#"}
         );
-        return {
-            success: true,
-            veranstaltungen: veranstaltungen
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
         };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
     }
 
     // Veranstaltungen nach Zeitraum filtern
@@ -38,10 +51,23 @@ component rest="true" restpath="/veranstaltung" {
             {datasource="#getConfig('DSN')#"}
         );
         
-        return {
-            success: true,
-            veranstaltungen: veranstaltungen
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
         };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
     }
     
     // Veranstaltungen nach Jahr filtern
@@ -71,10 +97,23 @@ component rest="true" restpath="/veranstaltung" {
             {datasource="#getConfig('DSN')#"}
         );
         
-        return {
-            success: true,
-            veranstaltungen: veranstaltungen
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
         };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
     }
     
     // Veranstaltungen der nächsten X Tage
@@ -112,10 +151,23 @@ component rest="true" restpath="/veranstaltung" {
             {datasource="#getConfig('DSN')#"}
         );
         
-        return {
-            success: true,
-            veranstaltungen: veranstaltungen
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
         };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
     }
 
     // Veranstaltungen nach Typ/Kategorie filtern
@@ -132,10 +184,23 @@ component rest="true" restpath="/veranstaltung" {
             {typId={value=arguments.typId, cfsqltype="cf_sql_integer"}},
             {datasource="#getConfig('DSN')#"}
         );
-        return {
-            success: true,
-            veranstaltungen: veranstaltungen
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltungen": []
         };
+        
+        // Veranstaltungen in das gewünschte Format umwandeln
+        for (var i = 1; i <= veranstaltungen.recordCount; i++) {
+            var event = {};
+            for (var col in veranstaltungen.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                event[lCase(col)] = veranstaltungen[col][i];
+            }
+            arrayAppend(formattedResponse.veranstaltungen, event);
+        }
+        
+        return formattedResponse;
     }
 
     remote struct function get(numeric id restargsource="Path") httpmethod="GET" restpath="/{id}" returnformat="json" {
@@ -175,12 +240,39 @@ component rest="true" restpath="/veranstaltung" {
             {datasource="#getConfig('DSN')#"}
         );
 
-        return {
-            success: true,
-            veranstaltung: veranstaltung,
-            artists: artists,
-            veranstalter: veranstalter
+        // Format der Antwort an die Dokumentation anpassen
+        var formattedResponse = {
+            "success": true,
+            "veranstaltung": {},
+            "artists": [],
+            "veranstalter": {}
         };
+        
+        // Veranstaltung formatieren
+        if (veranstaltung.recordCount > 0) {
+            for (var col in veranstaltung.columnList.listToArray()) {
+                // Alle Spalten in Kleinbuchstaben umwandeln
+                formattedResponse.veranstaltung[lCase(col)] = veranstaltung[col][1];
+            }
+        }
+        
+        // Artists formatieren
+        for (var i = 1; i <= artists.recordCount; i++) {
+            var artist = {};
+            for (var col in artists.columnList.listToArray()) {
+                artist[lCase(col)] = artists[col][i];
+            }
+            arrayAppend(formattedResponse.artists, artist);
+        }
+        
+        // Veranstalter formatieren
+        if (veranstalter.recordCount > 0) {
+            for (var col in veranstalter.columnList.listToArray()) {
+                formattedResponse.veranstalter[lCase(col)] = veranstalter[col][1];
+            }
+        }
+        
+        return formattedResponse;
     }
 
 }
