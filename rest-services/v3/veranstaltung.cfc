@@ -120,11 +120,19 @@ component rest="true" restpath="/veranstaltung" {
     remote struct function getNextDays(
         numeric days restargsource="Path"
     ) httpmethod="GET" restpath="filter/next/{days}" returnformat="json" {
-        // Nur bestimmte Werte für Tage zulassen
-        if (arguments.days != 7 && arguments.days != 30 && arguments.days != 90) {
+        // Sicherstellen, dass days eine positive Zahl ist
+        if (arguments.days <= 0) {
             return {
                 success: false,
-                message: "Nur 7, 30 oder 90 Tage erlaubt"
+                message: "Bitte eine positive Anzahl von Tagen angeben"
+            };
+        }
+        
+        // Optional: Maximale Anzahl von Tagen begrenzen, um Performance-Probleme zu vermeiden
+        if (arguments.days > 365) {
+            return {
+                success: false,
+                message: "Die maximale Anzahl von Tagen ist auf 365 begrenzt"
             };
         }
         

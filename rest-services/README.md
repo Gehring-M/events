@@ -58,12 +58,15 @@
   # Events der nächsten 30 Tage
   curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/30"
   
-  # Events der nächsten 90 Tage
-  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/90"
+  # Events der nächsten 45 Tage
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/45"
+  
+  # Beliebige Anzahl von Tagen (max. 365)
+  curl -X GET "http://localhost/rest/v3/veranstaltung/filter/next/120"
   ```
 
   - Parameter:
-    - `days` - Anzahl der Tage (nur 7, 30 oder 90 erlaubt)
+    - `days` - Beliebige positive Anzahl von Tagen (maximal 365)
 
 ##### Veranstaltungstyp Filter
 
