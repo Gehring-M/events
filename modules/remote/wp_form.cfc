@@ -60,7 +60,7 @@
         </cfif>
     
         <cfset saveStructuredContent(nodeType=2121, data={"kontakt_fk":kid, "veranstaltung_fk": id.nodeid})>
-        <cflocation url='https://www.regio-schwaz.tirol/kulturkalender/danke'>
+        <cflocation url='https://kulturbezirk-schwaz.tirol/moechten-sie-eine-veranstaltung-bekanntgeben/danke'>
 
     </cffunction>
 </cfcomponent>
