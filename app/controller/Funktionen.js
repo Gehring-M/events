@@ -169,7 +169,7 @@
 				) {
 				switch (cItem.data.xtype) {
 					case 'combobox':
-						if (cItem.data.mehrfachauswahl=='ja' && rec != undefined && rec[cItem.data.name]!="" && rec[cItem.data.name].toString().indexOf(",")!=-1) {
+						if (cItem.data.mehrfachauswahl=='ja' && rec != undefined && rec[cItem.data.name]!="" && rec[cItem.data.name]?.toString().indexOf(",")!=-1) {
 							myRec=[];
 							Ext.each(rec[cItem.data.name].split(","), function(cid) {
 						
@@ -610,6 +610,8 @@
 			var myReloadStore = myGrid.getStore();
 		}
 
+		myReloadStore.clearFilter();
+		myReloadStore.load()
 	
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
@@ -689,7 +691,7 @@
 				height: '100%',
 				margin:'0 5 0 0',
 				margin:'0',
-				name:'tabpanel_'+el.windowName
+				name:'tabpanel_' + el.windowName
 			});		// felder und values des tabs holen
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
 				xtype: 'fieldcontainer',
