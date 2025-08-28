@@ -15,6 +15,16 @@
 		}
 	},
 	
+	listeners: {
+		load: function(store, records, successful) {
+			if (successful) {
+				// apply client-side filter to hide deactivated entries
+				store.filter('deactivated', 0);
+			}
+		}
+	},
+
+	
 	fields: [{
 		name: 'recordid'
 	},{ 
@@ -53,5 +63,9 @@
 		name: 'uploads'
 	},{ 
 		name: 'geprueft'
+	},{
+		name: 'deactivated'
+	},{
+		name: 'deactivatedwhen'
 	}]
 });
