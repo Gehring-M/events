@@ -1,6 +1,11 @@
 ﻿Ext.define('myapp.store.Veranstaltungen', {
   extend: 'Ext.data.Store',
-	autoLoad: false,
+	autoLoad: {
+		params: {
+			filterVon: Ext.Date.format(new Date(new Date().getFullYear(), (new Date().getMonth() - 6), 1), 'Y-m-d'),
+			filterBis: Ext.Date.format(new Date(new Date().getFullYear(), 11, 31), 'Y-m-d')
+		}
+	},
 	remoteSort: false,
 	storeId: 'Veranstaltungen',
 	proxy: {
@@ -14,6 +19,15 @@
 	url: 'modules/common/retrieve.cfc?method=getVeranstaltungen',
 		reader: {
 			type: 'json'
+		}
+	},
+
+	listeners: {
+		load: function(store, records, successful) {
+			if (successful) {
+				// apply client-side filter to hide deactivated entries
+				store.filter('deactivated', 0);
+			}
 		}
 	},
 	
@@ -82,10 +96,20 @@
 	},{ 
 		name: 'visible'
 	},{ 
-		name: 'ev_always_active'
+		name: 'next'
 	},{ 
 		name: 'extern'
 	},{ 
 		name: 'duplicate_fk'
+	},{
+		name: 'deactivated'
+	},{
+		name: 'deactivatedwhen'
+	},{
+		name: 'changed_by_kbsz'
+	},{
+		name: 'import_status'
+	},{
+		name: 'geodatenpool_id'
 	}]
 });
