@@ -1,0 +1,208 @@
+{
+    "@id": "121638774",
+    "@type": "Event",
+    "name": "Zillertaler Bauernmarkt am Josef-Riedl-Platz in Mayrhofen",
+    "description": "<p><b>Jeden Freitag im Monat von 09.00 bis 13.00 Uhr.</b></p> <p>Am Josef-Riedl-Platz (neben der Kirche)</p> <p>Frisches saisonales Obst und Gemüse, Brot, Käse, Eier, Speck, Honig, heimische Forellen, Zillertaler Schmankerln, selbstgemachte Doggln und viele andere regionale Qualitätsprodukte aus landwirtschaftlicher Hand werden angeboten.</p> <p>Der Zillertaler Bauernmarkt ist somit ein Treffpunkt für alle, die sich gesund ernähren möchten und unsere Umwelt schätzen.&nbsp;Mit Ihrem Besuch unterstützen Sie heimische Landwirte und fördern damit unsere regionalen Betriebe. Vor Ort gibt es zudem einen sozialen Stand, um verschiedene wohltätige Einrichtungen zu unterstützen.</p> <p>Um die Umwelt zu schonen und auf Plastik zu verzichten, werden am Markt nur Fair-Trade Bio-Baumwolltasche für »kleines Geld« angeboten.</p> <p>Wir freuen uns auf Ihren Besuch am Zillertaler Bauernmarkt!</p> <p><b>Wichtige Informationen</b></p> <p><b>Freitag, 15.08.2025 von 09.00 - 14.00 Uhr / Veranstaltungsort: Bereich Bücherei und Sport Bründl, Untere Hauptstraße, Mayrhofen.</b></p> <p>&nbsp;</p>",
+    "odta:kindOfEvent": [
+        "https://odta.io/voc/TheaterFestival",
+        "https://odta.io/voc/TheaterEventEnumeration",
+        "https://odta.io/voc/ExhibitionEventEnumeration",
+        "https://odta.io/voc/EventEnumeration",
+        "https://odta.io/voc/CinemaEvent"
+    ],
+    "eventSchedule": [
+        {
+            "@type": "Schedule",
+            "startDate": "2025-05-30",
+            "endDate": "2025-05-30",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-06-06",
+            "endDate": "2025-06-06",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-06-13",
+            "endDate": "2025-06-13",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-06-20",
+            "endDate": "2025-06-20",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-06-27",
+            "endDate": "2025-06-27",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-07-04",
+            "endDate": "2025-07-04",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-07-11",
+            "endDate": "2025-07-11",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-07-18",
+            "endDate": "2025-07-18",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-07-25",
+            "endDate": "2025-07-25",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-08-01",
+            "endDate": "2025-08-01",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-08-08",
+            "endDate": "2025-08-08",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-08-15",
+            "endDate": "2025-08-15",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-08-22",
+            "endDate": "2025-08-22",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-08-29",
+            "endDate": "2025-08-29",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-09-05",
+            "endDate": "2025-09-05",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-09-12",
+            "endDate": "2025-09-12",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        },
+        {
+            "@type": "Schedule",
+            "startDate": "2025-09-19",
+            "endDate": "2025-09-19",
+            "startTime": "09:00:00",
+            "endTime": "13:00:00",
+            "byDay": [
+                "https://schema.org/Friday"
+            ]
+        }
+    ],
+    "image": [
+        {
+            "@id": "123185178",
+            "@type": "ImageObject",
+            "contentUrl": "https://uploads.mapservices.eu/nefos_tirol/site-files/1110/uploads/image_443216232.jpg",
+            "name": "zillertaler-bauernherbst",
+            "author": {
+                "name": ""
+            }
+        }
+    ],
+    "organizer": {
+        "@type": "Organization",
+        "name": "Zillertaler Bauernmarkt",
+        "email": "info@mayrhofen.at",
+        "telephone": "+43 5285 6760",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Josef-Riedl-Platz",
+            "postalCode": "6290",
+            "addressLocality": "Mayrhofen"
+        }
+    }
+}

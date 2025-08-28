@@ -1,0 +1,42 @@
+-- created_fk = 2 (admin)
+INSERT INTO tvb_kategorie (name, qualitaet_fk, created_fk)
+VALUES
+    -- qualitätsstufe '1' ... sofort importieren
+    ('https://odta.io/voc/AdventMarket', 1, 2),
+    ('https://odta.io/voc/Ball', 1, 2),
+    ('https://odta.io/voc/Ballet', 1, 2),
+    ('https://odta.io/voc/HarvestFestival', 1, 2),
+    ('https://odta.io/voc/CarnivalParade', 1, 2),
+    ('https://odta.io/voc/CarnivalSession', 1, 2),
+    ('https://odta.io/voc/FestivalEnumeration', 1, 2),
+    ('https://odta.io/voc/OpenAirTheater', 1, 2),
+    ('https://odta.io/voc/HistoricalMarket', 1, 2),
+    ('https://odta.io/voc/HistoricalParade', 1, 2),
+    ('https://odta.io/voc/ChildrenTheater', 1, 2),
+    ('https://odta.io/voc/Comedy', 1, 2),
+    ('https://odta.io/voc/ArtsAndCraftsFair', 1, 2),
+    ('https://odta.io/voc/FestivalOfLights', 1, 2),
+    ('https://odta.io/voc/MedievalMarket', 1, 2),
+    ('https://odta.io/voc/Musical', 1, 2),
+    ('https://odta.io/voc/MusicalTheater', 1, 2),
+    ('https://odta.io/voc/Opera', 1, 2),
+    ('https://odta.io/voc/Operetta', 1, 2),
+    ('https://odta.io/voc/CityFestival', 1, 2),
+    ('https://odta.io/voc/StreetFoodFestival', 1, 2),
+    ('https://odta.io/voc/DanceEventEnumeration', 1, 2),
+    ('https://odta.io/voc/DanceTheater', 1, 2),
+    ('https://odta.io/voc/TheaterFestival', 1, 2),
+    ('https://odta.io/voc/VarietyShow', 1, 2),
+    ('https://odta.io/voc/ExhibitionOpening', 1, 2),
+    ('https://odta.io/voc/WineFestival', 1, 2),
+    -- qualitätsstufe '2' ... mit Überprüfung importieren
+    ('https://odta.io/voc/Excursion', 2, 2),
+    ('https://odta.io/voc/Brunch', 2, 2),
+    ('https://odta.io/voc/PermanentExhibition', 2, 2),
+    ('https://odta.io/voc/FoodEventEnumeration', 2, 2),
+    ('https://odta.io/voc/FoodMarket', 2, 2),
+    ('https://odta.io/voc/Seminar', 2, 2),
+    ('https://odta.io/voc/TheaterEventEnumeration', 2, 2),
+    ('https://odta.io/voc/Tasting', 2, 2),
+    -- qualitätsstufe '3' ... nicht importieren
+    ('https://odta.io/voc/Unknown', 3, 2);

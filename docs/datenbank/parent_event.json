@@ -1,0 +1,65 @@
+ {
+            "@id": "121706423",
+            "@type": "Event",
+            "name": "Sommernachtstraum - Platzkonzert der BMK Zell am Ziller",
+            "description": "<p>Genießen Sie traditionelle, klassische und moderne Blasmusik inmitten des wunderschönen Ambiente im Gielerhof in Zell am Ziller.</p> <p><br>Die Zeller Musikanten unter der Leitung von&nbsp;Kapellmeister Fritz Joast freuen sich auf Ihren Besuch!<br>Beginn: 20.00 Uhr, Eintritt frei!</p>",
+            "odta:kindOfEvent": [
+                "https://odta.io/voc/OpenAir",
+                "https://odta.io/voc/EventEnumeration"
+            ],
+            "location": {
+                "@type": "Place",
+                "name": "Bundesmusikkapelle Zell am Ziller",
+                "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": 47.233826707583,
+                    "longitude": 11.879847049713
+                },
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "",
+                    "postalCode": "6280",
+                    "addressLocality": "Zell am Ziller"
+                },
+                "url": "http://www.bmk-zell.at",
+                "telephone": "(0043) 660 7678751"
+            },
+            "eventSchedule": [
+                {
+                    "@type": "Schedule",
+                    "startDate": "2025-08-14",
+                    "endDate": "2025-08-14",
+                    "startTime": "20:00:00",
+                    "byDay": [
+                        "https://schema.org/Thursday"
+                    ]
+                }
+            ],
+            "image": [
+                {
+                    "@id": "123352231",
+                    "@type": "ImageObject",
+                    "contentUrl": "https://uploads.mapservices.eu/nefos_tirol/site-files/1110/uploads/image_328414575.jpg",
+                    "name": "Gielerhof",
+                    "author": {
+                        "name": ""
+                    }
+                }
+            ],
+            "url": [
+                "http://www.zell.at"
+            ],
+            "organizer": {
+                "@type": "Organization",
+                "name": "Bundesmusikkapelle Zell am Ziller",
+                "url": "http://www.bmk-zell.at",
+                "email": "",
+                "telephone": "(0043) 660 7678751",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "",
+                    "postalCode": "6280",
+                    "addressLocality": "Zell am Ziller"
+                }
+            }
+        }
