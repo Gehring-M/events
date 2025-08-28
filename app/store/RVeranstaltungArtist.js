@@ -24,8 +24,6 @@
 	},{ 
 		name: 'name'	
 	},{ 
-		name: 'vorname'	
-	},{ 
 		name: 'uhrzeitvon',
 		type: 'date'	
 	},{ 
