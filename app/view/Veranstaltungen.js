@@ -9,7 +9,7 @@
 
 	initComponent: function () {
 		var me = this,
-			myController = myapp.app.getController('Common');
+		myController = myapp.app.getController('Common');
 		Ext.applyIf(me, {
 			items: [{
 				xtype: 'grid',
@@ -288,6 +288,40 @@
 				],
 
 				tools: [{
+					xtype: 'combobox',
+					name: 'importStatusFilter',
+					width: 180,
+					margin: '0 0 0 5',
+					value: '',
+					store: Ext.create('Ext.data.Store', {
+						fields: ['value', 'label'],
+						data: [
+							{ value: '', label: 'Alle' },
+							{ value: 1, label: 'Sofort importiert' },
+							{ value: 2, label: 'Import nach Freigabe' }
+						]
+					}),
+					displayField: 'label',
+					valueField: 'value',
+					editable: false,
+					listeners: {
+						change: function(combo, newValue) {
+							const grid = Ext.ComponentQuery.query('grid[name=veranstaltungen]')[0];
+							const store = grid.getStore();
+							store.clearFilter();
+							store.filterBy(function(record) {
+								// Always filter out deactivated entries
+								if (record.get('deactivated') !== 0) return false;
+								// If no import_status selected, show all non-deactivated
+								if (!newValue) return true;
+								// Otherwise, filter by import_status
+								return record.get('import_status') == newValue;
+							});
+							// Force grid refresh
+        					grid.getView().refresh();
+						}
+					}
+				},{
 					xtype: 'textfield',
 					labelSeparator: ' ',
 					name: 'filterText',
@@ -305,14 +339,14 @@
 							}
 						}
 					}
-				}, {
+				},{
 					xtype: 'datefield',
 					name: 'filterVon',
 					submitFormat: 'Y-m-d',
 					width: 100,
 					labelSeparator: '',
 					emptyText: 'Beginn',
-					value: new Date(new Date().getFullYear(), 0, 1),
+					value: new Date(new Date().getFullYear(), (new Date().getMonth() - 6), (new Date().getDate())),
 					margin: '0 0 0 5',
 					plugins: [Ext.create('Ext.ux.field.date.plugin.CalendarWeek')]
 				}, {
