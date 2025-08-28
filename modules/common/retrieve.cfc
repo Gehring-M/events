@@ -267,7 +267,7 @@
 </cffunction>
 <!--------------------------------------------------------------------------------->					
 					
-<cffunction name="getVeranstaltungen" access="remote" returnFormat="json" output="yes">
+<cffunction name="getVeranstaltungen" access="remote" returnFormat="json" output="no">
 	
 	<cfargument name="filterText" type="string" required="no" default="">
 	<cfargument name="filterVon" type="string" required="no" default="">
@@ -283,25 +283,6 @@
 	<cfset var result = structNew() >
 
 	<cfif isAuth()>
-		
-		<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">
-			<cfquery name="qSearch" datasource="#getConfig('DSN')#">
-				SELECT *, if(parent_fk is null,id,parent_fk) as finalid 
-				FROM veranstaltung 
-				WHERE 
-					1=1
-					<cfif arguments.filterText NEQ "">
-						AND name like '%#arguments.filterText#%'
-					</cfif>
-					<cfif arguments.filterVon NEQ "">
-						AND von >= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterVon#">
-					</cfif>
-					<cfif arguments.filterBis NEQ "">
-						AND von <= <cfqueryparam cfsqltype="CF_SQL_DATE" value="#arguments.filterBis#">
-					</cfif>
-					
-			</cfquery>
-		</cfif>
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
 			SELECT 
 				v1.*, v2.name parent_name
@@ -310,16 +291,19 @@
 				LEFT JOIN veranstaltung v2 on v1.parent_fk = v2.id
 			WHERE
 				1=1
-				<cfif arguments.filterText NEQ "" OR arguments.filterVon NEQ "" OR arguments.filterBis NEQ "">	
-					<cfif qSearch.recordcount NEQ 0>
-						AND v1.id IN(#ValueList(qSearch.finalid)#) OR v1.parent_fk IN(#ValueList(qSearch.finalid)#)
-					<cfelse>
-						AND 1=2
-					</cfif>	
+				<cfif arguments.filterVon NEQ "">
+					AND v1.von >= '#arguments.filterVon#'
+				</cfif>
+				<cfif arguments.filterBis NEQ "">
+					<!--- check if "bis" is available --->
+					AND COALESCE(v1.bis, v1.von) <= '#arguments.filterBis#'
+				</cfif>
+				<cfif arguments.filterText NEQ "">
+					AND v1.name like '%#arguments.filterText#%'
 				</cfif>
 				<cfif arguments.sub NEQ "">
-						AND v1.parent_fk = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.sub#">
-					</cfif>	
+					AND v1.parent_fk = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.sub#">
+				</cfif>	
 			ORDER BY 
 				v1.von, v1.uhrzeitvon
 		</cfquery>
@@ -332,7 +316,6 @@
 		</cfquery>
 					
 		<cfloop query="qData">
-			
 			<cfif qData.parent_fk EQ "" OR arguments.sub neq "">
 			
 				<cfquery name="qSubData" dbtype="query">
@@ -381,8 +364,12 @@
 				<cfset tmpStruct["showteasertext"]	= qData.showteasertext>
 				<cfset tmpStruct["duplicate_fk"] = qData.duplicate_fk>
 				<cfset tmpStruct["visible"]	= qData.visible>
-				<cfset tmpStruct["ev_always_active"]	= qData.ev_always_active>
+				<cfset tmpStruct["next"]	= qData.next>
 				<cfset tmpStruct["extern"]	= qData.extern>
+				<cfset tmpStruct["deactivated"] = qData.deactivated>
+				<cfset tmpStruct["deactivatedwhen"] = qData.deactivatedwhen>
+				<cfset tmpStruct["import_status"] = qData.import_status>
+				<cfset tmpStruct["bilder_urls"] = qData.bilder_urls>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				<cfif arguments.sub neq "">
 				<cfloop query="qSubData">
@@ -420,13 +407,14 @@
 					<cfset tmpStruct["uploads"] = qSubData.uploads>
 					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
 					<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
-						<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
-						<cfset tmpStruct["extern"]	= qSubData.extern>
-						<cfset tmpStruct["tipp"]	= qSubData.tipp>
-						<cfset tmpStruct["kinder"]	= qSubData.kinder>
-						<cfset tmpStruct["showteasertext"]	= qSubData.showteasertext>
-						<cfset tmpStruct["ev_always_active"]	= qSubData.ev_always_active>
-						<cfset tmpStruct["visible"]	= qSubData.visible>
+					<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
+					<cfset tmpStruct["extern"]	= qSubData.extern>
+					<cfset tmpStruct["tipp"]	= qSubData.tipp>
+					<cfset tmpStruct["kinder"]	= qSubData.kinder>
+					<cfset tmpStruct["showteasertext"]	= qSubData.showteasertext>
+					<cfset tmpStruct["next"]	= qSubData.next>
+					<cfset tmpStruct["visible"]	= qSubData.visible>
+					<cfset tmpStruct["import_status"] = qSubData.import_status>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
 			</cfif>	
@@ -484,6 +472,8 @@
 			<cfset tmpStruct["bilder"] 	= qData.bilder>
 			<cfset tmpStruct["uploads"] 	= qData.uploads>
 			<cfset tmpStruct["geprueft"] 	= qData.geprueft>
+			<cfset tmpStruct["deactivated"] = qData.deactivated>
+			<cfset tmpStruct["deactivatedwhen"] = qData.deactivatedwhen>
 				
 			<cfset ArrayAppend(returnArray, tmpStruct)>
 		</cfloop>
@@ -530,6 +520,8 @@
 			<cfset tmpStruct["email"] 	= qData.email>
 			<cfset tmpStruct["web"] 	= qData.web>
 			<cfset tmpStruct["beschreibung"] 	= qData.beschreibung>
+			<cfset tmpStruct["deactivated"] = qData.deactivated>
+			<cfset tmpStruct["deactivatedwhen"] = qData.deactivatedwhen>
 				
 			<cfset ArrayAppend(returnArray, tmpStruct)>
 		</cfloop>
@@ -678,7 +670,9 @@
 <cffunction name="getBilder" access="remote" returnFormat="json" output="no">
 	<cfargument name="veranstaltung_fk" type="string" required="no" default="0">
   	<cfargument name="artist_fk" type="string" required="no" default="0">
+	<cfargument name="veranstalter_fk" type="string" required="no" default="0">
   	<cfset var returnArray = ArrayNew(1)>
+	<cfset var qData = QueryNew("id, bilder")>
 	<cfset var tmpStruct = StructNew()>
 	<cfif isAuth()>	
 		<cfif arguments.veranstaltung_fk NEQ 0>
@@ -966,7 +960,12 @@
 		<cfquery name="qVARegion" datasource="#getConfig('DSN')#">
 			SELECT * FROM r_veranstaltung_region 
 		</cfquery>
+		
+		<cflog file="application" text="getVeranstaltungen DEBUG: Found #qData.recordcount# total records in qData query">
+		<cflog file="application" text="getVeranstaltungen DEBUG: Parameters - filterVon=#arguments.filterVon#, filterBis=#arguments.filterBis#">
+		
 		<cfloop query="qData">
+			<!--- Process parent events and their sub-events --->
 			<cfif qData.parent_fk EQ "">
 				<cfquery name="qSubData" dbtype="query">
 					SELECT * FROM qData WHERE parent_fk = '#qData.id#'
@@ -1056,6 +1055,52 @@
 					<cfset tmpStruct["region"]	= VARRegion.name>
 					<cfset ArrayAppend(returnArray, tmpStruct)>
 				</cfloop>		
+			<!--- Also process sub-events that match criteria but parent doesn't --->
+			<cfelseif qData.parent_fk NEQ "">
+				<!--- This is a sub-event that matched the search criteria independently --->
+				<cflog file="application" text="getVeranstaltungen DEBUG: Processing standalone sub-event ID=#qData.id#, name=#qData.name#, parent_fk=#qData.parent_fk#">
+				<cfquery name="tmpVATyp" dbtype="query">
+					SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
+				<cfquery name="tmpVARegion" dbtype="query">
+					SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qData.id#'
+				</cfquery>
+				<cfquery name="VARRegion" datasource="#getConfig('DSN')#">
+					SELECT * FROM region WHERE id ='#tmpVARegion.region_fk#'
+				</cfquery>
+				<cfif listlen(valueList(tmpVATyp.typ_fk))>
+				<cfquery name="Ctyp" datasource="#getConfig('DSN')#">
+					SELECT * FROM typ WHERE id IN (#valueList(tmpVATyp.typ_fk)#)
+				</cfquery>
+				</cfif>
+				<cfset tmpStruct = {}>
+				<cfset tmpStruct["recordid"] = qData.id>
+				<cfset tmpStruct["parent_fk"] = qData.parent_fk>
+				<cfset tmpStruct["opened"] = 0>
+				<cfset tmpStruct["children"] = 0>
+				<cfset tmpStruct["name"] = qData.name>
+				<cfset tmpStruct["parent_name"] = qData.parent_name>
+				<cfset tmpStruct["von"] = qData.von>
+				<cfset tmpStruct["bis"] = qData.bis>
+				<cfset tmpStruct["uhrzeitvon"] = qData.uhrzeitvon>
+				<cfset tmpStruct["uhrzeitbis"] = qData.uhrzeitbis>
+				<cfset tmpStruct["veranstaltungsort"] = qData.veranstaltungsort>
+				<cfset tmpStruct["adresse"] = qData.adresse>
+				<cfset tmpStruct["plz"] = qData.plz>
+				<cfset tmpStruct["ort"] = qData.ort>
+				<cfset tmpStruct["latitude"] = qData.latitude>
+				<cfset tmpStruct["longitude"] = qData.longitude>
+				<cfset tmpStruct["beschreibung"] = qData.beschreibung>
+				<cfset tmpStruct["preis"] = qData.preis>
+				<cfset tmpStruct["bilder"] = qData.bilder>
+				<cfset tmpStruct["link"] = qData.link>
+				<cfset tmpStruct["uploads"] = qData.uploads>
+				<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
+				<cfif isDefined("Ctyp")>
+				<cfset tmpStruct["typ"]	= ValueArray (Ctyp.name)>
+				</cfif>
+				<cfset tmpStruct["region"]	= VARRegion.name>
+				<cfset ArrayAppend(returnArray, tmpStruct)>
 			</cfif>		
 		</cfloop>
 	<cfreturn returnArray>
@@ -1085,5 +1130,97 @@
   <cfreturn returnArray>
   
 </cffunction>		
+<!--------------------------------------------------------------------------------->
+<cffunction name="getArtistRegistrierungen" access="remote" returnFormat="json">
+	<!--- init --->
+	<cfset var response = []>
+  	<cfset var object   = {}>
+	 
+	<!--- check authentication --->
+  	<cfif isAuth()>		
+
+		<!--- fetch artists that need to be approved --->
+		<cfquery name="openRegistrations" datasource="#getConfig('DSN')#">
+			SELECT * FROM artist;
+		</cfquery>
+
+		<!--- create response --->
+		<cfloop query="openRegistrations">
+			<!--- clear object --->
+			<cfset object = {}>
+			<!--- build object --->
+			<cfset object['id']             = openRegistrations.id>
+			<cfset object['user_fk']        = openRegistrations.user_fk>
+			<cfset object['name']           = openRegistrations.name>
+			<cfset object['ansprechperson'] = openRegistrations.ansprechperson>
+			<cfset object['adresse']        = openRegistrations.adresse>
+			<cfset object['plz']            = openRegistrations.plz>
+			<cfset object['ort']            = openRegistrations.ort>
+			<cfset object['ort_fk']         = openRegistrations.ort_fk>
+			<cfset object['latitude']       = openRegistrations.latitude>
+			<cfset object['longitude']      = openRegistrations.longitude>
+			<cfset object['telefon']        = openRegistrations.telefon>
+			<cfset object['email']          = openRegistrations.email>
+			<cfset object['web']            = openRegistrations.web>
+			<cfset object['link']           = openRegistrations.link>
+			<cfset object['beschreibung']   = openRegistrations.beschreibung>
+			<cfset object['bilder']         = openRegistrations.bilder>
+			<cfset object['uploads']        = openRegistrations.uploads>
+			<cfset object['geprueft']       = openRegistrations.geprueft>
+			<cfset object['vorname']        = openRegistrations.vorname>
+			<cfset object['approved']       = openRegistrations.approved>
+			<cfset object['approvedwhen']   = openRegistrations.approvedwhen>
+			<cfset object['createdwhen']    = openRegistrations.createdwhen>
+			<!--- add to response data --->
+			<cfset ArrayAppend(response, object)>
+		</cfloop>
+  	</cfif>
+	<!--- return response --->
+  	<cfreturn response>
+</cffunction>	
+<!--------------------------------------------------------------------------------->
+<cffunction name="getVeranstalterRegistrierungen" access="remote" returnFormat="json">
+	<!--- init --->
+	<cfset var response = []>
+  	<cfset var object   = {}>
+	 
+	<!--- check authentication --->
+  	<cfif isAuth()>		
+
+		<!--- fetch artists that need to be approved --->
+		<cfquery name="openRegistrations" datasource="#getConfig('DSN')#">
+			SELECT * FROM veranstalter;
+		</cfquery>
+
+		<!--- create response --->
+		<cfloop query="openRegistrations">
+			<!--- clear object --->
+			<cfset object = {}>
+			<!--- build object --->
+			<cfset object['id']             = openRegistrations.id>
+			<cfset object['name']           = openRegistrations.name>
+			<cfset object['adresse']        = openRegistrations.adresse>
+			<cfset object['plz']            = openRegistrations.plz>
+			<cfset object['ort']            = openRegistrations.ort>
+			<cfset object['ort_fk']         = openRegistrations.ort_fk>
+			<cfset object['latitude']       = openRegistrations.latitude>
+			<cfset object['longitude']      = openRegistrations.longitude>
+			<cfset object['telefon']        = openRegistrations.telefon>
+			<cfset object['email']          = openRegistrations.email>
+			<cfset object['web']            = openRegistrations.web>
+			<cfset object['beschreibung']   = openRegistrations.beschreibung>
+			<cfset object['bilder']         = openRegistrations.bilder>
+			<cfset object['uploads']        = openRegistrations.uploads>
+			<cfset object['approved']       = openRegistrations.approved>
+			<cfset object['approvedwhen']   = openRegistrations.approvedwhen>
+			<cfset object['createdwhen']    = openRegistrations.createdwhen>
+			<!--- add to response data --->
+			<cfset ArrayAppend(response, object)>
+		</cfloop>
+  	</cfif>
+	<!--- return response --->
+  	<cfreturn response>
+</cffunction>	
+<!--------------------------------------------------------------------------------->
 </cfsilent>
 </cfcomponent>
