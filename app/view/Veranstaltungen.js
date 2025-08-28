@@ -1,4 +1,4 @@
-﻿Ext.define('myapp.view.Veranstaltungen', {
+Ext.define('myapp.view.Veranstaltungen', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.Veranstaltungen',
 	layout: {
