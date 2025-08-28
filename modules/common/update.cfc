@@ -119,7 +119,6 @@
 </cffunction>
 <cffunction  name="removeParent" access="remote" returnFormat="json" output="no">
 	<cfargument  name="id" required="yes" type="numeric">
-	<cfif isAuth() AND isAdmin()>
 	<cfset out=QueryGetRow(getStructuredContent(nodetype=2102, instanceids=id),1)>
 	<cfset region=QueryGetRow(getStructuredContent(nodetype=2117, whereclause="veranstaltung_fk = #out['parent_fk']#"),1)>
 	<cfset out["parent_fk"]=null>
@@ -128,10 +127,58 @@
 	<cfset region["id"]=null>
 	<cfset saveStructuredContent(nodetype=2102, data=out, instance=id)>
 
-
 	<cfreturn region>
-	</cfif>
 </cffunction>
-</cfsilent>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="changeArtistApproval" access="remote" returnFormat="json" output="no">
+	<!--- inits --->
+	<cfset var requestData = deserializeJson(getHttpRequestData().content)>
+	<cfset var response    = {}>
+
+	<!--- check if authenticated and if correct params --->
+	<cfif isAuth() AND StructKeyExists(requestData, 'artistID') AND StructKeyExists(requestData, 'approved')>
+		<!--- update flag for that artist --->
+		<cfquery name="approveArtist" datasource="#getConfig('DSN')#">
+			UPDATE artist 
+			SET 
+				approved = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.approved#">,
+				approvedwhen = <cfqueryparam cfsqltype="cf_sql_date" value="#now()#">
+			WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.artistID#">;
+		</cfquery>
+		<!--- set response message --->
+		<cfset response['message'] = 'Successfully updated status [approved] for artist with ID [#requestData.artistID#]'>
+	<cfelse>
+		<cfset response['message'] = 'Not authenticated or wrong parameters'>
+	</cfif>
+
+	<!--- return response --->
+	<cfreturn response>
+</cffunction>
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="changeOrganizerApproval" access="remote" returnFormat="json" output="no">
+	<!--- inits --->
+	<cfset var requestData = deserializeJson(getHttpRequestData().content)>
+	<cfset var response    = {}>
+
+	<!--- check if authenticated and if correct params --->
+	<cfif isAuth() AND StructKeyExists(requestData, 'organizerID') AND StructKeyExists(requestData, 'approved')>
+		<!--- update flag for that artist --->
+		<cfquery name="approveOrganizer" datasource="#getConfig('DSN')#">
+			UPDATE veranstalter 
+			SET 
+				approved = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.approved#">,
+				approvedwhen = <cfqueryparam cfsqltype="cf_sql_date" value="#now()#">
+			WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.organizerID#">;
+		</cfquery>
+		<!--- set response message --->
+		<cfset response['message'] = 'Successfully updated status [approved] for organizer with ID [#requestData.organizerID#]'>
+	<cfelse>
+		<cfset response['message'] = 'Not authenticated or wrong parameters'>
+	</cfif>
+
+	<!--- return response --->
+	<cfreturn response>
+</cffunction>
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+</cfsilent>
 </cfcomponent>
