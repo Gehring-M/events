@@ -1,3 +1,20 @@
 ﻿@charset "utf-8";
 /* CSS Document */
-
+img.ag-img-left {
+	float: left;
+	display: inline-block;
+	margin-right: 1em;
+	margin-bottom: 0.67em;
+}
+img.ag-img-center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 0.67em;
+}
+img.ag-img-right {
+	float: right;
+	display: inline-block;
+	margin-left: 1em;
+	margin-bottom: 0.67em;
+}
