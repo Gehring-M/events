@@ -1,14 +1,21 @@
 ﻿Ext.define('myapp.controller.Common', {
 	extend: 'Ext.app.Controller',
-
-	views: [
+	
+	// register all the views that are being used
+	views: 
+	[
 		'Veranstaltungen',
 		'Veranstalter',
 		'Basics',
-		'Artist'
+		'Artist',
+		'Artikel',
+		'Registrierungen',
+		'ExterneDaten'
 	],
 
-	stores: [
+	// register all the stores that are being used
+	stores: 
+	[
 		'Auth',
 		'Laender',
 		'SubVeranstaltungen',
@@ -23,30 +30,52 @@
 		'Downloads',
 		'Kategorien',
 		'Typ',
-		'Region'
+		'Region',
+		'Artikel',
+		'ArtistRegistrierungen',
+		'OrganizerRegistrierungen'
 	],
 
-	refs: [{
-		ref: 'Veranstaltungen',
-		selector: 'Veranstaltungen',
-		xtype: 'Veranstaltungen',
-		autoCreate: true
-	}, {
-		ref: 'Basics',
-		selector: 'Basics',
-		xtype: 'Basics',
-		autoCreate: true
-	}, {
-		ref: 'Veranstalter',
-		selector: 'Veranstalter',
-		xtype: 'Veranstalter',
-		autoCreate: true
-	}, {
-		ref: 'Artist',
-		selector: 'Artist',
-		xtype: 'Artist',
-		autoCreate: true
-	}],
+	// define references for the UI components
+	refs: 
+	[
+		{
+			ref: 'Veranstaltungen',
+			selector: 'Veranstaltungen',
+			xtype: 'Veranstaltungen',
+			autoCreate: true
+		},{
+			ref: 'Basics',
+			selector: 'Basics',
+			xtype: 'Basics',
+			autoCreate: true
+		},{
+			ref: 'Veranstalter',
+			selector: 'Veranstalter',
+			xtype: 'Veranstalter',
+			autoCreate: true
+		},{
+			ref: 'Artist',
+			selector: 'Artist',
+			xtype: 'Artist',
+			autoCreate: true
+		},{
+			ref: 'Artikel',
+			selector: 'Artikel',
+			xtype: 'Artikel',
+			autoCreate: true
+		},{
+			ref: 'Registrierungen',
+			selector: 'Registrierungen',
+			xtype: 'Registrierungen',
+			autoCreate: true
+		},{
+			ref: 'ExterneDaten',
+			selector: 'ExterneDaten',
+			xtype: 'ExterneDaten',
+			autoCreate: true
+		}
+	],
 
 	init: function () {
 		var authStore = this.getAuthStore();
@@ -56,7 +85,7 @@
 
 
 		me = this,
-			this.myAuthStore = authStore
+		this.myAuthStore = authStore
 		this.myFunctions = myapp.app.getController('Funktionen');
 		this.isAdministrator = (authStore.findExact('administrator', true) == 0) ? true : false;
 		this.getTagsStore().load();
@@ -67,6 +96,7 @@
 		this.cVeranstaltung = 0;
 		this.cArtist = 0;
 		this.cVeranstalter = 0;
+		this.cApproval = 0;
 		this.myTimeOut = 5000;
 		this.timerActive = false;
 		this.timerTyp = "";
@@ -155,9 +185,9 @@
 	},
 
 
-	//------------------------------------------------------------------------
-	//Allgemeine Funktionen
-	//------------------------------------------------------------------------	
+	// #############################
+	// #   Allgemeine Funktionen   #
+	// #############################
 
 	onOpenFile: function (el) {
 		myDataID = el.agRecord.upload;
@@ -346,6 +376,16 @@
 		this.timerTyp = "";
 
 		if (el.activeTab.xtype == "grid") {
+			if(this.cArtikel){
+			el.activeTab.getStore().load({
+				params: {
+					artikel_fk: this.cArtikel,
+					//artist_fk: this.cArtist,
+					//veranstalter_fk: this.cVeranstalter
+				}
+			});
+		}
+		else{
 			el.activeTab.getStore().load({
 				params: {
 					veranstaltung_fk: this.cVeranstaltung,
@@ -353,6 +393,7 @@
 					veranstalter_fk: this.cVeranstalter
 				}
 			});
+		}
 		} else {
 			myGrid = el.activeTab.down('grid');
 			myStore = myGrid.getStore();
@@ -364,6 +405,23 @@
 				me.timerActive = true;
 				me.timerTyp = 'uploads';
 			}
+			console.log(this.cArtikel)
+			if(this.cArtikel){
+			myStore.load({
+				params: {
+					artikel_fk: this.cArtikel,
+
+				},
+				callback: function (response) {
+					if (myGrid.name == "Bilder" || myGrid.name == "Downloads") {
+						setTimeout(function () {
+							myGrid.headerCt.getGridColumns()[0].setWidth(118);
+						}, 250);
+					}
+				}, scope: this
+			});
+		}
+		else{
 			myStore.load({
 				params: {
 					veranstaltung_fk: this.cVeranstaltung,
@@ -378,6 +436,7 @@
 					}
 				}, scope: this
 			});
+		}
 		}
 
 	},
@@ -490,6 +549,7 @@
 
 	onClickButton: function (el, record) {
 		var me = this;
+
 		if (el.hasOwnProperty('windowName')) {
 			myStore = el.up('form').down('grid').getStore();
 			//reset store filter
@@ -502,7 +562,7 @@
 			if (!el.hasOwnProperty('nameForeignKey') || myStore.data.length > 0) {
 				myWindow = this.myFunctions.onOpenWindow(el, record);
 				console.log(myWindow)
-				myWindow.down('textfield').focus();
+				myWindow.down('textfield')?.focus();
 				if (el.hasOwnProperty('agVerknuepfungErstellen')) {
 					myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung);
 				}
@@ -669,6 +729,8 @@
 
 	onGridRowSelected: function (el, record, row) {
 
+		console.log('Here')
+
 		if (el.view.up('grid').name == "veranstaltungen"  || el.view.up('grid').name == "SubVeranstaltungen") {
 			this.cVeranstaltung = record.data.recordid;
 			this.cArtist = 0;
@@ -783,11 +845,9 @@
 				}, scope: this
 			});
 		}
-
 	},
 
 	loadDetailsOnGridSelect: function (el, record) {
-
 		var myGrid = el.up('grid'),
 			loadGridName = myGrid.agLoadDetailsOnSelect,
 			loadGrid = el.up('grid').up('container').down('grid[name=' + loadGridName + ']'),
@@ -833,16 +893,27 @@
 	},
 
 	//------------------------------------------------------------------------
-	//Dokumentensuche
+	// Dokumentensuche
 	//------------------------------------------------------------------------
 
 	actionVeranstaltungen: function () {
-
 		var myVeranstaltungenStore = this.getVeranstaltungenStore(),
-			myView = this.getVeranstaltungen();
+		myView = this.getVeranstaltungen();
 		myVeranstaltungenStore.removeFilter('filterOpened');
+		
+		// Apply default date filters
+		var defaultParams = {
+			filterVon: Ext.Date.format(new Date(new Date().getFullYear(), (new Date().getMonth() - 6), (new Date().getDate())), 'Y-m-d'),
+			filterBis: Ext.Date.format(new Date(new Date().getFullYear(), 11, 31), 'Y-m-d')
+		};
+		
 		myVeranstaltungenStore.load({
+			params: defaultParams,
 			callback: function (response) {
+
+				// apply client-side filter to hide deactivated entries
+				myVeranstaltungenStore.filter('deactivated', 0)
+
 				if (response.length > 0) {
 					myView.down('grid[name=veranstaltungen]').getView().select(0);
 				}
@@ -852,10 +923,52 @@
 		this.application.setMainView(myView);
 	},
 
+
+	actionExterneDaten: function () {
+		const myView = this.getExterneDaten()
+
+		this.application.setMainView(myView)
+	},
+
+
+	actionRegistrierungen: function () {
+		var myView = this.getRegistrierungen();
+		this.timerActive = false;
+		this.timerTyp = "";
+		
+		// Load the artist registrations store
+		var artistStore = this.getArtistRegistrierungenStore();
+		if (artistStore) {
+			artistStore.load({
+				params: {
+					typ: 'artist'
+				}
+			});
+		}
+		
+		// Load the organizer registrations store  
+		var organizerStore = this.getOrganizerRegistrierungenStore();
+		if (organizerStore) {
+			organizerStore.load({
+				params: {
+					typ: 'organizer'
+				}
+			});
+		}
+		
+		this.application.setMainView(myView);
+	},
+
 	actionArtist: function () {
 		var myView = this.getArtist();
-		this.getArtistStore().load({
+		var artistStore = this.getArtistStore();
+		
+		artistStore.load({
 			callback: function (response) {
+				
+				// apply client-side filter to hide deactivated entries
+				artistStore.filter('deactivated', 0)
+				
 				if (response.length > 0) {
 					myView.down('grid[name=artist]').getView().select(0);
 				}
@@ -865,6 +978,23 @@
 		setTimeout(function () {
 			if (myView.down('grid[name=artist]').getSelectionModel().getCurrentPosition() == undefined) {
 				myView.down('grid[name=artist]').getView().select(0);
+			}
+		}, 500);
+	},
+
+	actionArtikel: function () {
+		var myView = this.getArtikel();
+		this.getArtikelStore().load({
+			callback: function (response) {
+				if (response.length > 0) {
+					myView.down('grid[name=artikel]').getView().select(0);
+				}
+			}
+		});
+		this.application.setMainView(myView);
+		setTimeout(function () {
+			if (myView.down('grid[name=artikel]').getSelectionModel().getCurrentPosition() == undefined) {
+				myView.down('grid[name=artikel]').getView().select(0);
 			}
 		}, 500);
 	},
@@ -885,6 +1015,10 @@
 		this.timerTyp = "";
 		this.getVeranstalterStore().load({
 			callback: function (response) {
+
+				// apply client-side filter to hide deactivated entries
+				this.getVeranstalterStore().filter('deactivated', 0)
+
 				if (response.length > 0) {
 					myView.down('grid[name=veranstalter]').getView().select(0);
 					me.cVeranstalter = response[0].data.recordid;
