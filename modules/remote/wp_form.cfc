@@ -1,66 +1,78 @@
 <cfcomponent>
+
     <cfinclude template="../functions.cfm" />
     <cfinclude template="../../ameisen/functions.cfm" />
-    <cffunction  name="newVeranstaltung" access="remote"  returnformat="json">
-        <cfset requestdata = GetHttpRequestData().headers />
-        <cfset returnData = structNew()>
-        <cfinclude template="../cors.cfm" />
 
-        <cfset form["extern"]=2>
-        <cfset form["visible"]=0>
-        <cfset form["tipp"]=0>
-        <cfset form["longitude"]=0>
-        <cfset form["latitude"]=0>
-        <cfif structKeyExists(form,"accepted_dp") AND form["accepted_dp"] neq "">
-            <cfset form["accepted_dp"] = now()>
-        </cfif>
-        <cfif structKeyExists(form,"accepted_ds") AND form["accepted_ds"] neq "">
-            <cfset form["accepted_ds"] = now()>
-        </cfif>
-        <cfif structKeyExists(form,"kmail") AND not isCorrectEmail(form["kmail"])>
-            <cfset form["kmail"] = "@agindo.at">
-        </cfif>
-        <cfset kid=Structnew()>
-        
-        <cfif structKeyExists(form,"kname") AND form["kname"] neq "" AND structKeyExists(form,"kmail") AND form["kmail"] neq "" AND structKeyExists(form,"accepted_dp") AND form["accepted_dp"] neq "" AND structKeyExists(form,"accepted_ds") AND form["accepted_ds"] neq "" AND  isCorrectEmail(form["kmail"])>
-            <!---check if email already exists--->
-            <cfset check = getStructuredContent(nodeType=2120)>
-            <cfquery dbtype="query" name="kexists">
-                     SELECT * FROM check WHERE mail=<cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#form["kmail"]#">
+    <cffunction name="newEventMail" access="remote" returnformat="json">
+        <cfargument name="eventID" type="numeric" required="true">
+
+        <cfif eventID NEQ 0>
+
+            <cfquery name="newEvent" datasource="#getConfig('DSN')#">
+                SELECT *, k.name AS kontaktName, k.mail AS kontaktMail
+                FROM veranstaltung AS v
+                JOIN r_veranstaltung_kontakt AS rvk 
+                ON v.id = rvk.veranstaltung_fk
+                JOIN kontakt AS k 
+                ON rvk.kontakt_fk = k.id
+                JOIN r_veranstaltung_region AS rvr 
+                ON v.id = rvr.veranstaltung_fk
+                JOIN region AS r 
+                ON rvr.region_fk = r.id
+                WHERE v.id = <cfqueryparam cfsqltype="cf_sql_integer" value="#eventID#">; 
             </cfquery>
-            <cfif kexists.recordCount gt 0>
-                <cfset kid=QueryGetRow(kexists,1).node_fk>
-            <cfelse>
-                <cfset test = formatAndValidateStructuredFields(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] })>
-                <cfset kid= saveStructuredContent(nodeType=2120, data={"name":form["kname"], "mail":form["kmail"], "accepted_dp":form["accepted_dp"], "accepted_ds":form["accepted_ds"] }).nodeid>
-            </cfif>
+
+            <!--- show in email response --->
+            <cfset object = {}>
+            <cfset object['id'] = newEvent.id>
+            <cfset object['parent_fk'] = newEvent.parent_fk>
+            <cfset object['name'] = newEvent.name>
+            <cfset object['von'] = newEvent.von>
+            <cfset object['bis'] = newEvent.bis>
+            <cfset object['uhrzeitvon'] = newEvent.uhrzeitvon>
+            <cfset object['uhrzeitbis'] = newEvent.uhrzeitbis>
+            <cfset object['ort_fk'] = newEvent.ort_fk>
+            <cfset object['veranstaltungsort'] = newEvent.veranstaltungsort>
+            <cfset object['adresse'] = newEvent.adresse>
+            <cfset object['plz'] = newEvent.plz>
+            <cfset object['ort'] = newEvent.ort>
+            <cfset object['latitude'] = newEvent.latitude>
+            <cfset object['longitude'] = newEvent.longitude>
+            <cfset object['beschreibung'] = newEvent.beschreibung>
+            <cfset object['preis'] = newEvent.preis>
+            <cfset object['bilder'] = newEvent.bilder>
+            <cfset object['link'] = newEvent.link>
+            <cfset object['uploads'] = newEvent.uploads>
+            <cfset object['kinder'] = newEvent.kinder>
+            <cfset object['tipp'] = newEvent.tipp>
+            <cfset object['visible'] = newEvent.visible>
+            <cfset object['extern'] = newEvent.extern>
+            <cfset object['duplicate_fk'] = newEvent.duplicate_fk>
+            <cfset object['next'] = newEvent.next>
+            <cfset object['remote_fk'] = newEvent.remote_fk>
+            <cfset object['showteasertext'] = newEvent.showteasertext>
+            <cfset object['deactivated'] = newEvent.deactivated>
+            <cfset object['deactivatedwhen'] = newEvent.deactivatedwhen>
+
+
+            <cfmail from="#getConfig('mail.from')#" to="#getConfig('mail.to.freigabe')#" bcc="markus.hasibeder@agindo.at" subject="[Regio Schwaz Kulturkalender] Neue Veranstaltung wurde online eingetragen." type="HTML">	
+                Es wurde eine neue Veranstaltung mit dem Namen: <a href="https://events.agindo-services.info/">#newEvent.name# über das Formular eingetragen, bitte diese Veranstaltung prüfen.</a>
+
+                <br>
+                Kontaktdaten:
+                <ul>
+                    <li>Name: #newEvent.kontaktName#</li>
+                    <li>Mail: #newEvent.kontaktMail#</li>
+                </ul> 
+                <br>
+
+                
+                <br>Formulardaten: <br>
+                <cfdump var="#object#">
+            </cfmail>
         <cfelse>
-
+            <cfreturn { "success": false, "message": "eventID is required" }>
         </cfif>
-
-        <cfset region_fk="">
-        <cfif structKeyExists(form,"region") AND form["region"] neq "">
-            <cfset region_fk=form.region>
-        </cfif>
-
-             
-        <cfset test = formatAndValidateStructuredFields(nodeType=2102, data=form)>
-        <cfset id= saveStructuredContent(nodeType=2102, data=form)>
-
-        <cfmail from="#getConfig('mail.from')#" to="#getConfig('mail.to.freigabe')#" bcc="markus.hasibeder@agindo.at" subject="[Regio Schwaz Kulturkalender] Neue Veranstaltung wurde online eingetragen." type="HTML">	
-            Es wurde eine neue Veranstaltung mit dem Namen: <a href="https://events.agindo-services.info/">#form["name"]# über das Formular eingetragen, bitte diese Veranstaltung prüfen.</a>
-            
-            <br>Formulardaten: <br>
-            <cfdump var="#form#">
-            
-            
-        </cfmail>
-        <cfif region_fk neq "">
-            <cfset saveStructuredContent(nodeType=2117, data={"region_fk":region_fk, "veranstaltung_fk": id.nodeid})>
-        </cfif>
-    
-        <cfset saveStructuredContent(nodeType=2121, data={"kontakt_fk":kid, "veranstaltung_fk": id.nodeid})>
-        <cflocation url='https://kulturbezirk-schwaz.tirol/moechten-sie-eine-veranstaltung-bekanntgeben/danke'>
 
     </cffunction>
 </cfcomponent>
