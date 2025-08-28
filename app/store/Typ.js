@@ -19,8 +19,6 @@
 	},{
 		name: 'name'
 	},{
-		name: 'kb'
-	},{
 		name: 'checked'
 	}]
 });
