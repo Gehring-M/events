@@ -85,7 +85,7 @@
 	},{ 
 		name: 'visible'
 	},{ 
-		name: 'ev_always_active'
+		name: 'next'
 	},{ 
 		name: 'extern'
 	},{ 
