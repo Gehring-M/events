@@ -12,7 +12,7 @@
 		<name>veranstaltung_fk</name>
 		<type>genericelement</type>
 		<element>veranstaltung</element>
-		<required>yes</required>
+		<required>no</required>
 		<multiple>no</multiple>
 	</field>
 	<field>

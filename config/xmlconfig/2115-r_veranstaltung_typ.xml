@@ -13,12 +13,14 @@
 		<type>genericelement</type>
 		<element>veranstaltung</element>
 		<required>yes</required>
+		<multiple>no</multiple>
 	</field>
 	<field>
 		<name>typ_fk</name>
 		<type>genericelement</type>
 		<element>typ</element>
 		<required>yes</required>
+		<multiple>no</multiple>
 	</field>
 </editfields> 
 </ameisen-node>
