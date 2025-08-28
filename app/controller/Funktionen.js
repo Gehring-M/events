@@ -610,8 +610,21 @@
 			var myReloadStore = myGrid.getStore();
 		}
 
-		myReloadStore.clearFilter();
-		myReloadStore.load()
+		// special handling for Artist store to preserve deactivated filter
+		if (myReloadStore.storeId === 'Artist' || myReloadStore.storeId === 'Veranstalter' || myReloadStore.storeId === 'Veranstaltungen') {
+			// only reload if necessary and re-apply filter
+			if (myReloadStore.getCount() === 0) {
+				myReloadStore.load({
+					callback: function() {
+						myReloadStore.filter('deactivated', 0)
+					}
+				})
+			}
+		} else {
+			// For other stores, clear filters and reload as before
+			myReloadStore.clearFilter()
+			myReloadStore.load()
+		}
 	
 		// rausfinden, ob es sich um ein tab window handelt
 		var myFieldStore = this.getWindowFieldsStore();
@@ -1239,11 +1252,11 @@
 			}
 		});
 		
-		// Bericht drucken
+		// löschen
 		myDeleteButton.on({
 			click: {
 				fn: function (el) {
-					Ext.Msg.confirm('Datensatz löschen?',"Möchten Sie diesen Datensatz wirklich löschen?",function(elem){
+					Ext.Msg.confirm('Datensatz löschen?', "Möchten Sie diesen Datensatz wirklich löschen?",function(elem){
 						if (elem === 'yes') {
 							myMask.show();
 							openedNodes = [];
@@ -1263,6 +1276,46 @@
 								callback: function(a,b,response) {
 									var jsonParse = Ext.JSON.decode(response.responseText);
 									if (jsonParse.success) {
+										// handle veranstalter soft-deletion
+										if (nodeType === 2101) {
+											const veranstalterStore = Ext.getStore('Veranstalter')
+											// update the record
+											const recordToUpdate = veranstalterStore.getById(record.data.recordid)
+											if (recordToUpdate) {
+												recordToUpdate.set('deactivated', 1)
+												recordToUpdate.commit()
+											}
+											// re-apply filter to hide deactivated entries
+											veranstalterStore.clearFilter()
+											veranstalterStore.filter('deactivated', 0)
+										}
+										// handle veranstaltung soft-deletion
+										if (nodeType === 2102) {
+											const veranstaltungenStore = Ext.getStore('Veranstaltungen')
+											// update the record
+											const recordToUpdate = veranstaltungenStore.getById(record.data.recordid)
+											if (recordToUpdate) {
+												recordToUpdate.set('deactivated', 1)
+												recordToUpdate.commit()
+											}
+											// re-apply filter to hide deactivated entries
+											veranstaltungenStore.clearFilter()
+											veranstaltungenStore.filter('deactivated', 0)
+										}
+										// handle artist store update after soft-deletion
+										if (nodeType === 2103) {
+											const artistStore = Ext.getStore('Artist')
+											// update the record
+											var recordToUpdate = artistStore.getById(record.data.recordid)
+											if (recordToUpdate) {
+												recordToUpdate.set('deactivated', 1)
+												recordToUpdate.commit()
+											}
+											// re-apply filter to hide deactivated entries
+											artistStore.clearFilter()
+											artistStore.filter('deactivated', 0)
+										}
+
 										myReloadStore.reload({
 											callback: function(response) {
 												if (openedNodes.length > 0) {
