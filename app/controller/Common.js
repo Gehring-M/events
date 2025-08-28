@@ -1013,11 +1013,12 @@
 		var myTabPanel = myView.down('tabpanel');
 		this.timerActive = false;
 		this.timerTyp = "";
+		var me = this; // Store reference to controller
 		this.getVeranstalterStore().load({
 			callback: function (response) {
 
 				// apply client-side filter to hide deactivated entries
-				this.getVeranstalterStore().filter('deactivated', 0)
+				me.getVeranstalterStore().filter('deactivated', 0)
 
 				if (response.length > 0) {
 					myView.down('grid[name=veranstalter]').getView().select(0);
