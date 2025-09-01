@@ -1,4 +1,4 @@
-const url = 'http://events.marcel.intern'
+const url = 'https://events-test.agindo-services.info'
 
 
 Ext.define('myapp.view.ExterneDaten', {

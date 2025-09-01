@@ -568,7 +568,7 @@
         <cfset var newEvents = []>
         <cfset var oldEvents = QueryNew('id')>
         <cfset var response = {}>
-        <cfset var api_url = "https://tirol.mapservices.eu/nefos_app/frontend/resource/json/Resource.action">
+        <cfset var api_url = getConfig('geodatapool.url')>
         <cfset var tvb_response = {}>
         <cfset var geodatapool_ids = []>
         <cfset var import_status = 3>
