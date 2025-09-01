@@ -369,7 +369,6 @@
 				<cfset tmpStruct["deactivated"] = qData.deactivated>
 				<cfset tmpStruct["deactivatedwhen"] = qData.deactivatedwhen>
 				<cfset tmpStruct["import_status"] = qData.import_status>
-				<cfset tmpStruct["bilder_urls"] = qData.bilder_urls>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				<cfif arguments.sub neq "">
 				<cfloop query="qSubData">
