@@ -3,9 +3,9 @@ CREATE TABLE tvb_kategorie_qualitaet (
     qualitaetsstufe INT NOT NULL, 
     beschreibung VARCHAR(128) NOT NULL,
     created_fk INT NOT NULL,
-    createdwhen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    createdwhen DATETIME DEFAULT CURRENT_TIMESTAMP,
     changed_fk INT,
-    changedwhen TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    changedwhen DATETIME ON UPDATE CURRENT_TIMESTAMP,
     deleted_fk INT,
-    deletedwhen TIMESTAMP
+    deletedwhen DATETIME
 );
