@@ -630,18 +630,14 @@
 		var myFieldStore = this.getWindowFieldsStore();
 	
 		Ext.each(myFieldStore.data.items,function(cItem,index){
-			
 			if (cItem.data.windowname == el.windowName) {
-				console.log(cItem)
-				if (cItem.raw.tab!="" && myTabs.indexOf(cItem.raw.tab)==-1) {
+				if (cItem.raw.tab != "" && myTabs.indexOf(cItem.raw.tab) == -1) {
 					myTabs.push(cItem.raw.tab);
 				}
 				
-				if (cItem.data.xtype=="combobox" && cItem.data.valuefield!="") {
+				if (cItem.data.xtype == "combobox" && cItem.data.valuefield != "") {
 					myComboboxen.push(cItem.data.name);
 				}
-				
-				
 			}
 		});
 		
@@ -693,7 +689,6 @@
 		// Fenster erzeugen
 		var myWindow = this.createWindow(winwidth,winheight,el.text,'windowfields',maxwinheight,nodeType,modus,el,record);
 		
-		console.log(myWindow)
 		if (myWindow.nodeType === 2102) {
 			myWindow.width="90%"
 			myWindow.down('fieldcontainer[name=windowFields]').add({
@@ -718,6 +713,40 @@
 				//,hidden: (cTab=="ebene3") ? true : false
 			});
 			var myFields = me.getWindowFields(el.windowName,record.data,modus,'',myWindow,ckConfig);
+
+
+			// create another field that summarizes these 
+			const field_names = ['kinder', 'next', 'tipp', 'visible']
+			const filtered_fields = []
+			let first_occurrence = -1
+
+			// manipulate myFields directly (just if nodetype 2102)
+			myFields.forEach((field, i) => {
+				const index = field_names.indexOf(field.name)
+				// found element
+				if (index >= 0) {
+					if (first_occurrence === -1) {
+						field.margin = '0 0 0 140px'
+						first_occurrence = i
+					}
+					// manipulate current field
+					field.labelWidth = 75
+					filtered_fields.push(field)
+					myFields = myFields.filter((field) => field.name !== field_names[index])
+				}
+			})
+
+			console.log(filtered_fields)
+
+			// create new field 
+			const hbox = {
+				xtype: 'fieldcontainer',
+				layout: 'hbox',
+				items: filtered_fields
+			}
+			//
+			myFields.splice(first_occurrence, 0, hbox)
+
 		
 			// felder in window einhängen
 			myWindow.down('fieldcontainer[name=container_'+el.windowName+'_main]').add(myFields);
