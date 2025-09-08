@@ -4,62 +4,6 @@
     <cfinclude template="../ameisen/functions.cfm">
     <cfinclude template="../modules/functions.cfm">
 
-    <!--- ##################### --->
-    <!--- #   UPLOAD IMAGES   # --->
-    <!--- ##################### --->
-
-    <cffunction name="uploadImages" access="private" returntype="array">
-        <!--- arguments --->
-        <cfargument name="images" type="array" required="true">
-
-        <!--- init --->
-        <cfset var image_ids = []>
-        <cfset var nodetype = 1301>
-        <cfset var uploadStruct = {}>
-
-        <!--- used code from 'uploader.cfm' --->
-        <cfset qCategories = getStructuredContent(nodetype=1201, parentIds=0, maxrows=1)>
-        <cfif qCategories.recordcount EQ 1>
-
-            <cfloop array="#images#" index="image">
-                <cfif StructKeyExists(image, 'contentUrl')>
-
-                    <!--- reset --->
-                    <cfset uploadStruct = {}>
-
-                    <cfset imageUrl = image['contentUrl']>
-                    <!--- maybe no need to make this HTTP request --->
-                    <!---<cfhttp url="#image['contentUrl']#" method="get" result="imageResponse" />--->
-
-                    <!--- Extract the base URL by removing the file name from the path --->
-                    <cfset baseUrl = left(imageUrl, len(imageUrl) - len(GetFileFromPath(imageUrl)))>
-                    <!--- Extract the image name --->
-                    <cfset imageName = GetFileFromPath(imageUrl)>
-
-                    <!---
-                    <cfset struct = {}>
-                    <cfset struct['imageUrl'] = imageUrl>
-                    <cfset struct['baseUrl'] = baseUrl>
-                    <cfset struct['imageName'] = imageName>
-                    --->
-
-                    <!--- upload into MediaArchive via URL (cleaner) --->
-                    <cfset uploadResult = copyIntoMediaArchive(nodeType=nodetype, categoryNodeId=qCategories.node_fk, method="url", path=baseUrl, file=imageName)>
-
-                    <cfset uploadStruct['instanceid'] = uploadResult['instanceid']>
-                    <cfset uploadStruct['imageName'] = ListFirst(imageName, ".")>
-
-                    <!--- append array --->
-                    <cfset ArrayAppend(image_ids, uploadStruct)>
-                </cfif>
-            </cfloop>
-
-        </cfif>
-
-        <cfreturn image_ids>
-
-    </cffunction>
-
 
     <!--- ################################# --->
     <!--- #   GET EVENT STRUCT TEMPLATE   # --->
@@ -208,16 +152,100 @@
 
 
     <!--- #################### --->
+    <!--- #   STORE IMAGES   # --->
+    <!--- #################### --->
+
+    <cffunction name="storeImages" access="private" returntype="void">
+        <!--- arguments --->
+        <cfargument name="images" type="array" required="true">
+        <cfargument name="event_id" type="numeric" required="true">
+        <cfargument name="category_node" type="numeric" required="true">
+        <cfargument name="old_event" type="struct" required="true">
+
+        <!--- init --->
+        <cfset var image_ids = []>
+        <cfset var uploadResults = []>
+
+        <!--- remove already existing images --->
+        <cfif StructKeyExists(old_event, 'bilder') AND old_event.bilder NEQ "">
+            <cfset remove_ids = ListToArray(old_event['bilder'], ',')>
+            <cfloop array="#remove_ids#" index="remove_id">
+                <cfset removeMediaArchiveUploadFlat(event_id, 'bilder', remove_id, 2102)>
+                <cfset deleteStructuredContent(remove_id)>
+            </cfloop>
+        </cfif>
+
+
+        <cfset var uploadStruct = {}>
+        <cfset var imageUrl = "">
+        <cfset var baseUrl = "">
+        <cfset var imageName = "">
+
+        <!--- upload new images --->
+        <cfloop array="#images#" index="image">
+            <cfif StructKeyExists(image, 'contentUrl')>
+                <!------>
+                <cfset uploadStruct = {}>
+                <cfset imageUrl = "">
+                <cfset baseUrl = "">
+                <cfset imageName = "">
+                <!------>
+                <cfset imageUrl = image['contentUrl']> 
+                <cfset baseUrl = left(imageUrl, len(imageUrl) - len(GetFileFromPath(imageUrl)))>
+                <cfset imageName = GetFileFromPath(imageUrl)>
+
+                <!--- upload into correct media-archive via URL --->
+                <cfset uploadResult = copyIntoMediaArchive(nodetype=1301, categoryNodeId=category_node, method="url", path=baseUrl, file=imageName)>
+                <!------>
+                <cfset ArrayAppend(uploadResults, uploadResult)>
+            </cfif>
+        </cfloop>
+
+        <!--- associate images with entity --->
+        <cfloop array="#uploadResults#" item="uploadResult">
+            <cfset attachMediaArchiveItemFlat(instanceID=event_id, uploadfield="bilder", uploaddataid=uploadResult['instanceid'], nodetype=2102)>
+        </cfloop>
+    </cffunction>
+
+
+    <!--- ############################# --->
+    <!--- #   STORE EVENT <> REGION   # --->
+    <!--- ############################# --->
+
+    <cffunction name="storeEventRegion" access="private" returntype="void">
+        <!--- arguments --->
+        <cfargument name="event_ids" type="array" required="true">
+        <cfargument name="region_fk" type="numeric" required="true">
+
+        <!--- init --->
+        <cfset var relation = {}>
+
+        <!--- check if there are IDs to store --->
+        <cfif ArrayLen(event_ids) GT 0>
+            <cfloop array="#event_ids#" index="event_id">
+                <!------>
+                <cfset relation = {}>
+                <cfset relation['veranstaltung_fk'] = event_id>
+                <cfset relation['region_fk'] = region_fk>
+                <!------>
+                <cfset saveStructuredContent(nodetype=2117, data=relation)>
+            </cfloop>
+        </cfif>
+    </cffunction>
+
+
+    <!--- #################### --->
     <!--- #   STORE EVENTS   # --->
     <!--- #################### --->
 
     <cffunction name="storeEvents" access="private" returntype="numeric">
+
         <!--- argument --->
         <cfargument name="new_event" type="struct" required="true">
         <cfargument name="import_status" type="numeric" required="true">
         <cfargument name="instanceId" type="numeric" required="false">
         <cfargument name="region_fk" type="numeric" required="true">
-
+        <cfargument name="old_event" type="struct" required="true">
 
         <!--- init --->
         <cfset var events_modified = 0>
@@ -226,19 +254,24 @@
         <cfset var eventSchedule = {}>
         <cfset var upload_results = []>
         <cfset var saved_event = {}>
+        <cfset var event_ids = []>
+        <cfset var has_images = false>
+        <cfset var main_event_id = 0>
 
+        <!--- set event_schedules if available (is used to determine if just main event OR sub events as well) --->
         <cfif StructKeyExists(new_event, 'eventSchedule')>
             <cfset event_schedules = new_event['eventSchedule']>
         </cfif>
 
-        <!--- upload images if some exist --->
+        <!--- check if there are some images to download --->
         <cfif StructKeyExists(new_event, 'image')>
-            <cfset upload_results = uploadImages(images = new_event['image'])>
+            <cfset has_images = true>
         </cfif>
 
-        <!--- ############################# --->
-        <!--- #   STORE JUST MAIN EVENT   # --->
-        <!--- ############################# --->
+
+        <!--- ############################################## --->
+        <!--- #   CONSTRUCT MAIN EVENT (JUST MAIN EVENT)   # --->
+        <!--- ############################################## --->
 
         <cfif ArrayLen(event_schedules) EQ 1>
     
@@ -257,24 +290,27 @@
                 <cfset eventSchedule['uhrzeitbis'] = parseDateTime(event_schedule['endTime'])>
             </cfif>
 
-            <cfset parent_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule)>
+            <cfset main_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule)>
 
             <!--- decide if overwrite OR new entry --->
             <cfif StructKeyExists(arguments, 'instanceId')>
                 <!--- overwrite --->
-                <cfset saved_event = saveStructuredContent(nodetype=2102, instance=instanceId, data=parent_event)>
+                <cfset saved_event = saveStructuredContent(nodetype=2102, instance=instanceId, data=main_event)>
             <cfelse>
                 <!--- store new event --->
-                <cfset saved_event = saveStructuredContent(nodetype=2102, data=parent_event)>
+                <cfset saved_event = saveStructuredContent(nodetype=2102, data=main_event)>
+                <cfset ArrayAppend(event_ids, saved_event.nodeid)>
             </cfif>
+
+            <!--- ID for the main event --->
+            <cfset main_event_id = saved_event.nodeid>
 
             <!--- increment counter for feedback --->
             <cfset events_modified += 1>
 
-
-        <!--- ############################### --->
-        <!--- #   STORE MAIN & SUB EVENTS   # --->
-        <!--- ############################### --->
+        <!--- ############################################# --->
+        <!--- #   CONSTRUCT MAIN EVENT (HAS SUB EVENTS)   # --->
+        <!--- ############################################# --->
         
         <cfelseif ArrayLen(event_schedules) GT 1>
 
@@ -298,21 +334,31 @@
             </cfif>
 
             <!--- get constructed event for parent --->
-            <cfset parent_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule)>
+            <cfset main_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule)>
 
             <!--- decide if overwrite OR new entry --->
             <cfif StructKeyExists(arguments, 'instanceId')>
                 <!--- overwrite --->
-                <cfset saved_event = saveStructuredContent(nodetype=2102, instance=instanceId, data=parent_event)>
+                <cfset saved_event = saveStructuredContent(nodetype=2102, instance=instanceId, data=main_event)>
             <cfelse>
                 <!--- store new event --->
-                <cfset saved_event = saveStructuredContent(nodetype=2102, data=parent_event)>
+                <cfset saved_event = saveStructuredContent(nodetype=2102, data=main_event)>
+                <cfset ArrayAppend(event_ids, saved_event.nodeid)>
             </cfif>
+
+            <!--- ID for the main event --->
+            <cfset main_event_id = saved_event.nodeid>
 
             <!--- increment counter for feedback --->
             <cfset events_modified += 1>
+
+
+            <!--- ################################ --->
+            <!--- #   STORE SUB EVENTS AS WELL   # --->
+            <!--- ################################ --->
+
             <!--- subevents reference main event via parent_fk --->
-            <cfset parent_fk = saved_event.nodeid>
+            <cfset parent_fk = main_event_id>
 
             <!--- construct remaining subevents --->
             <cfloop array="#event_schedules#" index="event_schedule_item">
@@ -341,18 +387,8 @@
                 <cfelse>
                     <!--- store new event --->
                     <cfset savedEvent = saveStructuredContent(nodetype=2102, data=sub_event)>
+                    <cfset ArrayAppend(event_ids, savedEvent.nodeid)>
                 </cfif>
-
-                <!--- ############################################## --->
-                <!--- #   STORE RELATION 'SUB_EVENT' <> 'REGION'   # --->
-                <!--- ############################################## --->
-
-                <cfset eventRegionStruct = {}>
-                <cfset eventRegionStruct['veranstaltung_fk'] = savedEvent.nodeid>
-                <cfset eventRegionStruct['region_fk'] = region_fk>
-
-                <!--- save new relation --->
-                <cfset saveStructuredContent(nodetype=2117, data=eventRegionStruct)>
 
                 <!--- increment counter for feedback --->
                 <cfset events_modified += 1>
@@ -360,24 +396,17 @@
             </cfloop>
         </cfif>
 
-        <!--- ############################ --->
-        <!--- #   STORE REMAINING DATA   # --->
-        <!--- ############################ --->
+        <!--- stores relations event <> region --->
+        <cfset storeEventRegion(event_ids=event_ids, region_fk=region_fk)>
 
-        <cfif StructKeyExists(saved_event, 'nodeid') AND saved_event['nodeid'] NEQ "">
-
-            <!--- store relation 'main_event' <> 'region' --->
-            <cfset event_region_struct = {}>
-            <cfset event_region_struct['veranstaltung_fk'] = saved_event.nodeid>
-            <cfset event_region_struct['region_fk'] = region_fk>
-            <!--- store relation --->
-            <cfset saveStructuredContent(nodetype=2117, data=event_region_struct)>
-
-            <!--- associate images with 'main_event' --->
-            <cfloop array="#upload_results#" item="upload_result">
-                <cfset attachMediaArchiveItemFlat(instanceID=saved_event.nodeid, uploadfield="bilder", uploaddataid=upload_result['instanceid'], nodetype=2102)>
-            </cfloop>
-
+        <!--- handle images --->
+        <cfif has_images>
+            <cfset maPath = getConfig('vpath.geodatenimport')>
+            <!--- just insert into archive if category does exist --->
+            <cfif maPath NEQ "" AND pathExists(maPath)>
+                <cfset maNode = getNodeId(resolvePath(maPath))>
+                <cfset storeImages(images=new_event['image'], event_id=main_event_id, category_node=maNode, old_event=old_event)>
+            </cfif>
         </cfif>
 
         <cfreturn events_modified>
@@ -519,6 +548,11 @@
                 <cfset event_struct['geodatenpool_id'] = oldEvents.geodatenpool_id>
                 <cfset event_struct['db_id'] = oldEvents.id>
                 <cfset event_struct['changed_by_kbsz'] = oldEvents.changed_by_kbsz>
+                <cfif StructKeyExists(oldEvents, 'bilder')>
+                    <cfset event_struct['bilder'] = oldEvents.bilder>
+                <cfelse>
+                    <cfset event_struct['bilder'] = "">
+                </cfif>
                 <!--- append to array --->
                 <cfset ArrayAppend(event_informations, event_struct)>
             </cfif>
@@ -549,6 +583,7 @@
                 <cfset returnStruct['unknown'] = false>
                 <cfset returnStruct['db_id'] = event_struct['db_id']>
                 <cfset returnStruct['changed_by_kbsz'] = event_struct['changed_by_kbsz']>
+                <cfset returnStruct['bilder'] = event_struct['bilder']>
             </cfif>
         </cfloop>
 
@@ -601,7 +636,7 @@
 
                 <!--- check result --->
                 <cfif tvb_response.success>
-                    <!--- fetch geodatapool IDs that are already in DB (for that region) --->
+                    <!--- fetch information on every event (for that region) --->
                     <cfset event_informations = fetchEventInformationFromDB(region_fk = tvb.region_fk)>
 
                     <!--- loop through new events and decide if to import or not --->
@@ -617,7 +652,7 @@
                             <cfset result = isAlreadyInDB(new_event_id = newEvent['@id'], event_informations = event_informations)>
 
                             <cfif result.unknown>
-                                <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, region_fk = tvb.region_fk)>
+                                <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, region_fk = tvb.region_fk, old_event=result)>
                                 <cfif import_status EQ 1>
                                     <cfset response['debug']['new_visible_on_website'] += events_modified>
                                 <cfelse>
@@ -626,7 +661,7 @@
                             <cfelse>
                                 <!--- just overwrite if data wasn't changed by KBSZ (Kulturbezirk Schwaz) --->
                                 <cfif result.changed_by_kbsz EQ 0>
-                                    <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, instanceId = result.db_id, region_fk = tvb.region_fk)>
+                                    <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, instanceId = result.db_id, region_fk = tvb.region_fk, old_event=result)>
                                     <cfif import_status EQ 1>
                                         <cfset response['debug']['overwrite_visible_on_website'] += events_modified>
                                     <cfelse>
