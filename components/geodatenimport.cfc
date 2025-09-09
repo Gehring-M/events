@@ -432,13 +432,36 @@
                         <cfif 
                             StructKeyExists(eventSchedule, "von") AND eventSchedule.von NEQ "" AND
                             StructKeyExists(eventSchedule, "bis") AND eventSchedule.bis NEQ "" AND
-                            StructKeyExists(eventSchedule, "uhrzeitvon") AND eventSchedule.uhrzeitvon NEQ "" AND
-                            StructKeyExists(eventSchedule, "uhrzeitbis") AND eventSchedule.uhrzeitbis NEQ "" AND
-                            qSubEvents.von NEQ "" AND qSubEvents.bis NEQ "" AND qSubEvents.uhrzeitvon NEQ "" AND qSubEvents.uhrzeitbis NEQ "" AND
+                            qSubEvents.von NEQ "" AND qSubEvents.bis NEQ "" AND
+
+                            (
+                                // uhrzeitvon: both missing or both equal
+                                (
+                                    (NOT StructKeyExists(eventSchedule, "uhrzeitvon") OR eventSchedule.uhrzeitvon EQ "" OR isNull(eventSchedule.uhrzeitvon))
+                                    AND (qSubEvents.uhrzeitvon EQ "" OR isNull(qSubEvents.uhrzeitvon))
+                                )
+                                OR (
+                                    StructKeyExists(eventSchedule, "uhrzeitvon") AND eventSchedule.uhrzeitvon NEQ "" AND
+                                    qSubEvents.uhrzeitvon NEQ "" AND
+                                    timeFormat(qSubEvents.uhrzeitvon, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitvon, "HH:mm")
+                                )
+                            ) AND
+
+                            (
+                                // uhrzeitbis: both missing or both equal
+                                (
+                                    (NOT StructKeyExists(eventSchedule, "uhrzeitbis") OR eventSchedule.uhrzeitbis EQ "" OR isNull(eventSchedule.uhrzeitbis))
+                                    AND (qSubEvents.uhrzeitbis EQ "" OR isNull(qSubEvents.uhrzeitbis))
+                                )
+                                OR (
+                                    StructKeyExists(eventSchedule, "uhrzeitbis") AND eventSchedule.uhrzeitbis NEQ "" AND
+                                    qSubEvents.uhrzeitbis NEQ "" AND
+                                    timeFormat(qSubEvents.uhrzeitbis, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitbis, "HH:mm")
+                                )
+                            ) AND
+
                             dateFormat(qSubEvents.von, "yyyy-mm-dd") EQ dateFormat(eventSchedule.von, "yyyy-mm-dd") AND
-                            dateFormat(qSubEvents.bis, "yyyy-mm-dd") EQ dateFormat(eventSchedule.bis, "yyyy-mm-dd") AND
-                            timeFormat(qSubEvents.uhrzeitvon, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitvon, "HH:mm") AND
-                            timeFormat(qSubEvents.uhrzeitbis, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitbis, "HH:mm")
+                            dateFormat(qSubEvents.bis, "yyyy-mm-dd") EQ dateFormat(eventSchedule.bis, "yyyy-mm-dd")
                         >
                             <cfset overwrite_struct['overwrite'] = true>
                             <cfset overwrite_struct['overwrite_id'] = qSubEvents.id>
