@@ -174,12 +174,6 @@
 			<required>no</required>
 		</field>
 		<!-- ################################################################### -->
-		<field>
-			<name>bilder_urls</name>
-			<type>textlong</type>
-			<required>no</required>
-		</field>
-		<!-- ################################################################### -->
 	</editfields>
 	<uploads>
 		<upload>
