@@ -369,7 +369,7 @@
             </cfquery>
             <!--- get sub event IDs --->
             <cfquery name="qSubEvents" datasource="#getConfig('DSN_RO')#">
-                SELECT id, von, bis, uhrzeitvon, uhrzeitbis FROM veranstaltung WHERE geodatenpool_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#qEvent.geodatenpool_id#">;
+                SELECT id, von, bis, uhrzeitvon, uhrzeitbis FROM veranstaltung WHERE geodatenpool_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#qEvent.geodatenpool_id#"> AND parent_fk IS NOT NULL;
             </cfquery>
 
             <!--- memorize overwritten IDs --->
@@ -446,14 +446,16 @@
                         </cfif>
                     </cfloop>
 
+
+                    <!--- create sub event --->
+                    <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
+
                     <cfif overwrite_struct.overwrite>
-                        <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
                         <!--- overwrite sub event --->
-                        <cfset savedEvent = saveStructuredContent(nodetype=2102, instanceId=overwrite_struct['overwrite_id'], data=sub_event)>
+                        <cfset savedEvent = saveStructuredContent(nodetype=2102, instance=overwrite_struct.overwrite_id, data=sub_event)>
                         <!--- increment counter for feedback --->
                         <cfset events_modified += 1>
                     <cfelse>
-                        <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
                         <!--- save new sub event --->
                         <cfset savedEvent = saveStructuredContent(nodetype=2102, data=sub_event)>
                         <cfset ArrayAppend(event_ids, savedEvent.nodeid)>
@@ -468,6 +470,7 @@
         <cfset storeEventRegion(event_ids=event_ids, region_fk=region_fk)>
 
         <cfset returnStruct['main_event_ID'] = main_event_id>
+        <cfset returnStruct['events_modified'] = events_modified>
 
         <!--- handle images --->
         <cfif has_images>
