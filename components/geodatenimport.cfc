@@ -175,7 +175,6 @@
             </cfloop>
         </cfif>
 
-
         <cfset var uploadStruct = {}>
         <cfset var imageUrl = "">
         <cfset var baseUrl = "">
@@ -238,7 +237,7 @@
     <!--- #   STORE EVENTS   # --->
     <!--- #################### --->
 
-    <cffunction name="storeEvents" access="private" returntype="numeric">
+    <cffunction name="storeEvents" access="private" returntype="struct">
 
         <!--- argument --->
         <cfargument name="new_event" type="struct" required="true">
@@ -257,6 +256,9 @@
         <cfset var event_ids = []>
         <cfset var has_images = false>
         <cfset var main_event_id = 0>
+
+        <cfset var returnStruct = {}>
+        <cfset returnStruct['main_event_ID'] = 0>
 
         <!--- set event_schedules if available (is used to determine if just main event OR sub events as well) --->
         <cfif StructKeyExists(new_event, 'eventSchedule')>
@@ -360,44 +362,112 @@
             <!--- subevents reference main event via parent_fk --->
             <cfset parent_fk = main_event_id>
 
-            <!--- construct remaining subevents --->
-            <cfloop array="#event_schedules#" index="event_schedule_item">
-                <!--- reset --->
-                <cfset eventSchedule = {}>
-                <!--- construct sub events --->
-                <cfif StructKeyExists(event_schedule_item, 'startDate')>
-                    <cfset eventSchedule['von'] = parseDateTime(event_schedule_item['startDate'])>
-                </cfif>
-                <cfif StructKeyExists(event_schedule_item, 'endDate')>
-                    <cfset eventSchedule['bis'] = parseDateTime(event_schedule_item['endDate'])>
-                </cfif>
-                <cfif StructKeyExists(event_schedule_item, 'startTime')>
-                    <cfset eventSchedule['uhrzeitvon'] = parseDateTime(event_schedule_item['startTime'])>
-                </cfif>
-                <cfif StructKeyExists(event_schedule_item, 'endTime')>
-                    <cfset eventSchedule['uhrzeitbis'] = parseDateTime(event_schedule_item['endTime'])>
-                </cfif>
-                <!--- get shared properties --->
-                <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
 
-                <!--- decide if overwrite OR new entry --->
-                <cfif StructKeyExists(arguments, 'instanceId')>
-                    <!--- overwrite --->
-                    <cfset savedEvent = saveStructuredContent(nodetype=2102, instance=instanceId, data=sub_event)>
-                <cfelse>
-                    <!--- store new event --->
+            <!--- maybe make more performant (externalize) --->
+            <cfquery name="qEvent" datasource="#getConfig('DSN_RO')#">
+                SELECT geodatenpool_id FROM veranstaltung WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#main_event_id#">;
+            </cfquery>
+            <!--- get sub event IDs --->
+            <cfquery name="qSubEvents" datasource="#getConfig('DSN_RO')#">
+                SELECT id, von, bis, uhrzeitvon, uhrzeitbis FROM veranstaltung WHERE geodatenpool_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#qEvent.geodatenpool_id#">;
+            </cfquery>
+
+            <!--- memorize overwritten IDs --->
+            <cfset var overwrite_struct = {}>
+            <cfset overwrite_struct['overwrite'] = false>
+            <cfset overwrite_struct['overwrite_id'] = -1>
+
+            <!--- just new sub events --->
+            <cfif qSubEvents.recordCount EQ 0>
+
+                <cfloop array="#event_schedules#" index="event_schedule_item">
+                    <!--- reset --->
+                    <cfset eventSchedule = {}>
+                    <!--- construct sub events --->
+                    <cfif StructKeyExists(event_schedule_item, 'startDate')>
+                        <cfset eventSchedule['von'] = parseDateTime(event_schedule_item['startDate'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'endDate')>
+                        <cfset eventSchedule['bis'] = parseDateTime(event_schedule_item['endDate'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'startTime')>
+                        <cfset eventSchedule['uhrzeitvon'] = parseDateTime(event_schedule_item['startTime'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'endTime')>
+                        <cfset eventSchedule['uhrzeitbis'] = parseDateTime(event_schedule_item['endTime'])>
+                    </cfif>
+                    <!--- get shared properties --->
+                    <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
+                    <!--- save new sub event --->
                     <cfset savedEvent = saveStructuredContent(nodetype=2102, data=sub_event)>
                     <cfset ArrayAppend(event_ids, savedEvent.nodeid)>
-                </cfif>
+                    <!--- increment counter for feedback --->
+                    <cfset events_modified += 1>
+                </cfloop>
 
-                <!--- increment counter for feedback --->
-                <cfset events_modified += 1>
+            <!--- overall .. overwrite but might be the case that new schedules arrived as well --->
+            <cfelseif qSubEvents.recordCount GT 0>
+                
+                <cfloop array="#event_schedules#" index="event_schedule_item">
+                    <!--- reset --->
+                    <cfset overwrite_struct['overwrite'] = false>
+                    <cfset overwrite_struct['overwrite_id'] = -1>
+                    <cfset eventSchedule = {}>
+                    <!--- construct sub events --->
+                    <cfif StructKeyExists(event_schedule_item, 'startDate')>
+                        <cfset eventSchedule['von'] = parseDateTime(event_schedule_item['startDate'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'endDate')>
+                        <cfset eventSchedule['bis'] = parseDateTime(event_schedule_item['endDate'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'startTime')>
+                        <cfset eventSchedule['uhrzeitvon'] = parseDateTime(event_schedule_item['startTime'])>
+                    </cfif>
+                    <cfif StructKeyExists(event_schedule_item, 'endTime')>
+                        <cfset eventSchedule['uhrzeitbis'] = parseDateTime(event_schedule_item['endTime'])>
+                    </cfif>
 
-            </cfloop>
+                    <!--- check for duplicates --->
+                    <cfloop query="qSubEvents">
+                        <cfif 
+                            StructKeyExists(eventSchedule, "von") AND eventSchedule.von NEQ "" AND
+                            StructKeyExists(eventSchedule, "bis") AND eventSchedule.bis NEQ "" AND
+                            StructKeyExists(eventSchedule, "uhrzeitvon") AND eventSchedule.uhrzeitvon NEQ "" AND
+                            StructKeyExists(eventSchedule, "uhrzeitbis") AND eventSchedule.uhrzeitbis NEQ "" AND
+                            qSubEvents.von NEQ "" AND qSubEvents.bis NEQ "" AND qSubEvents.uhrzeitvon NEQ "" AND qSubEvents.uhrzeitbis NEQ "" AND
+                            dateFormat(qSubEvents.von, "yyyy-mm-dd") EQ dateFormat(eventSchedule.von, "yyyy-mm-dd") AND
+                            dateFormat(qSubEvents.bis, "yyyy-mm-dd") EQ dateFormat(eventSchedule.bis, "yyyy-mm-dd") AND
+                            timeFormat(qSubEvents.uhrzeitvon, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitvon, "HH:mm") AND
+                            timeFormat(qSubEvents.uhrzeitbis, "HH:mm") EQ timeFormat(eventSchedule.uhrzeitbis, "HH:mm")
+                        >
+                            <cfset overwrite_struct['overwrite'] = true>
+                            <cfset overwrite_struct['overwrite_id'] = qSubEvents.id>
+                            <cfbreak>
+                        </cfif>
+                    </cfloop>
+
+                    <cfif overwrite_struct.overwrite>
+                        <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
+                        <!--- overwrite sub event --->
+                        <cfset savedEvent = saveStructuredContent(nodetype=2102, instanceId=overwrite_struct['overwrite_id'], data=sub_event)>
+                        <!--- increment counter for feedback --->
+                        <cfset events_modified += 1>
+                    <cfelse>
+                        <cfset sub_event = getEventStructTemplate(new_event = new_event, import_status = import_status, event_schedule = eventSchedule, parent_fk = parent_fk)>
+                        <!--- save new sub event --->
+                        <cfset savedEvent = saveStructuredContent(nodetype=2102, data=sub_event)>
+                        <cfset ArrayAppend(event_ids, savedEvent.nodeid)>
+                        <!--- increment counter for feedback --->
+                        <cfset events_modified += 1>
+                    </cfif>
+                </cfloop>
+            </cfif>
         </cfif>
 
         <!--- stores relations event <> region --->
         <cfset storeEventRegion(event_ids=event_ids, region_fk=region_fk)>
+
+        <cfset returnStruct['main_event_ID'] = main_event_id>
 
         <!--- handle images --->
         <cfif has_images>
@@ -409,7 +479,9 @@
             </cfif>
         </cfif>
 
-        <cfreturn events_modified>
+        <cfset returnStruct['events_modified'] = events_modified>
+
+        <cfreturn returnStruct>
 
     </cffunction>
 
@@ -536,7 +608,8 @@
             FROM veranstaltung AS v
             JOIN r_veranstaltung_region AS rvr
             ON v.id = rvr.veranstaltung_fk 
-            WHERE rvr.region_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#region_fk#">;
+            WHERE rvr.region_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#region_fk#">
+            AND v.parent_fk IS NULL;
         </cfquery>
 
         <!--- construct array --->
@@ -638,6 +711,7 @@
                 <cfif tvb_response.success>
                     <!--- fetch information on every event (for that region) --->
                     <cfset event_informations = fetchEventInformationFromDB(region_fk = tvb.region_fk)>
+                    <cfset event_import = []>
 
                     <!--- loop through new events and decide if to import or not --->
                     <cfloop array="#tvb_response.events#" index="newEvent">
@@ -652,7 +726,9 @@
                             <cfset result = isAlreadyInDB(new_event_id = newEvent['@id'], event_informations = event_informations)>
 
                             <cfif result.unknown>
-                                <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, region_fk = tvb.region_fk, old_event=result)>
+                                <cfset retStruct = storeEvents(new_event = newEvent, import_status = import_status, region_fk = tvb.region_fk, old_event=result)>
+                                <cfset events_modified = retStruct['events_modified']>
+                                <cfset ArrayAppend(event_import, retStruct)>
                                 <cfif import_status EQ 1>
                                     <cfset response['debug']['new_visible_on_website'] += events_modified>
                                 <cfelse>
@@ -661,7 +737,9 @@
                             <cfelse>
                                 <!--- just overwrite if data wasn't changed by KBSZ (Kulturbezirk Schwaz) --->
                                 <cfif result.changed_by_kbsz EQ 0>
-                                    <cfset events_modified = storeEvents(new_event = newEvent, import_status = import_status, instanceId = result.db_id, region_fk = tvb.region_fk, old_event=result)>
+                                    <cfset retStruct = storeEvents(new_event = newEvent, import_status = import_status, instanceId = result.db_id, region_fk = tvb.region_fk, old_event=result)>
+                                    <cfset events_modified = retStruct['events_modified']>
+                                    <cfset ArrayAppend(event_import, retStruct)>
                                     <cfif import_status EQ 1>
                                         <cfset response['debug']['overwrite_visible_on_website'] += events_modified>
                                     <cfelse>
