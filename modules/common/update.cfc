@@ -136,7 +136,7 @@
 	<cfset var response    = {}>
 
 	<!--- check if authenticated and if correct params --->
-	<cfif isAuth() AND StructKeyExists(requestData, 'artistID') AND StructKeyExists(requestData, 'approved')>
+	<cfif isAuth() AND StructKeyExists(requestData, 'artistID') AND StructKeyExists(requestData, 'artistMail') AND StructKeyExists(requestData, 'approved')>
 		<!--- update flag for that artist --->
 		<cfquery name="approveArtist" datasource="#getConfig('DSN')#">
 			UPDATE artist 
@@ -145,8 +145,24 @@
 				approvedwhen = <cfqueryparam cfsqltype="cf_sql_date" value="#now()#">
 			WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.artistID#">;
 		</cfquery>
+		<!--- send email --->
+		<cfmail to="#requestData['artistMail']#" from="#getConfig('mail.from')#" subject="Vielen Dank für Ihre Registrierung" type="html" charset="utf-8">
+			<html>
+				<body>
+					<cfif requestData['approved']>
+						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
+					<cfelse>
+						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
+					</cfif>
+				</body>
+			</html>
+		</cfmail>
 		<!--- set response message --->
-		<cfset response['message'] = 'Successfully updated status [approved] for artist with ID [#requestData.artistID#]'>
+		<cfif requestData['approved']>
+			<cfset response['message'] = 'Successfully approved artist with ID [#requestData.artistID#]. Send mail to [#requestData.artistMail#] from [#getConfig('mail.from')#].'>
+		<cfelse>
+			<cfset response['message'] = 'Successfully rejected artist with ID [#requestData.artistID#]. Send mail to [#requestData.artistMail#] from [#getConfig('mail.from')#].'>
+		</cfif>
 	<cfelse>
 		<cfset response['message'] = 'Not authenticated or wrong parameters'>
 	</cfif>
@@ -161,7 +177,7 @@
 	<cfset var response    = {}>
 
 	<!--- check if authenticated and if correct params --->
-	<cfif isAuth() AND StructKeyExists(requestData, 'organizerID') AND StructKeyExists(requestData, 'approved')>
+	<cfif isAuth() AND StructKeyExists(requestData, 'organizerID') AND StructKeyExists(requestData, 'organizerMail') AND StructKeyExists(requestData, 'approved')>
 		<!--- update flag for that artist --->
 		<cfquery name="approveOrganizer" datasource="#getConfig('DSN')#">
 			UPDATE veranstalter 
@@ -170,8 +186,24 @@
 				approvedwhen = <cfqueryparam cfsqltype="cf_sql_date" value="#now()#">
 			WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.organizerID#">;
 		</cfquery>
+		<!--- send email --->
+		<cfmail to="#requestData['organizerMail']#" from="#getConfig('mail.from')#" subject="Vielen Dank für Ihre Registrierung" type="html" charset="utf-8">
+			<html>
+				<body>
+					<cfif requestData['approved']>
+						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
+					<cfelse>
+						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
+					</cfif>
+				</body>
+			</html>
+		</cfmail>
 		<!--- set response message --->
-		<cfset response['message'] = 'Successfully updated status [approved] for organizer with ID [#requestData.organizerID#]'>
+		<cfif requestData['approved']>
+			<cfset response['message'] = 'Successfully approved organizer with ID [#requestData.organizerID#]. Send mail to [#requestData.organizerMail#] from [#getConfig('mail.from')#].'>
+		<cfelse>
+			<cfset response['message'] = 'Successfully rejected organizer with ID [#requestData.organizerID#]. Send mail to [#requestData.organizerMail#] from [#getConfig('mail.from')#].'>
+		</cfif>
 	<cfelse>
 		<cfset response['message'] = 'Not authenticated or wrong parameters'>
 	</cfif>
