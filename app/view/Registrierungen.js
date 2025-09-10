@@ -286,7 +286,7 @@ Ext.define('myapp.view.Registrierungen', {
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
-                                                body: JSON.stringify({ artistID: rec.get('id'), approved: 1 })
+                                                body: JSON.stringify({ artistID: rec.get('id'), artistMail: rec.get('email'), approved: 1 })
                                             })
                                             .then(async (response) => {
                                                 const data = await response.json()
@@ -315,7 +315,7 @@ Ext.define('myapp.view.Registrierungen', {
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
-                                                body: JSON.stringify({ artistID: rec.get('id'), approved: 0 })
+                                                body: JSON.stringify({ artistID: rec.get('id'), artistMail: rec.get('email'), approved: 0 })
                                             })
 
                                             // notify user
@@ -598,7 +598,7 @@ Ext.define('myapp.view.Registrierungen', {
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
-                                                body: JSON.stringify({ organizerID: rec.get('id'), approved: 1 })
+                                                body: JSON.stringify({ organizerID: rec.get('id'), organizerMail: rec.get('email'), approved: 1 })
                                             })
                                             .then(async (response) => {
                                                 const data = await response.json()
@@ -627,7 +627,7 @@ Ext.define('myapp.view.Registrierungen', {
                                                 headers: {
                                                     'Content-Type': 'application/json'
                                                 },
-                                                body: JSON.stringify({ organizerID: rec.get('id'), approved: 0 })
+                                                body: JSON.stringify({ organizerID: rec.get('id'), organizerMail: rec.get('email'), approved: 0 })
                                             })
                                             .then(async (response) => {
                                                 const data = await response.json()

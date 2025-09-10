@@ -1,4 +1,5 @@
-const url = 'https://events-test.agindo-services.info'
+const url_test = 'https://events-test.agindo-services.info'
+const url_local = 'http://events.marcel.intern'
 
 
 Ext.define('myapp.view.ExterneDaten', {
@@ -15,7 +16,7 @@ Ext.define('myapp.view.ExterneDaten', {
             // get panel
             const panel = this.up('panel')
             // send request to import geodata
-            fetch(`${url}/components/geodatenimport.cfc?method=importGeodata`)
+            fetch(`${url_local}/components/geodatenimport.cfc?method=importGeodata`)
                 .then(async (response) => {
                     //
                     const data = await response.json()
