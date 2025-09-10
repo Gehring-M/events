@@ -216,5 +216,73 @@
 	<cfreturn response>
 </cffunction>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<cffunction name="updateEventApproval" access="remote" returnFormat="json" output="no">
+	<!--- inits --->
+	<cfset var requestData = deserializeJson(getHttpRequestData().content)>
+	<cfset var response    = {}>
+
+	<!--- check if authenticated and if correct params --->
+	<cfif isAuth() AND StructKeyExists(requestData, 'eventID') AND StructKeyExists(requestData, 'approved')>
+		<cfif requestData['approved']>
+			<!--- set visible on 'approve' --->
+			<cfquery name="approveEvent" datasource="#getConfig('DSN')#">
+				UPDATE veranstaltung 
+				SET 
+					visible = 1
+				WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData['eventID']#">;
+			</cfquery>
+		<cfelse>
+			<!--- set deactivated on 'reject' --->
+			<cfquery name="rejectEvent" datasource="#getConfig('DSN')#">
+				UPDATE veranstaltung 
+				SET 
+					deactivated = 1,
+					deactivatedwhen = <cfqueryparam cfsqltype="cf_sql_date" value="#now()#">
+				WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData['eventID']#">;
+			</cfquery>
+		</cfif>
+
+		<!--- get contact details --->
+		<cfquery name="qContact" datasource="#getConfig('DSN_RO')#">
+			SELECT mail, name
+			FROM kontakt 
+			WHERE id = (
+				SELECT kontakt_fk AS contact_ID 
+				FROM r_veranstaltung_kontakt
+				WHERE veranstaltung_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData['eventID']#">
+			);
+		</cfquery>
+
+		<!--- send email --->
+		<cfif StructKeyExists(qContact, 'mail') AND StructKeyExists(qContact, 'name') AND qContact['mail'] NEQ "" AND qContact['name'] NEQ "">
+			<cfmail to="#qContact['mail']#" from="#getConfig('mail.from')#" subject="" type="html" charset="utf-8">
+				<html>
+					<body>
+						<h2>Hallo #qContact['name']#,</h2>
+						<p>Vielen Dank für die Bekanntgabe einer Veranstaltung für die Website <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a>.</p>
+						<cfif requestData['approved']>
+							<p>Ihre Veranstaltung wurde in den Eventkalender aufgenommen.</p>
+						<cfelse>
+							<p>Leider können wir Ihre Veranstaltung nicht in den Eventkalender aufnehmen, da sie nicht den Kriterien des Kalenders entspricht.</p>
+						</cfif>
+					</body>
+				</html>
+			</cfmail>
+		</cfif>
+
+		<!--- set response message --->
+		<cfif requestData['approved']>
+			<cfset response['message'] = 'Successfully approved (set visible) an event with ID [#requestData.eventID#]. Send mail to [#qContact['mail']#] from [#getConfig('mail.from')#].'>
+		<cfelse>
+			<cfset response['message'] = 'Successfully deactivated (rejected) an event with ID [#requestData.eventID#]. Send mail to [#qContact['mail']#] from [#getConfig('mail.from')#].'>
+		</cfif>
+	<cfelse>
+		<cfset response['message'] = 'Not authenticated or wrong parameters'>
+	</cfif>
+
+	<!--- return response --->
+	<cfreturn response>
+</cffunction>
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 </cfsilent>
 </cfcomponent>

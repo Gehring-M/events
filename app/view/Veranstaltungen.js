@@ -59,6 +59,74 @@ Ext.define('myapp.view.Veranstaltungen', {
 						}
 					},
 					{
+						xtype: 'componentcolumn',
+						width: 180,
+						hideable: false,
+						menuDisabled: true,
+						resizable: false,
+						sortable: false,
+						dataIndex: 'approval_buttons',
+						renderer: function (value, data, record) {
+							if (record.data.parent_fk == null && record.data.import_status === 0) {
+								return {
+									xtype: 'container',
+									layout: 'hbox',
+									items: [{
+										xtype: 'button',
+										text: 'Bestätigen',
+										cls: 'btn-green',
+										margin: '0 5 0 0',
+										agRecord: record,
+										listeners: {
+											click: (btn, e) => {
+												// 
+												fetch('/modules/common/update.cfc?method=updateEventApproval', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json'
+													},
+													body: JSON.stringify({ eventID: record.raw.recordid, approved: 1 })
+												})
+												.then(async (response) => {
+													const data = await response.json()
+													console.log(data)
+												})
+												.catch((error) => {
+													console.log(error)
+												})
+											}
+										}
+									}, {
+										xtype: 'button',
+										text: 'Ablehnen',
+										cls: 'btn-red',
+										agRecord: record,
+										listeners: {
+											click: (btn, e) => {
+												// 
+												fetch('/modules/common/update.cfc?method=updateEventApproval', {
+													method: 'POST',
+													headers: {
+														'Content-Type': 'application/json'
+													},
+													body: JSON.stringify({ eventID: record.raw.recordid, approved: 0 })
+												})
+												.then(async (response) => {
+													const data = await response.json()
+													console.log(data)
+												})
+												.catch((error) => {
+													console.log(error)
+												})
+											}
+										}
+									}]
+								};
+							}
+							return '';
+						}
+					},
+					{
 						text: 'Titel der Veranstaltung', dataIndex: 'name', flex: 2, menuDisabled: true, sortable: true,
 						renderer: function (value, data, record) {
 
@@ -117,7 +185,7 @@ Ext.define('myapp.view.Veranstaltungen', {
 						sortable: false,
 						menuDisabled: true,
 						dataIndex: 'test',
-						width: 190,
+						width: 350,
 
 						renderer: function (value, data, record) {
 
@@ -136,9 +204,6 @@ Ext.define('myapp.view.Veranstaltungen', {
 										click: function (value, data, record) {
 
 											let scope = this
-
-
-
 
 											Ext.Ajax.request({
 												url: '/modules/common/create.cfc?method=duplicateVeranstaltungSub',
@@ -168,16 +233,7 @@ Ext.define('myapp.view.Veranstaltungen', {
 															store.reload({callback:()=>scope.up("grid").up().down("grid[name=SubVeranstaltungen]").getView().select(store.find("recordid", jsonParse.recordid))})
 															
 															//scope.up("grid").up().down("grid[name=SubVeranstaltungen]").getView().select(store.find("recordid", jsonParse.recordid))
-															
-											
-															
-														
-													
-										
-
-
-
-
+			
 													return jsonParse
 
 												}
@@ -318,7 +374,6 @@ Ext.define('myapp.view.Veranstaltungen', {
 								// Otherwise, filter by import_status
 								return record.get('import_status') == newValue;
 							});
-							console.log(store)
 							// Force grid refresh
         					grid.getView().refresh();
 						}
