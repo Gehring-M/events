@@ -150,10 +150,11 @@
 			<html>
 				<body>
 					<h2>Hallo #requestData['name']#,</h2>
+					<p>Vielen Dank für Ihre Registrierung als Künstler auf <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a>.</p>
 					<cfif requestData['approved']>
-						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
+						<p>Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a> gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
 					<cfelse>
-						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
+						<p>Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
 					</cfif>
 				</body>
 			</html>
@@ -192,10 +193,11 @@
 			<html>
 				<body>
 					<h2>Hallo #requestData['name']#,</h2>
+					<p>Vielen Dank für Ihre Registrierung als Veranstalter/Location auf <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a>.</p>
 					<cfif requestData['approved']>
-						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
+						<p>Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a> gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
 					<cfelse>
-						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
+						<p>Leider können wir Ihre Registrierung nicht annehmen, weil sie nicht den Kriterien unserer Plattform entspricht.</p>
 					</cfif>
 				</body>
 			</html>
