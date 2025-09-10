@@ -297,6 +297,7 @@ Ext.define('myapp.view.Veranstaltungen', {
 						fields: ['value', 'label'],
 						data: [
 							{ value: '', label: 'Alle' },
+							{ value: 0, label: 'Manuell registriert' },
 							{ value: 1, label: 'Sofort importiert' },
 							{ value: 2, label: 'Import nach Freigabe' }
 						]
@@ -313,10 +314,11 @@ Ext.define('myapp.view.Veranstaltungen', {
 								// Always filter out deactivated entries
 								if (record.get('deactivated') !== 0) return false;
 								// If no import_status selected, show all non-deactivated
-								if (!newValue) return true;
+								if (newValue === '' || newValue === null || newValue === undefined) return true;
 								// Otherwise, filter by import_status
 								return record.get('import_status') == newValue;
 							});
+							console.log(store)
 							// Force grid refresh
         					grid.getView().refresh();
 						}
