@@ -136,7 +136,7 @@
 	<cfset var response    = {}>
 
 	<!--- check if authenticated and if correct params --->
-	<cfif isAuth() AND StructKeyExists(requestData, 'artistID') AND StructKeyExists(requestData, 'artistMail') AND StructKeyExists(requestData, 'approved')>
+	<cfif isAuth() AND StructKeyExists(requestData, 'artistID') AND StructKeyExists(requestData, 'artistMail') AND StructKeyExists(requestData, 'approved') AND StructKeyExists(requestData, 'name')>
 		<!--- update flag for that artist --->
 		<cfquery name="approveArtist" datasource="#getConfig('DSN')#">
 			UPDATE artist 
@@ -149,6 +149,7 @@
 		<cfmail to="#requestData['artistMail']#" from="#getConfig('mail.from')#" subject="Vielen Dank für Ihre Registrierung" type="html" charset="utf-8">
 			<html>
 				<body>
+					<h2>Hallo #requestData['name']#,</h2>
 					<cfif requestData['approved']>
 						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
 					<cfelse>
@@ -177,7 +178,7 @@
 	<cfset var response    = {}>
 
 	<!--- check if authenticated and if correct params --->
-	<cfif isAuth() AND StructKeyExists(requestData, 'organizerID') AND StructKeyExists(requestData, 'organizerMail') AND StructKeyExists(requestData, 'approved')>
+	<cfif isAuth() AND StructKeyExists(requestData, 'organizerID') AND StructKeyExists(requestData, 'organizerMail') AND StructKeyExists(requestData, 'approved') AND StructKeyExists(requestData, 'name')>
 		<!--- update flag for that artist --->
 		<cfquery name="approveOrganizer" datasource="#getConfig('DSN')#">
 			UPDATE veranstalter 
@@ -190,6 +191,7 @@
 		<cfmail to="#requestData['organizerMail']#" from="#getConfig('mail.from')#" subject="Vielen Dank für Ihre Registrierung" type="html" charset="utf-8">
 			<html>
 				<body>
+					<h2>Hallo #requestData['name']#,</h2>
 					<cfif requestData['approved']>
 						<p>Vielen Dank für Ihre Registrierung als Künstler auf kulturbezirk-schwaz.tirol. Wir nehmen Ihre Daten gerne in unsere Datenbank auf. Damit werden Sie auf kulturbezirk-schwaz.tirol gefunden und können zukünftig von den Vorteilen der Plattform profitieren.</p>
 					<cfelse>
