@@ -1,0 +1,195 @@
+h2 {
+    margin: 0;
+    padding: 1rem;
+    color: #036B00;
+}
+h3 {
+    margin: 0;
+    color: #036B00;
+}
+p {
+    margin: 0;
+    font-weight: 500;
+}
+span.special-word {
+    color: #059900;
+    font-weight: 600;
+}
+div.result {
+    border: 1px solid #CCC;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+div.result-header {
+    border-bottom: 1px solid #CCC;
+}
+div.result-body {
+    display: flex;
+    flex-direction: column;
+}
+div.description {
+    border: 1px solid #CCC;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+div.user-decision {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #CCC;
+}
+div.already-updated {
+    display: flex;
+    flex-direction: column;
+}
+div.already-updated-body {
+    padding: 1rem;
+    border-bottom: 1px solid #CCC;
+}
+div.type-transfer {
+    display: flex;
+    flex-direction: column;
+}
+div.type-transfer-body {
+    display: flex;
+    border-bottom: 1px solid #CCC;
+}
+div.type-entity {
+    flex: 0 1 50%;
+}
+div.type-relation {
+    flex: 0 1 50%;
+    border-left: 1px solid #CCC;
+}
+div.tag-table {
+    display: flex;
+    flex-direction: column;
+}
+div.tag-table-body {
+    display: flex;
+    border-bottom: 1px solid #CCC;
+}
+
+div.extracted-fields {
+    display: flex; 
+    flex-direction: column;
+    border-bottom: 1px solid #CCC;
+}
+div.extracted-fields-header {
+    flex: 0 1 auto;
+    padding: 1rem;
+    border-bottom: 1px solid #CCC;
+}
+div.extracted-fields-body {
+    flex: 1 0 auto;
+    display: flex;
+}
+div.type-table-body {
+    display: flex;
+    border-bottom: 1px solid #CCC;
+}
+
+div.extracted-types {
+    flex: 0 1 50%;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #CCC;
+}
+div.extracted-tags {
+    flex: 0 1 50%;
+    display: flex;
+    flex-direction: column;
+}
+div.extracted-types-header, 
+div.extracted-tags-header,
+div.known-tags-header,
+div.relations-header,
+div.tag-relations-header,
+div.type-relations-header,
+div.start-transfer-header,
+div.already-updated-header,
+div.description-header,
+div.type-table-header,
+div.old-type-table-header,
+div.new-type-table-header,
+div.type-transfer-header,
+div.type-entity-header,
+div.type-relation-header,
+div.tag-table-header,
+div.old-tag-table-header,
+div.new-tag-table-header,
+div.tag-duplicates-header,
+div.tag-transfer-header,
+div.tag-entity-header,
+div.tag-relation-header {
+    padding: 1rem;
+    border-bottom: 1px solid #CCC;
+}
+div.extracted-types-body,
+div.extracted-tags-body,
+div.known-tags-body,
+div.tag-relations-body,
+div.type-relations-body,
+div.description-body,
+div.old-type-table-body,
+div.new-type-table-body,
+div.type-entity-body,
+div.type-relation-body,
+div.old-tag-table-body,
+div.new-tag-table-body,
+div.tag-entity-body,
+div.tag-relation-body {
+    padding: 1rem;
+}
+div.tag-transfer-body {
+    display: flex;
+}
+div.known-tags-body {
+    border-bottom: 1px solid #CCC;
+}
+div.tag-relation-body {
+    border-left: 1px solid #CCC;
+}
+div.tag-duplicates-body {
+    padding: 1rem;
+    border-bottom: 1px solid #CCC;
+}
+table {
+    border: 1px solid purple;
+}
+
+div.known-tags {
+    display: flex;
+    flex-direction: column;
+}
+
+div.relations-body {
+    display: flex;
+    border-bottom: 1px solid #CCC;
+}
+div.tag-relations {
+    flex: 0 1 50%;
+}
+div.type-relations {
+    flex: 0 1 50%;
+    border-left: 1px solid #CCC;
+}
+div.old-type-table {
+    flex: 0 1 50%;
+}
+div.new-type-table {
+    flex: 0 1 50%;
+    border-left: 1px solid #CCC;
+}
+div.old-tag-table {
+    flex: 0 1 50%;
+}
+div.new-tag-table {
+    flex: 0 1 50%;
+    border-left: 1px solid #CCC;
+}
+div.start-transfer {
+    display: flex;
+    flex-direction: column;
+}
