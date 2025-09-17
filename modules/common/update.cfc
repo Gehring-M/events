@@ -22,11 +22,11 @@
 		</cfif>
 	</cfloop>
 			
-    <cfset var result		= {}>
+    <cfset var result		 = {}>
     <cfset result["success"] = false>
 	<cfset result["message"] = "Die Daten konnten nicht erfolgreich gespeichert werden.">
    
-		
+
     <cfif isAuth()>
 		<cfif arguments.nodeType GT 1000>
 			<!--- Zu prüfende Felder festlegen	--->
@@ -45,11 +45,6 @@
 			<!--- Nodeabhängige Validierungen durchführen --->
 			<cfswitch expression="#arguments.nodeType#">
 				<cfcase value="2101">
-					<!--- Todo: Schnittstelle zum Ermitteln von lat und lon einbauen --->
-					<cfset myData['latitude'] = "0.0000000000">
-					<cfset myData['longitude'] = "0.0000000000">
-				</cfcase>
-				<cfcase value="2102">
 					<!--- Todo: Schnittstelle zum Ermitteln von lat und lon einbauen --->
 					<cfset myData['latitude'] = "0.0000000000">
 					<cfset myData['longitude'] = "0.0000000000">
@@ -90,8 +85,21 @@
 					<cfset instanceid = 0>
 				</cfif>	
 				
-				<!--- Daten eintragen --->
+				
+				<!--- Get correct entry from DB if "update" --->
+				<cfif (instanceid NEQ 0) AND (arguments.nodeType EQ 2102)>
 					
+					<cfquery name="getEvent" datasource="#getConfig('DSN')#">
+						SELECT changed_by_kbsz, geodatenpool_id, import_status 
+						FROM veranstaltung 
+						WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#instanceid#">;
+					</cfquery>
+
+					<cfset myData['changed_by_kbsz'] = 1>
+					<cfset myData['geodatenpool_id'] = getEvent.geodatenpool_id>
+					<cfset myData['import_status'] = getEvent.import_status>
+
+				</cfif>
 				
 				<cfset result["success"] = true>
 				<cfset saveStruct = saveStructuredContent(nodetype=arguments.nodeType,instance=instanceid,data=myData)>

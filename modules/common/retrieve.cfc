@@ -368,6 +368,8 @@
 				<cfset tmpStruct["extern"]	= qData.extern>
 				<cfset tmpStruct["deactivated"] = qData.deactivated>
 				<cfset tmpStruct["deactivatedwhen"] = qData.deactivatedwhen>
+				<cfset tmpStruct["changed_by_kbsz"] = qData.changed_by_kbsz>
+				<cfset tmpStruct["geodatenpool_id"] = qData.geodatenpool_id>
 				<cfset tmpStruct["import_status"] = qData.import_status>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
 				<cfif arguments.sub neq "">

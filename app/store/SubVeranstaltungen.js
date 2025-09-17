@@ -90,5 +90,11 @@
 		name: 'extern'
 	},{ 
 		name: 'duplicate_fk'
+	},{
+		name: 'changed_by_kbsz'
+	},{
+		name: 'geodatenpool_id'
+	},{
+		name: 'import_status'
 	}]
 });
