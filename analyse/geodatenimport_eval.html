@@ -1,0 +1,220 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>Geodatenimport Evaluation</title>
+        <style>
+            body {
+                font-family: 'Montserrat', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+                margin: 0;
+            }
+            div#evaluation {
+                width: 80%;
+                margin: 5rem auto;
+                display: flex;
+                flex-direction: column;
+                gap: 3rem;
+            }
+            div#evaluation h3 {
+                margin: 0;
+            }
+            div.container {
+                width: 100%;
+                background-color: #FAFAFA;
+                display: flex;
+                flex-direction: column;
+                gap: 2.5rem;
+                padding: 1.5rem;
+                border-radius: 0.25rem;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+            }
+            div.item {
+                display: flex;
+                gap: 1rem;
+                flex-direction: column;
+                align-items: start;
+            }
+            table {
+                display: inline;
+                border-collapse: separate;
+                border-radius: 0.25rem;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+            }
+            table th,
+            table td {
+                padding: 0.5rem;
+            }
+            table.state th {
+                background-color: orange;
+            }
+            table.feedback th {
+                background-color: green;
+                color: #EEE;
+            }
+            table.eval th {
+                background-color: purple;
+                color: #EEE;
+            }
+            table td {
+                background-color: #EEE;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="evaluation">
+            <!-- initial state -->
+            <div class="container">
+                <div class="item">
+                    <h3>Initialer Stand</h3>
+                    <table class="state">
+                        <thead>
+                            <tr>
+                                <th>Veranstaltungen</th>
+                                <th>Relationen Veranstaltung <> Region</th>
+                                <th>Anzahl der Bilder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>179</td>
+                                <td>179</td>
+                                <td>135</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- import feedback -->
+            <div class="container">
+                <div class="item">
+                    <h3>Feedback für den ersten Import (ohne Silberregion)</h3>
+                    <table class="feedback">
+                        <thead>
+                            <tr>
+                                <th>new entries that are active on website</th>
+                                <th>new entries that need approval</th>
+                                <th>overwritten entries that are active on website</th>
+                                <th>overwritten entries that need approval</th>
+                                <th>did not overwrite because KBSZ did</th>
+                                <th>entries that did not match a category</th>
+                                <th>http request errors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3</td>
+                                <td>8</td>
+                                <td>53</td>
+                                <td>79</td>
+                                <td>0</td>
+                                <td>216</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- after import state -->
+                <div class="item">
+                    <h3>Stand nach dem ersten Import</h3>
+                    <table class="state">
+                        <thead>
+                            <tr>
+                                <th>Veranstaltungen</th>
+                                <th>Relationen Veranstaltung <> Region</th>
+                                <th>Anzahl der Bilder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>190</td>
+                                <td>190</td>
+                                <td>144</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- import feedback + Silberregion -->
+            <div class="container">
+                <div class="item">
+                    <h3>Feedback für den zweiten Import (mit Silberregion)</h3>
+                    <table class="feedback">
+                        <thead>
+                            <tr>
+                                <th>new entries that are active on website</th>
+                                <th>new entries that need approval</th>
+                                <th>overwritten entries that are active on website</th>
+                                <th>overwritten entries that need approval</th>
+                                <th>did not overwrite because KBSZ did</th>
+                                <th>entries that did not match a category</th>
+                                <th>http request errors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>35</td>
+                                <td>31</td>
+                                <td>56</td>
+                                <td>87</td>
+                                <td>0</td>
+                                <td>310</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- + Silberregion -->
+                <div class="item">
+                    <h3>Stand nach dem Import mit Silberregion</h3>
+                    <table class="state">
+                        <thead>
+                            <tr>
+                                <th>Veranstaltungen</th>
+                                <th>Relationen Veranstaltung <> Region</th>
+                                <th>Anzahl der Bilder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>256</td>
+                                <td>256</td>
+                                <td>208</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Eckdaten -->
+            <div class="container">
+                <div class="item">
+                    <h3>Länge der JSON-Files (in Zeilen)</h3>
+                    <table class="eval">
+                        <thead>
+                            <tr>
+                                <th>Achensee</th>
+                                <th>Silberregion</th>
+                                <th>Zillertal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>9111</td>
+                                <td>8046</td>
+                                <td>11989</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <p>Bedeutet: Silberregion liefert am wenigsten ... 🫠</p>
+                    <h3>Situation</h3>
+                    <p>Achensee und Zillertal liefern jede Veranstaltung nur 1-mal, Subveranstaltungen unterscheiden sich aber durch <span style="color: purple; font-weight: 500;">eventSchedules</span> (property in der JSON)</p>
+                    <p>Die Daten aus der Silberregion sind inkonsistent (oder gewollt?) und werden wie folgt angeboten :</p>
+                    <ul>
+                        <li>Wie bei Achensee und Zillertal ... eine Veranstaltung kommt nur 1 mal vor, kann aber zu mehreren Zeiten statt finden.</li>
+                        <li>Großteils bei Silberregion ... eine Veranstaltung kann mehrmals vorkommen aber jede Veranstaltung ist an 1nen Zeitslot gebunden.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
