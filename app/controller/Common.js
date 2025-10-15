@@ -2,16 +2,17 @@
 	extend: 'Ext.app.Controller',
 	
 	// register all the views that are being used
-	views: 
-	[
-		'Veranstaltungen',
-		'Veranstalter',
-		'Basics',
-		'Artist',
-		'Artikel',
-		'Registrierungen',
-		'ExterneDaten'
-	],
+       views: 
+       [
+	       'Veranstaltungen',
+	       'Veranstalter',
+	       'Basics',
+	       'Artist',
+	       'Artikel',
+	       'Registrierungen',
+	       'ExterneDaten',
+	       'Locations'
+       ],
 
 	// register all the stores that are being used
 	stores: 
@@ -33,49 +34,59 @@
 		'Region',
 		'Artikel',
 		'ArtistRegistrierungen',
-		'OrganizerRegistrierungen'
+		'OrganizerRegistrierungen',
+		'LocationDropdown'
 	],
 
 	// define references for the UI components
-	refs: 
-	[
-		{
-			ref: 'Veranstaltungen',
-			selector: 'Veranstaltungen',
-			xtype: 'Veranstaltungen',
-			autoCreate: true
-		},{
-			ref: 'Basics',
-			selector: 'Basics',
-			xtype: 'Basics',
-			autoCreate: true
-		},{
-			ref: 'Veranstalter',
-			selector: 'Veranstalter',
-			xtype: 'Veranstalter',
-			autoCreate: true
-		},{
-			ref: 'Artist',
-			selector: 'Artist',
-			xtype: 'Artist',
-			autoCreate: true
-		},{
-			ref: 'Artikel',
-			selector: 'Artikel',
-			xtype: 'Artikel',
-			autoCreate: true
-		},{
-			ref: 'Registrierungen',
-			selector: 'Registrierungen',
-			xtype: 'Registrierungen',
-			autoCreate: true
-		},{
-			ref: 'ExterneDaten',
-			selector: 'ExterneDaten',
-			xtype: 'ExterneDaten',
-			autoCreate: true
-		}
-	],
+       refs: 
+       [
+	       {
+		       ref: 'Veranstaltungen',
+		       selector: 'Veranstaltungen',
+		       xtype: 'Veranstaltungen',
+		       autoCreate: true
+	       },{
+		       ref: 'Basics',
+		       selector: 'Basics',
+		       xtype: 'Basics',
+		       autoCreate: true
+	       },{
+		       ref: 'Veranstalter',
+		       selector: 'Veranstalter',
+		       xtype: 'Veranstalter',
+		       autoCreate: true
+	       },{
+		       ref: 'Artist',
+		       selector: 'Artist',
+		       xtype: 'Artist',
+		       autoCreate: true
+	       },{
+		       ref: 'Artikel',
+		       selector: 'Artikel',
+		       xtype: 'Artikel',
+		       autoCreate: true
+	       },{
+		       ref: 'Registrierungen',
+		       selector: 'Registrierungen',
+		       xtype: 'Registrierungen',
+		       autoCreate: true
+	       },{
+		       ref: 'ExterneDaten',
+		       selector: 'ExterneDaten',
+		       xtype: 'ExterneDaten',
+		       autoCreate: true
+	       },{
+		       ref: 'Locations',
+		       selector: 'Locations',
+		       xtype: 'Locations',
+		       autoCreate: true
+	       }
+       ],
+       actionLocations: function () {
+	       var myView = this.getLocations();
+	       this.application.setMainView(myView);
+       },
 
 	init: function () {
 		var authStore = this.getAuthStore();
