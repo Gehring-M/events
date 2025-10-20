@@ -5,7 +5,7 @@
        views: 
        [
 	       'Veranstaltungen',
-	       'Veranstalter',
+	       'Veranstalter', 
 	       'Basics',
 	       'Artist',
 	       'Artikel',

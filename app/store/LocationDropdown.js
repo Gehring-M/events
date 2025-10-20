@@ -38,8 +38,8 @@ Ext.define('myapp.store.LocationDropdown', {
     listeners: {
         load: function(store, records, successful, operation) {
             try {
-                // Raw objects as received by reader
-                var rawSnapshot = records.map(function(r){ return r.raw });
+                // Defensive: only map if records is a valid array
+                var rawSnapshot = Array.isArray(records) ? records.map(function(r){ return r.raw }) : [];
                 // If the reader created a single wrapper record whose raw contains the locations array,
                 // replace the store data with that inner array so models have correct id/name fields.
                 try {

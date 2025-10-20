@@ -5,6 +5,8 @@ CREATE TABLE regional_highlights (
     name VARCHAR(128) NOT NULL,
     beschreibung VARCHAR(256),
     kulturrelevant SMALLINT(1) NOT NULL,
+    active SMALLINT(1) NOT NULL DEFAULT 0,
+    bilder TEXT,
     created_fk INT,
     createdwhen DATETIME DEFAULT CURRENT_TIMESTAMP,
     changed_fk INT,
