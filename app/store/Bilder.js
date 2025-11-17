@@ -14,6 +14,30 @@
 			type: 'json'
 		}
 	},
+
+	/**
+	 * DEBUGGING
+	 * 
+	listeners: {
+		load: function(store, records, successful) {
+			console.log('LOAD BILDER STORE');
+			console.log(records);
+		},
+		add: function(store, records, index) {
+			console.log('Records added to Bilder store:', records);
+		},
+		remove: function(store, records, index, isMove) {
+			console.log('Records removed from Bilder store:', records);
+		},
+		update: function(store, record, operation, modifiedFieldNames) {
+			console.log('Record updated in Bilder store:', record);
+		},
+		clear: function(store) {
+			console.log('Bilder store cleared');
+		}
+	},
+	*/
+
 	fields: [{
 		name: 'recordid'
 	},{

@@ -269,18 +269,18 @@
 					
 <cffunction name="getVeranstaltungen" access="remote" returnFormat="json" output="no">
 	
+	<cfargument name="eventFilter" type="string" required="no" default="">
 	<cfargument name="filterText" type="string" required="no" default="">
 	<cfargument name="filterVon" type="string" required="no" default="">
 	<cfargument name="filterBis" type="string" required="no" default="">
-		
 	<cfargument name="filterOrt" type="string" required="no" default="">
 	<cfargument name="filterBezirk" type="string" required="no" default="">
 	<cfargument name="sub" required="no" default="">
-		
+	
   	<cfset var returnArray = ArrayNew(1)>
 	<cfset var tmpStruct = StructNew()>
 	<cfset var qSearch = QueryNew('id')>
-	<cfset var result = structNew() >
+	<cfset var result = structNew()>
 
 	<cfif isAuth()>
 		<cfquery name="qData" datasource="#getConfig('DSN')#">
@@ -290,20 +290,41 @@
 				veranstaltung v1
 				LEFT JOIN veranstaltung v2 on v1.parent_fk = v2.id
 			WHERE
-				1=1
+				v1.deactivated = 0
 				<cfif arguments.filterVon NEQ "">
-					AND v1.von >= '#arguments.filterVon#'
+					AND ((v1.bis IS NULL) OR (v1.bis = '') OR (v1.bis >= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.filterVon#">))
 				</cfif>
 				<cfif arguments.filterBis NEQ "">
-					<!--- check if "bis" is available --->
-					AND COALESCE(v1.bis, v1.von) <= '#arguments.filterBis#'
+					AND v1.von <= <cfqueryparam cfsqltype="cf_sql_date" value="#arguments.filterBis#">
 				</cfif>
 				<cfif arguments.filterText NEQ "">
 					AND v1.name like '%#arguments.filterText#%'
 				</cfif>
-				<cfif arguments.sub NEQ "">
-					AND v1.parent_fk = <cfqueryparam cfsqltype="CF_SQL_INTEGER" value="#arguments.sub#">
-				</cfif>	
+				<!--- EVENT FILTER --->
+				<cfif StructKeyExists(arguments, 'eventFilter')>
+					<cfswitch expression="#arguments['eventFilter']#">
+						<!--- new events --->
+						<cfcase value="">
+							AND v1.changed_by_kbsz = 0 AND v1.visible = 0
+						</cfcase>
+						<!--- active --->
+						<cfcase value="active">
+							AND v1.changed_by_kbsz = 1 AND v1.visible = 1
+						</cfcase>
+						<!--- inactive --->
+						<cfcase value="inactive">
+							AND v1.changed_by_kbsz = 1 AND v1.visible = 0
+						</cfcase>
+						<!--- all --->
+						<cfcase value="all">
+							AND 1 = 1
+						</cfcase>
+						<!--- fallback --->
+						<cfdefaultcase>
+							AND 1 = 1
+						</cfdefaultcase>
+					</cfswitch>
+				</cfif>
 			ORDER BY 
 				v1.von, v1.uhrzeitvon
 		</cfquery>
@@ -328,8 +349,9 @@
 					SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qData.id#'
 				</cfquery>
 				<cfquery name="RRegion" datasource="#getConfig('DSN')#">
-			SELECT * FROM region WHERE id ='#tmpRegion.region_fk#'
-		</cfquery>
+					SELECT * FROM region WHERE id ='#tmpRegion.region_fk#'
+				</cfquery>
+
 				<cfset tmpStruct = {}>
 				<cfset tmpStruct["recordid"] = qData.id>
 				<cfset tmpStruct["parent_fk"] = qData.parent_fk>
@@ -371,64 +393,15 @@
 				<cfset tmpStruct["changed_by_kbsz"] = qData.changed_by_kbsz>
 				<cfset tmpStruct["geodatenpool_id"] = qData.geodatenpool_id>
 				<cfset tmpStruct["import_status"] = qData.import_status>
+				<cfset tmpStruct["slider_tag_fk"] = qData.slider_tag_fk>
 				<cfset ArrayAppend(returnArray, tmpStruct)>
-				<cfif arguments.sub neq "">
-				<cfloop query="qSubData">
-					<cfquery name="tmpVATyp" dbtype="query">
-						SELECT * FROM qVATyp WHERE veranstaltung_fk = '#qSubData.id#'
-					</cfquery>
-					<cfquery name="tmpVARegion" dbtype="query">
-						SELECT * FROM qVARegion WHERE veranstaltung_fk = '#qSubData.id#'
-					</cfquery>
-					<cfset tmpStruct = {}>
-					<cfset tmpStruct["recordid"] = qSubData.id>
-					<cfset tmpStruct["parent_fk"] = qSubData.parent_fk>
-					<cfset tmpStruct["opened"] = 0>
-					<cfset tmpStruct["children"] = 0>
-					<cfset tmpStruct["name"] = qSubData.name>
-					<cfset tmpStruct["parent_name"] = qSubData.parent_name>
-					<cfset tmpStruct["von"] = qSubData.von>
-					<cfset tmpStruct["bis"] = qSubData.bis>
-					<cfset tmpStruct["uhrzeitvon"] = qSubData.uhrzeitvon>
-					<cfset tmpStruct["uhrzeitbis"] = qSubData.uhrzeitbis>
-					<cfset tmpStruct["ort_fk"] = qSubData.ort_fk>
-					<cfset tmpStruct["ort_name"] = qSubData.ort_fk>
-					<cfset tmpStruct["bezirk"] = qSubData.ort_fk>
-					<cfset tmpStruct["veranstaltungsort"] = qSubData.veranstaltungsort>
-					<cfset tmpStruct["adresse"] = qSubData.adresse>
-					<cfset tmpStruct["plz"] = qSubData.plz>
-					<cfset tmpStruct["ort"] = qSubData.ort>
-					<cfset tmpStruct["latitude"] = qSubData.latitude>
-					<cfset tmpStruct["longitude"] = qSubData.longitude>
-					<cfset tmpStruct["beschreibung"] = qSubData.beschreibung>
-					<cfset tmpStruct["preis"] = qSubData.preis>
-					<cfset tmpStruct["bilder"] = qSubData.bilder>
-					<cfset tmpStruct["duplicate_fk"] = qSubData.duplicate_fk>
-					<cfset tmpStruct["link"] = qSubData.link>
-					<cfset tmpStruct["uploads"] = qSubData.uploads>
-					<cfset tmpStruct["optionstyle"]	= "border-bottom: 1px dotted ##e6e6e6; padding: 1px 6px 1px 24px; background-image: url('/img/ul.png'); background-repeat: no-repeat; background-position: 10px 6px;">	
-					<cfset tmpStruct["typ_fk"]	= valueList(tmpVATyp.typ_fk)>
-					<cfset tmpStruct["region_fk"]	= tmpRegion.region_fk>
-					<cfset tmpStruct["extern"]	= qSubData.extern>
-					<cfset tmpStruct["tipp"]	= qSubData.tipp>
-					<cfset tmpStruct["kinder"]	= qSubData.kinder>
-					<cfset tmpStruct["showteasertext"]	= qSubData.showteasertext>
-					<cfset tmpStruct["next"]	= qSubData.next>
-					<cfset tmpStruct["visible"]	= qSubData.visible>
-					<cfset tmpStruct["import_status"] = qSubData.import_status>
-					<cfset ArrayAppend(returnArray, tmpStruct)>
-				</cfloop>		
 			</cfif>	
-			</cfif>	
-				
 		</cfloop>
-			
 	</cfif>				
 
 	<cfreturn returnArray>
     
 </cffunction>				
-					
 <!--------------------------------------------------------------------------------->
 <cffunction name="getArtists" access="remote" returnFormat="json" output="no">
 	

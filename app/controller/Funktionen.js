@@ -1,4 +1,8 @@
-﻿Ext.define('myapp.controller.Funktionen', {
+﻿const env_test_url = 'https://events-test.agindo-services.info'
+const env_live_url = 'https://events.agindo-services.info'
+
+
+Ext.define('myapp.controller.Funktionen', {
 	extend: 'Ext.app.Controller',
 	
 	views: [
@@ -606,12 +610,12 @@
 		}
 		if (el.xtype=="button") {
 			var myGrid = el.up('grid');
-		
 			var myReloadStore = myGrid.getStore();
 		}
 
+
 		// special handling for Artist store to preserve deactivated filter
-		if (myReloadStore.storeId === 'Artist' || myReloadStore.storeId === 'Veranstalter' || myReloadStore.storeId === 'Veranstaltungen') {
+		if (myReloadStore.storeId === 'Artist' || myReloadStore.storeId === 'Veranstalter' || myReloadStore.storeId === 'Veranstaltungen' || myReloadStore.storeId === 'Bilder') {
 			// only reload if necessary and re-apply filter
 			if (myReloadStore.getCount() === 0) {
 				myReloadStore.load({
@@ -700,7 +704,8 @@
 				margin:'0 5 0 0',
 				margin:'0',
 				name:'tabpanel_' + el.windowName
-			});		// felder und values des tabs holen
+			});		
+			// Main [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
 				xtype: 'fieldcontainer',
 				layout: 'vbox',
@@ -709,10 +714,16 @@
 				height: '100%',
 				margin: '5 5 5 0',
 				title: "Main",
-				name: 'container_'+el.windowName+'_main'
+				name: 'container_'+el.windowName+'_main',
+				listeners: {
+					render: function() {
+						var mainEventsStore = Ext.data.StoreManager.lookup('MainVeranstaltungen');
+						console.log(mainEventsStore)
+					}
+				}
 				//,hidden: (cTab=="ebene3") ? true : false
 			});
-			var myFields = me.getWindowFields(el.windowName,record.data,modus,'',myWindow,ckConfig);
+			var myFields = me.getWindowFields(el.windowName, record.data, modus,'', myWindow, ckConfig);
 
 
 			// create another field that summarizes these 
@@ -729,8 +740,11 @@
 						field.margin = '0 0 0 140px'
 						first_occurrence = i
 					}
+					else {
+						field.margin = '0 0 0 80px'
+					}
 					// manipulate current field
-					field.labelWidth = 75
+					field.labelWidth = 50
 					filtered_fields.push(field)
 					myFields = myFields.filter((field) => field.name !== field_names[index])
 				}
@@ -746,12 +760,10 @@
 			}
 			//
 			myFields.splice(first_occurrence, 0, hbox)
-
-		
-			// felder in window einhängen
 			myWindow.down('fieldcontainer[name=container_'+el.windowName+'_main]').add(myFields);
+			// Veranstalter [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
-					disabled:myWindow.title==="Neue Veranstaltung"||myWindow.title==="Neue Subveranstaltung",
+					disabled: myWindow.title === "Neue Veranstaltung" || myWindow.title === "Neue Subveranstaltung",
 					xtype: 'grid',
 					border: true,
 					flex: 1,
@@ -823,15 +835,10 @@
 						cls: 'btn-orange',
 						name: 'addNewVeranstalter'
 					}]
-
-
-
-				
-				
-				//,hidden: (cTab=="ebene3") ? true : false
 			});
+			// Künstler [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
-				disabled:myWindow.title==="Neue Veranstaltung",
+				disabled: myWindow.title === "Neue Veranstaltung",
 				xtype: 'grid',
 				border: true,
 				flex: 1,
@@ -907,8 +914,9 @@
 
 
 			})
+			// Tags [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
-				disabled:myWindow.title==="Neue Veranstaltung",
+				disabled: myWindow.title === "Neue Veranstaltung",
 				xtype: 'grid',
 				name: 'tagzuweisung',
 				minHeight: 500,
@@ -983,14 +991,14 @@
 					cls: 'btn-orange'
 				}]
 			})
+			// Bilder [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add( {
-				disabled:myWindow.title==="Neue Veranstaltung",
+				disabled: myWindow.title === "Neue Veranstaltung",
 				xtype: 'fieldcontainer',
 				layout: 'hbox',
 				margin: '0 0 0 5',
 				title: 'Bilder',
 				minHeight: 500,
-		
 				width:"100%",
 				items: [{
 					xtype: 'grid',
@@ -1084,8 +1092,9 @@
 				}]
 
 			})
+			// Downloads [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add({
-				disabled:myWindow.title==="Neue Veranstaltung",
+				disabled: myWindow.title === "Neue Veranstaltung",
 				xtype: 'fieldcontainer',
 				layout: 'hbox',
 				margin: '0 0 0 5',
@@ -1188,8 +1197,9 @@
 				}
 				]
 			})
+			// Kontake [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add( {
-				disabled:myWindow.title==="Neue Veranstaltung" || myWindow.title==="Neue Veranstaltung",
+				disabled: myWindow.title === "Neue Veranstaltung",
 				xtype: 'fieldcontainer',
 				layout: 'hbox',
 				margin: '0 0 0 5',
@@ -1285,108 +1295,131 @@
 		myDeleteButton.on({
 			click: {
 				fn: function (el) {
-					Ext.Msg.confirm('Datensatz löschen?', "Möchten Sie diesen Datensatz wirklich löschen?",function(elem){
+					Ext.Msg.confirm('Datensatz löschen?', "Möchten Sie diesen Datensatz wirklich löschen?", async function (elem) {
+						//
 						if (elem === 'yes') {
-							myMask.show();
-							openedNodes = [];
-							if (nodeType == 2102) {
-								Ext.Array.each(myCommonController.getVeranstaltungenStore().data.items,function(cItem) {
-									if (cItem.data.parent_fk=="" && cItem.data.opened) {
-										openedNodes.push(cItem.data.recordid);
+							// additional behavior (handle images differently)
+							if (myGrid.name=="Bilder") {
+								const imageID = record && record.data ? record.data.recordid : null
+								const url = `${env_live_url}/modules/common/veranstaltungen.cfc?method=deleteImage&imageID=${imageID}`
+								const serverResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+								const responseData = await serverResponse.json()
+								
+								if (responseData.success) {
+									// remove image from Bilder store after successful deletion
+									const bilderStore = myGrid.getStore()
+									if (bilderStore && record?.data?.recordid) {
+										bilderStore.remove(record)
+									}
+								}
+								else {
+									console.error(`Could not delete image with ID: ${imageID}`)
+								}
+								// Close the topmost window (image edit box)
+								const topWindow = Ext.WindowManager.getActive();
+								topWindow.close()
+							}
+							// previous behavior
+							else {
+								myMask.show();
+								openedNodes = [];
+
+								if (nodeType == 2102) {
+									Ext.Array.each(myCommonController.getVeranstaltungenStore().data.items, function(cItem) {
+										if (cItem.data.parent_fk=="" && cItem.data.opened) {
+											openedNodes.push(cItem.data.recordid);
+										}
+									});
+								}
+
+								const params = {
+									records: record.data.recordid,
+									nodeType: nodeType
+								}
+
+								console.log(params)
+
+								Ext.Ajax.request({
+									url: '/modules/common/delete.cfc?method=deleteRecord',
+									params: params,
+									callback: function(a,b,response) {
+										var jsonParse = Ext.JSON.decode(response.responseText);
+										if (jsonParse.success) {
+											// handle veranstalter soft-deletion
+											if (nodeType === 2101) {
+												const veranstalterStore = Ext.getStore('Veranstalter')
+												// update the record
+												const recordToUpdate = veranstalterStore.getById(record.data.recordid)
+												if (recordToUpdate) {
+													recordToUpdate.set('deactivated', 1)
+													recordToUpdate.commit()
+												}
+												// re-apply filter to hide deactivated entries
+												veranstalterStore.clearFilter()
+												veranstalterStore.filter('deactivated', 0)
+											}
+											// handle veranstaltung soft-deletion
+											if (nodeType === 2102) {
+												const veranstaltungenStore = Ext.getStore('Veranstaltungen')
+												// update the record
+												const recordToUpdate = veranstaltungenStore.getById(record.data.recordid)
+												if (recordToUpdate) {
+													recordToUpdate.set('deactivated', 1)
+													recordToUpdate.commit()
+												}
+												// re-apply filter to hide deactivated entries
+												veranstaltungenStore.clearFilter()
+												veranstaltungenStore.filter('deactivated', 0)
+											}
+											// handle artist store update after soft-deletion
+											if (nodeType === 2103) {
+												const artistStore = Ext.getStore('Artist')
+												// update the record
+												var recordToUpdate = artistStore.getById(record.data.recordid)
+												if (recordToUpdate) {
+													recordToUpdate.set('deactivated', 1)
+													recordToUpdate.commit()
+												}
+												// re-apply filter to hide deactivated entries
+												artistStore.clearFilter()
+												artistStore.filter('deactivated', 0)
+											}
+
+											myReloadStore.reload({
+												callback: function(response) {
+													if (openedNodes.length > 0) {
+														var tmpStore = myCommonController.getVeranstaltungenStore();
+														//tmpStore.removeFilter('filterOpened');
+														Ext.Array.each(tmpStore.data.items,function(cItem) {
+															if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
+																cItem.set('opened',true);
+															}
+														});
+														
+													}
+												}
+											});
+										
+											myWindow.close();
+											
+										} else {
+											if (jsonParse.message != "") { 
+												Ext.Msg.alert('Systemnachricht',jsonParse.message);
+												myWindow.close();
+											}
+											
+										}
+											
+										myMask.hide();
 									}
 								});
 							}
-							Ext.Ajax.request({
-								url: '/modules/common/delete.cfc?method=deleteRecord',
-								params: {
-									records: record.data.recordid,
-									nodeType: nodeType
-								},
-								callback: function(a,b,response) {
-									var jsonParse = Ext.JSON.decode(response.responseText);
-									if (jsonParse.success) {
-										// handle veranstalter soft-deletion
-										if (nodeType === 2101) {
-											const veranstalterStore = Ext.getStore('Veranstalter')
-											// update the record
-											const recordToUpdate = veranstalterStore.getById(record.data.recordid)
-											if (recordToUpdate) {
-												recordToUpdate.set('deactivated', 1)
-												recordToUpdate.commit()
-											}
-											// re-apply filter to hide deactivated entries
-											veranstalterStore.clearFilter()
-											veranstalterStore.filter('deactivated', 0)
-										}
-										// handle veranstaltung soft-deletion
-										if (nodeType === 2102) {
-											const veranstaltungenStore = Ext.getStore('Veranstaltungen')
-											// update the record
-											const recordToUpdate = veranstaltungenStore.getById(record.data.recordid)
-											if (recordToUpdate) {
-												recordToUpdate.set('deactivated', 1)
-												recordToUpdate.commit()
-											}
-											// re-apply filter to hide deactivated entries
-											veranstaltungenStore.clearFilter()
-											veranstaltungenStore.filter('deactivated', 0)
-										}
-										// handle artist store update after soft-deletion
-										if (nodeType === 2103) {
-											const artistStore = Ext.getStore('Artist')
-											// update the record
-											var recordToUpdate = artistStore.getById(record.data.recordid)
-											if (recordToUpdate) {
-												recordToUpdate.set('deactivated', 1)
-												recordToUpdate.commit()
-											}
-											// re-apply filter to hide deactivated entries
-											artistStore.clearFilter()
-											artistStore.filter('deactivated', 0)
-										}
-
-										myReloadStore.reload({
-											callback: function(response) {
-												if (openedNodes.length > 0) {
-													var tmpStore = myCommonController.getVeranstaltungenStore();
-													//tmpStore.removeFilter('filterOpened');
-													Ext.Array.each(tmpStore.data.items,function(cItem) {
-														if (openedNodes.includes(cItem.data.recordid) || openedNodes.includes(cItem.data.parent_fk)) {
-															cItem.set('opened',true);
-														}
-													});
-													
-												}
-												if (myGrid.name=="Bilder" || myGrid.name=="Downloads") {
-													setTimeout(function(){
-														myGrid.headerCt.getGridColumns()[0].setWidth(118);
-													}, 250);
-												}
-											}
-										});
-									
-										myWindow.close();
-										
-									} else {
-										if (jsonParse.message != "") { 
-											Ext.Msg.alert('Systemnachricht',jsonParse.message);
-											myWindow.close();
-										}
-										
-									}
-										
-									myMask.hide();
-								}
-							});
 						}
-					},this);
+					}, this);
 				}
 			}
 		});
-		if(record?.data?.children!==undefined){
-		myWindow.down("[xtype=combobox]").up().setVisible(record?.data?.children!==undefined && record.data.children<1)
-		}
-	
+
 		if(record?.data?.children!==undefined){
 			myWindow.down("[xtype=combobox]").up().setVisible(record?.data?.children!==undefined && record.data.children<1)
 		}
@@ -1499,12 +1532,34 @@
 		}
 		
 	
+		// Validate dates: von (start) must be less than or equal to bis (end)
+		if (myParams.nodeType === 2102) {
+			var vonField = myForm.getForm().findField('von');
+			var bisField = myForm.getForm().findField('bis');
+			
+			if (vonField && bisField) {
+				var vonValue = vonField.getValue();
+				var bisValue = bisField.getValue();
+				
+				// Check if both dates have values
+				if (vonValue && bisValue) {
+					// Compare as dates - von must be before or equal to bis
+					if (new Date(vonValue).getTime() > new Date(bisValue).getTime()) {
+						Ext.Msg.alert('Datum Fehler', 'Das Startdatum (von) darf nicht nach dem Enddatum (bis) liegen. Bitte überprüfen Sie die Datumsangaben.');
+						return;
+					}
+				}
+			}
+		}
+		
 		// wenn der Pflichtfeld check erfolgreich war, cfc aufrufen
 		if (myMandatoryFields.length==0) {
 			if(myWindow.duplicate_fk!==undefined){
-			myParams.duplicate_fk=myWindow.duplicate_fk
+				myParams.duplicate_fk=myWindow.duplicate_fk
 			}
-			
+			if (myParams.nodeType === 2102 && myParams.name === undefined) {
+				myParams.name = myForm.getForm().findField('name').getValue()
+			}
 			myForm.submit({
 				url: '/modules/common/update.cfc?method=updateData',
 				submitEmptyText: false,
@@ -1512,6 +1567,20 @@
 				params: myParams,
 				success: function(form,action) {
 					var jsonParse = Ext.JSON.decode(action.response.responseText);
+					// update separate "MainVeranstaltungen" store after successfully modifying some data
+					if (myParams.nodeType === 2102 || !myParams.parent_fk) {
+						const eventID = myParams.instance
+						const eventName = myParams.name
+						const mainEvents = Ext.data.StoreManager.lookup('MainVeranstaltungen')
+						if (mainEvents) {
+							const rec = mainEvents.findRecord('recordid', eventID, 0, false, true, true)
+							if (rec) {
+								rec.set('name', eventName)
+								rec.commit()
+							}
+						}
+					}
+
 					if (jsonParse.success) {
 						let vid = jsonParse.recordid
 						if(mySaveButton.createNewEntry){
@@ -1537,7 +1606,6 @@
 								}
 								el.previousSibling().setValue();
 							}
-						
 						});
 					}
 				}

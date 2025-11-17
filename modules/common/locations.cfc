@@ -14,7 +14,7 @@
         <cfset response['regional_highlights'] = []>
 
         <cfquery name="rhs" datasource="#getConfig('DSN')#">
-            SELECT rh.id, rh.adresse, rh.name AS regional_highlight, rh.beschreibung, rh.kulturrelevant, rh.active AS aktiv, o.name AS ortsname, b.name AS bezirksname
+            SELECT rh.id, rh.adresse, rh.name AS regional_highlight, rh.beschreibung, rh.kulturrelevant, rh.aktiv, o.name AS ortsname, b.name AS bezirksname
             FROM regional_highlights AS rh
             JOIN ort AS o
             ON rh.ort_fk = o.id
@@ -87,7 +87,7 @@
             <cfif StructKeyExists(requestData, 'name') AND StructKeyExists(requestData, 'adresse') AND StructKeyExists(requestData, 'ort_fk') AND StructKeyExists(requestData, 'beschreibung') AND StructKeyExists(requestData, 'kulturrelevant') AND StructKeyExists(requestData, 'aktiv')>
                 <cfset user_fk = session.user.data.userid>
                 <cfquery name="saveLocation" datasource="#getConfig('DSN')#">
-                    INSERT INTO regional_highlights (name, adresse, ort_fk, beschreibung, kulturrelevant, active, created_fk)
+                    INSERT INTO regional_highlights (name, adresse, ort_fk, beschreibung, kulturrelevant, aktiv, created_fk)
                     VALUES (
                         <cfqueryparam cfsqltype="cf_sql_varchar" value="#requestData.name#">,
                         <cfqueryparam cfsqltype="cf_sql_varchar" value="#requestData.adresse#">,
@@ -114,6 +114,49 @@
 
         <cfreturn response>
 
+    </cffunction>
+
+
+    <!--- ####################### --->
+    <!--- #   UPDATE LOCATION   # --->
+    <!--- ####################### --->
+
+    <cffunction name="updateLocation" access="remote" returnFormat="JSON">
+
+        <!--- init --->
+        <cfset var requestData = deserializeJSON(getHttpRequestData().content)>
+        <cfset var response = {}>
+
+        <!--- update location --->
+        <cfif isAdmin() OR (isAuth() AND hasGroup('verwaltungsclient', 'name'))>
+            <!--- check incoming data --->
+            <cfif StructKeyExists(requestData, 'id') AND StructKeyExists(requestData, 'name') AND StructKeyExists(requestData, 'adresse') AND StructKeyExists(requestData, 'beschreibung') AND StructKeyExists(requestData, 'kulturrelevant') AND StructKeyExists(requestData, 'aktiv')>
+
+                <cfquery name="updateLocation" datasource="#getConfig('DSN')#" result="updateResult">
+                    UPDATE regional_highlights
+                    SET 
+                        name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#requestData['name']#">,
+                        adresse = <cfqueryparam cfsqltype="cf_sql_varchar" value="#requestData['adresse']#">,
+                        beschreibung = <cfqueryparam cfsqltype="cf_sql_varchar" value="#requestData['beschreibung']#">,
+                        kulturrelevant = <cfqueryparam cfsqltype="cf_sql_smallint" value="#requestData['kulturrelevant']#">,
+                        aktiv = <cfqueryparam cfsqltype="cf_sql_smallint" value="#requestData['aktiv']#">
+                    WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#requestData.id#">
+                </cfquery>
+
+                <cfset response['result'] = updateResult>
+                <cfset response['success'] = true>
+                <cfset response['message'] = "Successfully updated location.">
+                <cfreturn response>
+            <cfelse>
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Please provide the following request params: { id, name, adresse, beschreibung, kulturrelevant, aktiv }">
+                <cfreturn response>
+            </cfif>
+        <cfelse>
+            <cfset response['success'] = false>
+            <cfset response['message'] = "You are not authenticated!">
+            <cfreturn response>
+        </cfif>
     </cffunction>
 
 
@@ -205,69 +248,55 @@
     </cffunction>
 
 
-    <!--- ######################## --->
-    <!--- #   SLIDER LOCATIONS   # --->
-    <!--- ######################## --->
+    <!--- #################### --->
+    <!--- #   DELETE IMAGE   # --->
+    <!--- #################### --->
 
-    <cffunction name="sliderLocations" access="remote" returnFormat="JSON">
+    <cffunction name="deleteImage" access="remote" returnFormat="JSON">
 
+        <!--- arguments --->
+        <cfargument name="imageID" type="numeric" required="no">
+        
         <!--- init --->
-        <cfset response = {}>
-        <cfset response['locations'] = []>
+        <cfset var response = {}>
 
 
-        <cfif isAdmin() OR (isAuth() AND hasGroup('verwaltungsclient', 'name'))>
+        <cfif isAuth() OR (isAuth() AND hasGroup('verwaltungsclient', 'name'))>
 
-            <cfquery name="activeLocations" datasource="#getConfig('DSN')#">
-                SELECT 
-                    rh.id AS id,
-                    rh.adresse AS adresse,
-                    rh.name AS name,
-                    rh.beschreibung AS beschreibung,
-                    rh.bilder AS bilder,
-                    o.name AS ort_name,
-                    b.name AS bezirk_name
-                FROM regional_highlights AS rh
-                JOIN ort AS o 
-                ON rh.ort_fk = o.id
-                JOIN bezirk as b
-                ON o.bezirk_fk = b.id
-                WHERE rh.active = 1;
-            </cfquery>
+            <cfif StructKeyExists(arguments, 'imageID')>
 
-            <cfif activeLocations.recordcount GT 0>
-                <cfloop query="activeLocations">
-                    <!--- location --->
-                    <cfset activeLocation = {}>
-                    <cfset activeLocation['id'] = activeLocations['id']>
-                    <cfset activeLocation['address'] = activeLocations['adresse']>
-                    <cfset activeLocation['name'] = activeLocations['name']>
-                    <cfset activeLocation['description'] = activeLocations['beschreibung']>
-                    <cfset activeLocation['location'] = activeLocations['ort_name']>
-                    <cfset activeLocation['district'] = activeLocations['bezirk_name']>
-                    <cfset activeLocation['images'] = []>
-                    <!--- extract images --->
-                    <cfif activeLocations['bilder'] NEQ "">
-                        <cfset images = getStructuredContent(nodetype=1301, instanceids=activeLocations.bilder)>
-                        <cfloop query="images">
-                            <!--- image --->
-                            <cfset image = {}>
-                            <cfset image['id'] = images.id>
-                            <cfset image['path'] = href("instance:"&images.id)&"&dimensions=300x150&cropmode=cropcenter">
-                            <cfset image['filename'] = images.originalfilename>
-                            <cfset ArrayAppend(activeLocation['images'], image)>
-                        </cfloop>
-                    </cfif>
-                    <!--- append location --->
-                    <cfset ArrayAppend(response['locations'], activeLocation)>
+                <!--- get location ID(s) --->
+                <cfquery name="relatedLocationIDs" datasource="#getConfig('DSN')#">
+                    SELECT id 
+                    FROM regional_highlights
+                    WHERE FIND_IN_SET(<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.imageID#">, bilder);
+                </cfquery>
+
+                <!--- get a list of location IDs --->
+                <cfset locationIDs = []>
+                <cfloop query="relatedLocationIDs">
+                    <cfset ArrayAppend(locationIDs, relatedLocationIDs.id)>
                 </cfloop>
+
+                <!--- remove associated images from locations --->
+                <cfloop array="#locationIDs#" item="locationID">
+                    <cfset result = removeMediaArchiveUploadFlat(locationID, 'bilder', arguments.imageID, 2112)>
+                </cfloop>
+
+                <!--- remove image --->
+                <cfset deletionResult = deleteStructuredContent(arguments.imageID)>
+
+                <cfset response['success'] = true>
+                <cfset response['message'] = "Successfully deleted image.">
+                <cfreturn response>
+            <cfelse>
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Please provide the following URL param: { imageID }">
+                <cfreturn response>
             </cfif>
-            <cfset response['success'] = true>
-            <cfset response['message'] = "Sending locations...">
-            <cfreturn response>
         <cfelse>
             <cfset response['success'] = false>
-            <cfset response['message'] = "You are not authenticated!">
+            <cfset response['message'] = "You are not authenticated.">
             <cfreturn response>
         </cfif>
 

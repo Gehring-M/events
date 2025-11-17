@@ -11,7 +11,8 @@
 	       'Artikel',
 	       'Registrierungen',
 	       'ExterneDaten',
-	       'Locations'
+	       'Locations',
+		   'Categories'
        ],
 
 	// register all the stores that are being used
@@ -35,7 +36,10 @@
 		'Artikel',
 		'ArtistRegistrierungen',
 		'OrganizerRegistrierungen',
-		'LocationDropdown'
+		'LocationDropdown',
+		'MainVeranstaltungen',
+		'SliderTags',
+		'Categories'
 	],
 
 	// define references for the UI components
@@ -81,7 +85,12 @@
 		       selector: 'Locations',
 		       xtype: 'Locations',
 		       autoCreate: true
-	       }
+	       },{
+				ref: 'Categories',
+				selector: 'Categories',
+				xtype: 'Categories',
+				autoCreate: true
+		   }
        ],
        actionLocations: function () {
 	       var myView = this.getLocations();
@@ -116,7 +125,9 @@
 			return;
 		}
 
-
+		/**
+		 * was is des?!
+		 * 
 		// patienten store nach x sek neu laden
 		setInterval(function () {
 			var existingData = [];
@@ -147,6 +158,7 @@
 
 			}
 		}, this.myTimeOut);
+		*/
 
 		this.inited = true;
 
@@ -213,7 +225,7 @@
 	},
 
 	onCellClicked: function (gridview, markup, cellnumber, rec) {
-
+		console.log('ON CELL CLICKED')
 		if (gridview.up('grid').name == "veranstaltungen") {
 			this.cVeranstaltung = rec.data.recordid;
 		}
@@ -322,7 +334,6 @@
 			rec.set('checked', status);
 
 		}
-
 	},
 
 	loadDetailsOnGridClick: function (el, record) {
@@ -386,68 +397,79 @@
 		this.timerActive = false;
 		this.timerTyp = "";
 
+		// ==> Veranstalter, Künstler, Tags
+		//     el.activeTab.xtype = "grid"
 		if (el.activeTab.xtype == "grid") {
-			if(this.cArtikel){
-			el.activeTab.getStore().load({
-				params: {
-					artikel_fk: this.cArtikel,
-					//artist_fk: this.cArtist,
-					//veranstalter_fk: this.cVeranstalter
-				}
-			});
-		}
-		else{
-			el.activeTab.getStore().load({
-				params: {
-					veranstaltung_fk: this.cVeranstaltung,
-					artist_fk: this.cArtist,
-					veranstalter_fk: this.cVeranstalter
-				}
-			});
-		}
-		} else {
-			myGrid = el.activeTab.down('grid');
-			myStore = myGrid.getStore();
+			if (this.cArtikel) {
+				el.activeTab.getStore().load({
+					params: {
+						artikel_fk: this.cArtikel,
+					}
+				});
+			}
+			else {
+				el.activeTab.getStore().load({
+					params: {
+						veranstaltung_fk: this.cVeranstaltung,
+						artist_fk: this.cArtist,
+						veranstalter_fk: this.cVeranstalter
+					}
+				});
+			}
+		} 
+		// ==> Main (wirft einen Error, kann Store nicht loaden), Bilder, Downloads, Kontakte
+		//     el.activeTab.xtype = "fieldcontainer"
+		else {
+			myGrid = el.activeTab.down('grid')
+			myStore = myGrid.getStore()
+
 			if (myStore.storeId == "Bilder") {
 				me.timerActive = true;
 				me.timerTyp = 'bilder';
 			}
+
 			if (myStore.storeId == "Downloads") {
 				me.timerActive = true;
 				me.timerTyp = 'uploads';
 			}
-			console.log(this.cArtikel)
-			if(this.cArtikel){
-			myStore.load({
-				params: {
-					artikel_fk: this.cArtikel,
 
-				},
-				callback: function (response) {
-					if (myGrid.name == "Bilder" || myGrid.name == "Downloads") {
-						setTimeout(function () {
-							myGrid.headerCt.getGridColumns()[0].setWidth(118);
-						}, 250);
-					}
-				}, scope: this
-			});
-		}
-		else{
-			myStore.load({
-				params: {
+			if (this.cArtikel) {
+				myStore.load({
+					params: {
+						artikel_fk: this.cArtikel,
+
+					},
+					callback: function (response) {
+						/**
+						 * IRRELEVANT?
+						 * 
+						if (myGrid.name == "Bilder" || myGrid.name == "Downloads") {
+							console.log('IF ARTIKEL')
+							console.log(response)
+						}
+						*/
+					}, scope: this
+				});
+			}
+			else {
+				const params = {
 					veranstaltung_fk: this.cVeranstaltung,
 					artist_fk: this.cArtist,
 					veranstalter_fk: this.cVeranstalter
-				},
-				callback: function (response) {
-					if (myGrid.name == "Bilder" || myGrid.name == "Downloads") {
-						setTimeout(function () {
-							myGrid.headerCt.getGridColumns()[0].setWidth(118);
-						}, 250);
-					}
-				}, scope: this
-			});
-		}
+				}
+				myStore.load({
+					params: params,
+					callback: function (response) {
+						/**
+						 * IRRELEVANT?
+						 *
+						console.log('ELSE ARTIKEL')
+						console.log(response)
+						*/
+					}, 
+					scope: this
+				});
+			}
 		}
 
 	},
@@ -538,8 +560,7 @@
 				}
 
 			} else {
-				el.setValue();
-				Ext.Msg.alert('Details', 'Bitte suchen Sie mittels Texteingabe im Feld "' + el.agFieldLabel + '" bzw. wählen Sie dann eine Option aus der Auswahlliste aus.');
+				//el.setValue();
 			}
 
 		}
@@ -561,21 +582,24 @@
 	onClickButton: function (el, record) {
 		var me = this;
 
+		// Currently used event is stored globally, thus remove the referenced event while creating a new event
+		// otherwise it'll keep the last referenced event and thus, showing invalid data
+		if (el.text === 'Neue Veranstaltung') {
+			this.cVeranstaltung = 0
+		}
+
 		if (el.hasOwnProperty('windowName')) {
 			myStore = el.up('form').down('grid').getStore();
-			//reset store filter
-			myStore.clearFilter(true);
 			myGrid = el.up('form').down('grid');
 			if (el.hasOwnProperty('gridNodeTypeForForeignKey')) {
 				myGrid = el.up('form').down('grid[nodeType=' + el.gridNodeTypeForForeignKey + ']');
 				myStore = myGrid.getStore();
 			}
 			if (!el.hasOwnProperty('nameForeignKey') || myStore.data.length > 0) {
-				myWindow = this.myFunctions.onOpenWindow(el, record);
-				console.log(myWindow)
-				myWindow.down('textfield')?.focus();
+				myWindow = this.myFunctions.onOpenWindow(el, record)
+				myWindow.down('textfield')?.focus()
 				if (el.hasOwnProperty('agVerknuepfungErstellen')) {
-					myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung);
+					myWindow.down('hiddenfield[name=vkid]').setValue(me.cVeranstaltung)
 				}
 				if (el.hasOwnProperty('nameForeignKey')) {
 					myRecord = myGrid.getSelectionModel().getCurrentPosition().record.data,
@@ -597,13 +621,16 @@
 			}
 		}
 
+		// "Veranstaltung suchen" button wird hier behandelt
+
 		if (el.hasOwnProperty('agAction')) {
 			if (el.agAction == "suchen") {
-				myForm = el.up('form');
-				myFields = myForm.getValues();
-				myGrid = myForm.down('grid'),
-					myStore = myGrid.getStore();
-
+				// init
+				myForm = el.up('form')
+				myFields = myForm.getValues()
+				myGrid = myForm.down('grid')
+				myStore = myGrid.getStore()
+				// reload store
 				myStore.load({
 					params: myFields,
 					callback: function (response) {
@@ -707,6 +734,7 @@
 	},
 
 	onDblClickGrid: function (el, record) {
+		console.log('ON DOUBLE CLICK GRID')
 		var myStore = el.up('grid').getStore(),
 			editierbar = true;
 		if (record.data.editierbar != undefined && record.data.editierbar == false) {
@@ -715,7 +743,7 @@
 		if (el.up('grid').hasOwnProperty('nameForeignKey')) {
 			isteditierbar = el.up('form').down('grid').getSelectionModel().getCurrentPosition().record.data.editierbar;
 			if (isteditierbar != undefined && isteditierbar == false) {
-				editierbar = false;
+				editierbar = false; 
 			}
 		}
 
@@ -728,10 +756,10 @@
 				myWindow.down('button[name=btnDeleteWindow]').setDisabled(true);
 			}
 		}
-
 	},
 
 	onClickGrid: function (el, record, row) {
+		console.log('ON CLICK GRID')
 		var myGrid = el.up('grid');
 		if (myGrid.hasOwnProperty('agLoadDetailsOnSelect') && myGrid.agLoadDetailsOnSelect != '') {
 			this.loadDetailsOnGridSelect(el, record);
@@ -739,10 +767,8 @@
 	},
 
 	onGridRowSelected: function (el, record, row) {
-
-		console.log('Here')
-
-		if (el.view.up('grid').name == "veranstaltungen"  || el.view.up('grid').name == "SubVeranstaltungen") {
+		console.log('ON GRID ROW SELECTED')
+		if (el.view.up('grid').name == "veranstaltungen" || el.view.up('grid').name == "SubVeranstaltungen") {
 			this.cVeranstaltung = record.data.recordid;
 			this.cArtist = 0;
 			this.cVeranstalter = 0;
@@ -762,7 +788,21 @@
 				myStore = myTabPanel.activeTab.down('grid').getStore();
 				myGrid = myTabPanel.activeTab.down('grid');
 			}
-			if (myStore.storeId !== "SubVeranstaltungen") {
+			// Only reload subevents if a main event (not a subevent) is selected
+            if (myGrid.name === "SubVeranstaltungen" && !record.data.parent_fk) {
+                myStore.removeAll()
+                myStore.load({
+                    params: {
+                        mainEventID: this.cVeranstaltung,
+                    },
+                    callback: function (response) {
+                        // Optionally handle response
+                    }, scope: this
+                })
+            } else if (myGrid.name === "SubVeranstaltungen" && record.data.parent_fk) {
+                // Do not reload, just select
+                // Optionally handle selection logic here
+            } else if (myStore.storeId !== "SubVeranstaltungen") {
 				myStore.load({
 
 					params: {
@@ -777,14 +817,15 @@
 					}, scope: this
 				});
 			}
-			else if(el.view.up('grid').name !== "SubVeranstaltungen"){
+			/** 
+			else if(el.view.up('grid').name !== "SubVeranstaltungen" && myStore.storeId !== 'Bilder'){
 				myStore.clearFilter(true);  // Clear any existing filters
-
 				myStore.filter({
 					property: 'parent_fk',
 					value: this.cVeranstaltung
 				});
 			}
+				*/
 		}
 
 		if (el.view.up('grid').name == "artist") {
@@ -913,13 +954,14 @@
 		myVeranstaltungenStore.removeFilter('filterOpened');
 		
 		// Apply default date filters
+		/**
 		var defaultParams = {
-			filterVon: Ext.Date.format(new Date(new Date().getFullYear(), (new Date().getMonth() - 6), (new Date().getDate())), 'Y-m-d'),
-			filterBis: Ext.Date.format(new Date(new Date().getFullYear(), 11, 31), 'Y-m-d')
+			filterVon: Ext.Date.format(new Date(new Date().getFullYear(), (new Date().getMonth()), 1), 'Y-m-d'),
+			filterBis: Ext.Date.format(new Date(new Date().getFullYear(), (new Date().getMonth() + 6), 1), 'Y-m-d')
 		};
+		*/
 		
 		myVeranstaltungenStore.load({
-			params: defaultParams,
 			callback: function (response) {
 
 				// apply client-side filter to hide deactivated entries
@@ -939,6 +981,16 @@
 		const myView = this.getExterneDaten()
 
 		this.application.setMainView(myView)
+	},
+
+
+	// #########################
+	// #   ACTION CATEGORIES   #
+	// #########################
+
+	actionCategories: function () {
+		const categoryView = this.getCategories()
+		this.application.setMainView(categoryView)
 	},
 
 
@@ -989,23 +1041,6 @@
 		setTimeout(function () {
 			if (myView.down('grid[name=artist]').getSelectionModel().getCurrentPosition() == undefined) {
 				myView.down('grid[name=artist]').getView().select(0);
-			}
-		}, 500);
-	},
-
-	actionArtikel: function () {
-		var myView = this.getArtikel();
-		this.getArtikelStore().load({
-			callback: function (response) {
-				if (response.length > 0) {
-					myView.down('grid[name=artikel]').getView().select(0);
-				}
-			}
-		});
-		this.application.setMainView(myView);
-		setTimeout(function () {
-			if (myView.down('grid[name=artikel]').getSelectionModel().getCurrentPosition() == undefined) {
-				myView.down('grid[name=artikel]').getView().select(0);
 			}
 		}, 500);
 	},

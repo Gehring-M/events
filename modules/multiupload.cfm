@@ -141,7 +141,6 @@
 							message = "Nur eine Datei zum Hochladen wählen.";
 						} else {
 							$.each(data.files,function(index,item){
-
 								if ($.inArray(item.type,cData.fileTypes.split(',')) != -1) {
 									if (item.size <= fileMaxSize) {
 										data.submit();
@@ -156,18 +155,26 @@
 									console.log(item.type);
 									data.files.splice(index,1);
 									errorObj.filetype.push(data.originalFiles[fileCount])
-								}								
+								}
 								fileCount++;
 							});
 						}
-						
 						if (fileCount === data.originalFiles.length) {
 							applyUserMessage($fileList,errorObj);
 							errorObj = {'filesize':[],'filetype':[]};
 							fileCount = 0;
 						}
+					},
+					done: function (e, data) {
+						// Notify parent window to update Bilder store
+						try {
+							const imageData = data.result || (data.jqXHR && data.jqXHR.responseJSON) || JSON.parse(data.jqXHR.responseText);
+							console.log(imageData)
+							window.parent.postMessage({ type: 'bilder-upload', image: imageData }, '*');
+						} catch (err) {
+							console.warn('Could not post message to parent for Bilder store update:', err);
+						}
 					}
-					
 				});
 				
 			
