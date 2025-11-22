@@ -185,7 +185,7 @@
 		<upload>
 			<name>bilder</name>
 			<type>medienarchiveintrag</type>
-			<category>ma-droploader</category>
+			<category>ma-events</category>
 			<multiple>yes</multiple>
 		</upload>
 	</uploads>

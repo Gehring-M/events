@@ -5,6 +5,7 @@
     <cfinclude template="/modules/functions.cfm">
     <cfinclude template="/modules/cors.cfm">
 
+
     <!--- ############################# --->
     <!--- #   HELPER: PARSE DATE      # --->
     <!--- ############################# --->
@@ -25,6 +26,7 @@
         </cftry>
     </cffunction>
 
+    
     <!--- ############################# --->
     <!--- #   FETCH UPCOMING EVENTS   # --->
     <!--- ############################# --->
@@ -202,7 +204,7 @@
             SELECT id, name
             FROM typ
             WHERE kb = 1;
-        </cfquery>
+        </cfquery>  
 
         <!--- build response --->
         <cfloop query="eventTypes">
@@ -481,10 +483,449 @@
     <!--- #   FETCH EVENT DETAILS   # --->
     <!--- ########################### --->
 
-    <cffunction name="fetchEventDetails" access="remote" returnFormat="JSON">
+    <cffunction name="fetchEventDetail" access="remote" returnFormat="JSON">
 
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
 
+        <!--- init --->
+        <cfset var response = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cfquery name="eventDetails" datasource="#getConfig('DSN')#">
+                SELECT 
+                    id,
+                    name,
+                    beschreibung,
+                    von,
+                    bis,
+                    uhrzeitvon,
+                    uhrzeitbis,
+                    adresse,
+                    ort,
+                    plz,
+                    kinder,
+                    tipp,
+                    preis,
+                    link,
+                    bilder
+                FROM veranstaltung
+                WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#">
+            </cfquery>
+
+            <cfquery name="subEvents" datasource="#getConfig('DSN')#">
+                SELECT 
+                    id,
+                    name,
+                    von,
+                    bis,
+                    uhrzeitvon,
+                    uhrzeitbis,
+                    ort
+                FROM veranstaltung
+                WHERE parent_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#">
+            </cfquery>
+
+            <cfloop query="eventDetails">
+                <cfset event = {}>
+                <cfset event['id'] = eventDetails.id>
+                <cfset event['name'] = eventDetails.name>
+                <cfset event['description'] = eventDetails.beschreibung>
+                <cfset event['from'] = eventDetails.von>
+                <cfset event['till'] = eventDetails.bis>
+                <cfset event['time_from'] = eventDetails.uhrzeitvon>
+                <cfset event['time_till'] = eventDetails.uhrzeitbis>
+                <cfset event['address'] = eventDetails.adresse>
+                <cfset event['location'] = eventDetails.ort>
+                <cfset event['postal_code'] = eventDetails.plz>
+                <cfset event['children'] = eventDetails.kinder>
+                <cfset event['tip'] = eventDetails.tipp>
+                <cfset event['price'] = eventDetails.preis>
+                <cfset event['link'] = eventDetails.link>
+                <!--- evaluate images --->
+                <cfset event['images'] = []>
+                <cfif eventDetails['bilder'] NEQ "">
+                    <cfset images = getStructuredContent(nodetype=1301, instanceids="#eventDetails['bilder']#")>
+                    <cfloop query="images">
+                        <!--- construct individual images --->
+                        <cfset image = {}>
+                        <cfset image['id'] = images.id>
+                        <cfset image['path'] = href("instance:"&images.id)&"&dimensions=600x300&cropmode=cropcenter">
+                        <cfset image['filename'] = images.originalfilename>
+                        <cfset ArrayAppend(event['images'], image)>
+                    </cfloop>
+                </cfif>
+                <!--- --->
+                <cfset event['sub_events'] = []>
+                <cfset response['event'] = event>
+            </cfloop>
+
+            <cfloop query="subEvents">
+                <cfset subEvent = {}>
+                <cfset subEvent['id'] = subEvents.id>
+                <cfset subEvent['name'] = subEvents.name>
+                <cfset subEvent['from'] = subEvents.von>
+                <cfset subEvent['till'] = subEvents.bis>
+                <cfset subEvent['time_from'] = subEvents.uhrzeitvon>
+                <cfset subEvent['time_till'] = subEvents.uhrzeitbis>
+                <cfset subEvent['location'] = subEvents.ort>
+                <cfset ArrayAppend(response['event']['sub_events'], subEvent)>
+            </cfloop>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully fetched event details">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
 
     </cffunction>
+
+
+    <!--- ########################### --->
+    <!--- #   FETCH ARTIST DETAIL   # --->
+    <!--- ########################### --->
+
+    <cffunction name="fetchArtistDetail" access="remote" returnFormat="JSON">
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
+
+        <!--- init --->
+        <cfset var response = {}>
+        <cfset response['artist'] = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cfquery name="artistDetails" datasource="#getConfig('DSN')#">
+                SELECT 
+                    id,
+                    name,
+                    beschreibung,
+                    ansprechperson,
+                    ort,
+                    adresse,
+                    plz,
+                    telefon,
+                    email,
+                    web,
+                    link,
+                    bilder
+                FROM artist
+                WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#"> AND approved = 1;
+            </cfquery>
+
+            <cfloop query="artistDetails">
+                <cfset artist = {}>
+                <cfset artist['id'] = artistDetails.id>
+                <cfset artist['name'] = artistDetails.name>
+                <cfset artist['description'] = artistDetails.beschreibung>
+                <cfset artist['location'] = artistDetails.ort>
+                <cfset artist['address'] = artistDetails.adresse>
+                <cfset artist['postal_code'] = artistDetails.plz>
+                <cfset artist['phone'] = artistDetails.telefon>
+                <cfset artist['email'] = artistDetails.email>
+                <cfset artist['web'] = artistDetails.web>
+                <cfset artist['link'] = artistDetails.link>
+                <cfset artist['images'] = artistDetails.bilder>
+                <!--- evaluate images --->
+                <cfset artist['images'] = []>
+                <cfif artistDetails['bilder'] NEQ "">
+                    <cfset images = getStructuredContent(nodetype=1301, instanceids="#artistDetails['bilder']#")>
+                    <cfloop query="images">
+                        <!--- construct individual images --->
+                        <cfset image = {}>
+                        <cfset image['id'] = images.id>
+                        <cfset image['path'] = href("instance:"&images.id)&"&dimensions=300x150&cropmode=cropcenter">
+                        <cfset image['filename'] = images.originalfilename>
+                        <cfset ArrayAppend(artist['images'], image)>
+                    </cfloop>
+                </cfif>
+                <!--- --->
+                <cfset response['artist'] = artist>
+            </cfloop>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['uuid'] = createUUID()>
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully fetched event details">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
+
+    </cffunction>
+
+
+    <!--- ############################# --->
+    <!--- #   FETCH LOCATION DETAIL   # --->
+    <!--- ############################# --->
+
+    <cffunction name="fetchLocationDetail" access="remote" returnFormat="JSON">
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
+
+        <!--- init --->
+        <cfset var response = {}>
+        <cfset response['location'] = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cfquery name="locationDetails" datasource="#getConfig('DSN')#">
+                SELECT 
+                    rh.id AS rh_id,
+                    rh.name AS rh_name,
+                    rh.adresse AS rh_address,
+                    rh.beschreibung AS rh_description,
+                    rh.bilder AS rh_images,
+                    o.name AS location_name,
+                    o.plz AS location_postal_code,
+                    b.name AS district_name,
+                    bu.name AS region_name
+                FROM regional_highlights AS rh
+                JOIN ort AS o
+                ON rh.ort_fk = o.id
+                JOIN bezirk AS b
+                ON o.bezirk_fk = b.id
+                JOIN bundesland AS bu
+                ON b.bundesland_fk = bu.id
+                WHERE rh.id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#"> AND rh.aktiv = 1;
+            </cfquery>
+
+            <cfloop query="locationDetails">
+                <cfset location = {}>
+                <cfset location['id'] = locationDetails.rh_id>
+                <cfset location['name'] = locationDetails.rh_name>
+                <cfset location['description'] = locationDetails.rh_description>
+                <cfset location['address'] = locationDetails.rh_address>
+                <cfset location['location_name'] = locationDetails.location_name>
+                <cfset location['location_postal_code'] = locationDetails.location_postal_code>
+                <cfset location['district_name'] = locationDetails.district_name>
+                <cfset location['region_name'] = locationDetails.region_name>
+                <!--- evaluate images --->
+                <cfset location['images'] = []>
+                <cfif locationDetails.rh_images NEQ "">
+                    <cfset image = getStructuredContent(nodetype=1301, instanceids="#locations['bilder']#")>
+                    <cfloop query="images">
+                        <!--- construct individual images --->
+                        <cfset image = {}>
+                        <cfset image['id'] = images.id>
+                        <cfset image['path'] = href("instance:"&images.id)&"&dimensions=300x150&cropmode=cropcenter">
+                        <cfset image['filename'] = images.originalfilename>
+                        <cfset ArrayAppend(location['images'], image)>
+                    </cfloop>
+                </cfif>
+                <cfset response['location'] = location>
+            </cfloop>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully fetched event details">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
+
+    </cffunction>
+
+
+    <!--- ############################ --->
+    <!--- #   FETCH ARTICLE DETAIL   # --->
+    <!--- ############################ --->
+
+    <cffunction name="fetchArticleDetail" access="remote" returnFormat="JSON">
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
+
+        <!--- init --->
+        <cfset var wordpressURL = getConfig('wordpress.url')>
+        <cfset var response = {}>
+        <cfset var wpArticle = NULL>
+        <cfset response['article'] = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cftry>
+                <!--- fetch article from wordpress --->
+                <cfhttp url="#wordpressURL#/posts/#arguments['id']#" method="GET" result="wpArticleRes">
+                    <cfhttpparam type="header" name="Accept" value="application/json">
+                </cfhttp>
+
+                <cfset wpArticle = deserializeJSON(wpArticleRes.filecontent)>
+            <cfcatch>
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Could not fetch article from wordpress">
+                <cfset response['error'] = {}>
+                <cfset response['error']['message'] = cfcatch.message>
+                <cfset response['error']['detail'] = cfcatch.detail>
+            </cfcatch>
+            </cftry>
+
+            <cfif NOT IsNull(wpArticle)>
+                <!--- init --->
+                <cfset article = {}>
+                <!--- construct article --->
+                <cfif StructKeyExists(wpArticle, 'id')>
+                    <cfset article['id'] = wpArticle.id>
+                </cfif>
+                <cfif StructKeyExists(wpArticle, 'title') AND StructKeyExists(wpArticle['title'], 'rendered')>
+                    <cfset article['name'] = wpArticle.title.rendered>
+                </cfif>
+                <cfif StructKeyExists(wpArticle, 'content') AND StructKeyExists(wpArticle['content'], 'rendered')>
+                    <cfset article['content'] = wpArticle.content.rendered>
+                </cfif>
+                <cfif StructKeyExists(wpArticle, 'excerpt') AND StructKeyExists(wpArticle['excerpt'], 'rendered')>
+                    <cfset article['excerpt'] = wpArticle.excerpt.rendered>
+                </cfif>
+                <!--- --->
+                <cfset article['img'] = {}>
+                <!--- evaluate image --->
+                <cfif StructKeyExists(wpArticle, '_links') AND StructKeyExists(wpArticle['_links'], 'wp:featuredmedia') AND isArray(wpArticle['_links']['wp:featuredmedia']) AND ArrayLen(wpArticle['_links']['wp:featuredmedia']) GT 0>
+                    <!--- fetch image --->
+                    <cftry>
+                        <cfset imageURL = "#wpArticle['_links']['wp:featuredmedia'][1]['href']#">
+                        <cfhttp url="#imageURL#" method="GET" result="wpArticleImageRes">
+                            <cfhttpparam type="header" name="Accept" value="application/json">
+                        </cfhttp>
+                        <cfset wpArticleImage = deserializeJSON(wpArticleImageRes.filecontent)>
+                        <!--- build object --->
+                        <cfif StructKeyExists(wpArticleImage, 'link') AND StructKeyExists(wpArticleImage, 'title') AND StructKeyExists(wpArticleImage['title'], 'rendered')>
+                            <cfset article['img']['path'] = wpArticleImage.link>
+                            <cfset article['img']['name'] = wpArticleImage.title.rendered>
+                        <cfelse>
+                            <cfset article['img']['path'] = NULL>
+                            <cfset article['img']['name'] = "Fallback">
+                        </cfif>
+                    <cfcatch>
+                        <cfset article['img']['path'] = NULL>
+                        <cfset article['img']['name'] = "Fallback">
+                    </cfcatch>
+                    </cftry>
+                <cfelse>
+                    <cfset article['img']['path'] = NULL>
+                    <cfset article['img']['name'] = "Fallback">
+                </cfif>
+                <!--- send article back to client --->
+                <cfset response['article'] = article>
+            </cfif>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully fetched event details">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
+
+    </cffunction>
+
+
+    <!--- ############################# --->
+    <!--- #   CREATE EVENT EXTERNAL   # --->
+    <!--- ############################# --->
+
+    <cffunction name="createEventExternal" access="remote" returnFormat="JSON">
+
+        <!--- init --->
+        <cfset var formStruct = formToStruct()>
+        <cfset var response = {}>
+
+        <!--- ensure correct media archive --->
+        <cfset maEventsPath = getConfig('ma.events')>
+        <cfif maEventsPath EQ "" OR NOT pathExists(maEventsPath)>
+            <cfheader statuscode="500" statustext="Internal Server Error">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Make sure to create the media archive " & maEventsPath & "first">
+            <cfreturn response>
+        </cfif>
+
+        <!--- media archive --->
+        <cfset maEvents = getNodeId(resolvePath(maEventsPath))>
+
+        <!--- initialize new artist object --->
+        <cfset newEvent = {}>
+
+        <cfif StructKeyExists(formStruct, 'eventName')>
+            <cfset newEvent['name'] = formStruct.eventName>
+        <cfelse>
+            <!--- shouldn't execute because it's validated in the frontend but just in case --->
+            <cfset newEvent['name'] = "fallback-name">
+        </cfif>
+
+        <!--- insert artist --->
+        <cfquery name="createEvent" datasource="#getConfig('DSN')#" result="dbResult">
+            INSERT INTO veranstaltung (parent_fk, name, von, bis, uhrzeitvon, uhrzeitbis, veranstaltungsort, adresse, plz, ort, beschreibung, preis, link, extern, visible, changed_by_kbsz) 
+            VALUES (
+                NULL,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventname']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventvon']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventbis']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventuhrzeitvon']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventuhrzeitbis']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventort']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventadresse']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventplz']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventort']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventbeschreibung']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventpreis']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#formStruct['eventlink']#">,
+                2,
+                0,
+                0
+            )
+        </cfquery>
+
+        <!--- extract event ID --->
+        <cfset eventID = dbResult.generatedKey>
+
+        <!--- count incoming images --->
+        <cfset imageCount = 0>
+        <cfloop collection="#formStruct#" item="key">
+            <cfif REFind("^image_\d+$", key)>
+                <cfset imageCount = imageCount + 1>
+            </cfif>
+        </cfloop>
+
+        <cfloop from="0" to="#imageCount - 1#" index="i">
+            <!--- upload image --->
+            <cfset uploadResult = uploadIntoMediaArchive("image_#i#", 1301, maEvents, "automatisch")>
+
+            <!--- associate with regional highlight --->
+            <cfinvoke component="/ameisen/components/mediaarchive" method="addUploadForInstance">
+                <cfinvokeargument name="instance" value="#eventID#">
+                <cfinvokeargument name="uploadfield" value="bilder">
+                <cfinvokeargument name="addid" value="#uploadResult.instanceid#">
+                <cfinvokeargument name="nodetype" value="2102">
+            </cfinvoke>
+
+        </cfloop>
+
+        <cfcontent type="application/json">
+
+        <cfheader statuscode="200" statustext="OK">
+        <cfset response['formstruct'] = formStruct>
+        <cfset response['success'] = true>
+        <cfset response['message'] = "Successfully created new artist.">
+        <cfreturn response>
+
+    </cffunction>
+
 
 </cfcomponent>

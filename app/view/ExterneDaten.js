@@ -16,7 +16,7 @@ Ext.define('myapp.view.ExterneDaten', {
             // get panel
             const panel = this.up('panel')
             // send request to import geodata
-            fetch(`${url_local}/components/geodatenimport.cfc?method=importGeodata`)
+            fetch(`${url_test}/modules/components/geodatenimport.cfc?method=importGeodata`)
                 .then(async (response) => {
                     //
                     const data = await response.json()

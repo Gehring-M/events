@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+	<config>
+		<listtype>fieldorder</listtype>
+		<overview>vorname,nachname,email</overview>
+		<orderfields>nachname,vorname</orderfields>
+		<pagetitle>#vorname# #nachname# (#email#)</pagetitle>
+	</config>
+	<editfields>
+        <!-- ################################################################### -->
+		<field>
+			<name>vorname</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>nachname</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>email</name>
+			<type>email</type>
+		</field>
+        <!-- ################################################################### -->
+		<field>
+			<name>recoveruuid</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>beschreibung</name>
+			<type>textlong</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>genre</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>bezirk</name>
+			<type>textshort</type>
+		</field>
+		<!-- ################################################################### -->
+		<field>
+			<name>status</name>
+			<type>set</type>
+			<items>aktiv,inaktiv</items>
+			<required>yes</required>
+			<default>aktiv</default>
+			<multiple>no</multiple>
+		</field>
+		<!-- ################################################################### -->
+	</editfields>
+</ameisen-node>

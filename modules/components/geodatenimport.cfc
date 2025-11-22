@@ -1,8 +1,8 @@
 <cfcomponent>
 
     <!--- imports --->
-    <cfinclude template="../ameisen/functions.cfm">
-    <cfinclude template="../modules/functions.cfm">
+    <cfinclude template="../../ameisen/functions.cfm">
+    <cfinclude template="../../modules/functions.cfm">
 
 
     <!--- ################################# --->

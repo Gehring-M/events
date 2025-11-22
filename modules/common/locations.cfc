@@ -177,7 +177,7 @@
             <cfset maPath = getConfig('vpath.regional.highlights')>
             <cfif maPath EQ "" OR NOT pathExists(maPath)>
                 <cfset response['success'] = false>
-                <cfset response['message'] = "Make sure to create the media archive" & getConfig('vpath.regional.highlights') & " first!">
+                <cfset response['message'] = "Make sure to create the media archive " & getConfig('vpath.regional.highlights') & " first!">
                 <cfreturn response>
             </cfif>
             <cfset maCatNode = getNodeId(resolvePath(maPath))>

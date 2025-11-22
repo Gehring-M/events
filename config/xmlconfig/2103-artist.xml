@@ -104,7 +104,7 @@
 	<upload>
 		<name>bilder</name>
 		<type>medienarchiveintrag</type>
-		<category>ma-droploader</category>
+		<category>ma-artists</category>
 		<multiple>yes</multiple>
 	</upload>
 </uploads>	

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>fieldorder</listtype>
+	<orderfields>name</orderfields>
+	<overview>name</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>name</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>ort_fk</name>
+		<type>genericelement</type>
+		<element>ort</element>
+		<required>no</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>adresse</name> 
+		<type>textshort</type>
+		<required>ynoes</required>
+	</field>
+	<field>
+		<name>plz</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>ort</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>latitude</name> 
+		<type>float</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>longitude</name> 
+		<type>float</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>telefon</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>email</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>web</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>beschreibung</name> 
+		<type>textlong</type>
+		<required>no</required>
+	</field>
+</editfields>
+<uploads>
+	<upload>
+		<name>uploads</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-droploader</category>
+		<multiple>no</multiple>
+	</upload>
+	<upload>
+		<name>bilder</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-organizer</category>
+		<multiple>no</multiple>
+	</upload>
+</uploads>	
+</ameisen-node>

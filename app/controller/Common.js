@@ -12,7 +12,8 @@
 	       'Registrierungen',
 	       'ExterneDaten',
 	       'Locations',
-		   'Categories'
+		   'Categories',
+		   'Jury'
        ],
 
 	// register all the stores that are being used
@@ -39,7 +40,8 @@
 		'LocationDropdown',
 		'MainVeranstaltungen',
 		'SliderTags',
-		'Categories'
+		'Categories',
+		'Jury'
 	],
 
 	// define references for the UI components
@@ -90,12 +92,27 @@
 				selector: 'Categories',
 				xtype: 'Categories',
 				autoCreate: true
+		   },{
+				ref: 'Jury',
+				selector: 'Jury',
+				xtype: 'Jury',
+				autoCreate: true
 		   }
-       ],
-       actionLocations: function () {
-	       var myView = this.getLocations();
-	       this.application.setMainView(myView);
-       },
+		],
+		
+		// ################################
+		// #   INJECT SENCHA PAGES HERE   #
+		// ################################
+
+		actionLocations: function () {
+			var myView = this.getLocations();
+			this.application.setMainView(myView);
+		},
+
+		actionJury: function () {
+			const juryView = this.getJury()
+			this.application.setMainView(juryView)
+		},
 
 	init: function () {
 		var authStore = this.getAuthStore();

@@ -1,0 +1,13 @@
+CREATE TABLE kb_user (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    deactivated BOOLEAN NOT NULL DEFAULT FALSE,
+    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    created_when DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    changed_when DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deactivated_when DATETIME NULL,
+    email_verified_when DATETIME NULL,
+    last_login DATETIME NULL
+);
