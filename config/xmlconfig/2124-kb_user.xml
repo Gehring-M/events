@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>fieldorder</listtype>
+	<orderfields>kb_username</orderfields>
+	<overview>kb_username</overview>
+	<pagetitle>#kb_username#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>kb_username</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>kb_email</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>kb_password</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+    <field>
+        <name>verified</name>
+        <type>integer</type>
+        <required>no</required>
+        <default>0</default>
+    </field>
+</editfields> 
+</ameisen-node>

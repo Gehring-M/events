@@ -1,0 +1,23 @@
+{
+    "server": {
+        "ip": "87.230.14.71",
+        "host": "agindo-services.info"
+    },
+    "ssh": {
+        "port": "22",
+        "authentication-method": {
+            "password": {
+                "username": "agindo",
+                "password": "alpenZoo123!"
+            }
+        }
+    },
+    "database": {
+        "port": "3306",
+        "db-name": "agindo-services",
+        "authentication": {
+            "username": "agindo",
+            "password": "alpenZoo123!"
+        }
+    }
+}

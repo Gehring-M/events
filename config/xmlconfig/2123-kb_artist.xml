@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>fieldorder</listtype>
+	<orderfields>name</orderfields>
+	<overview>name</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>user_fk</name>
+		<type>genericelement</type>
+		<element>kb_user</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>location_fk</name> 
+        <type>genericelement</type>
+		<element>ort</element>
+		<required>no</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>name</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>description</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>address</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>phone_number</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>contact_person</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+	<field>
+		<name>website</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+    <field>
+        <name>approved</name>
+        <type>integer</type>
+        <required>no</required>
+        <default>0</default>
+    </field>
+</editfields> 
+<uploads>
+	<upload>
+		<name>uploads</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-droploader</category>
+		<multiple>yes</multiple>
+	</upload>
+	<upload>
+		<name>images</name>
+		<type>medienarchiveintrag</type>
+		<category>ma-artists</category>
+		<multiple>yes</multiple>
+	</upload>
+</uploads>	
+</ameisen-node>
