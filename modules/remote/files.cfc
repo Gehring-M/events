@@ -16,7 +16,7 @@
 		<cfset returnStruct['value'] = "" />
 		
 		<cftry>
-			<cfset uploadKatInstance = resolveVPath("ma-droploader") />
+			<cfset uploadKatInstance = resolveVPath("ma-events") />
 			<cfset categoryNodeId = getNodeToInstance(uploadKatInstance).getId() />
 			<cfcatch>
 				<cfset returnStruct['error'] = cfcatch />

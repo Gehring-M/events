@@ -2,6 +2,19 @@
 const env_live_url = 'https://events.agindo-services.info'
 
 
+// Always reload Bilder grid store after upload, regardless of tab state
+window.reloadImageGrid = function() {
+	var grids = Ext.ComponentQuery.query('grid[name=Bilder]');
+	if (grids && grids.length > 0) {
+		var grid = grids[0];
+		var store = grid.getStore();
+		if (store) {
+			store.reload();
+			grid.getView().refresh();
+		}
+	}
+};
+
 Ext.define('myapp.controller.Funktionen', {
 	extend: 'Ext.app.Controller',
 	
@@ -19,12 +32,19 @@ Ext.define('myapp.controller.Funktionen', {
 		this.myFunctions = myapp.app.getController('Funktionen');
 		this.myCommonController = myapp.app.getController('Common');
 		isAdministrator = (authStore.data.items[0].data.administrator==1) ? true : false;
-		
+
+		// Listen for image upload messages from iframe
+		window.addEventListener('message', function(event) {
+			if (event && event.data && event.data.type === 'bilder-upload') {
+				if (window.reloadImageGrid) window.reloadImageGrid();
+			}
+		});
+
 		if (this.inited) {
 			return;
 		}
 		this.inited = true;
-		
+
 		this.control({
 			'button[name=emptyCombo]': {
 				click: this.emptyCombo
@@ -50,6 +70,7 @@ Ext.define('myapp.controller.Funktionen', {
 	
 		}
 		
+		// Do not enable Bilder tab here. It should only be enabled after event creation.
 		
 	},
 		
@@ -174,15 +195,16 @@ Ext.define('myapp.controller.Funktionen', {
 				switch (cItem.data.xtype) {
 					case 'combobox':
 						if (cItem.data.mehrfachauswahl=='ja' && rec != undefined && rec[cItem.data.name]!="" && rec[cItem.data.name]?.toString().indexOf(",")!=-1) {
-							myRec=[];
-							Ext.each(rec[cItem.data.name].split(","), function(cid) {
-						
-								if (cItem.data.mehrfachauswahl_convert==1) {
-									myRec.push(parseInt(cid));
-								} else {
-									myRec.push(cid);
-								}
-							});
+							if (rec[cItem.data.name] !== undefined) {
+								myRec = [];
+								Ext.each(rec[cItem.data.name].split(","), function(cid) {
+									if (cItem.data.mehrfachauswahl_convert==1) {
+										myRec.push(parseInt(cid));
+									} else {
+										myRec.push(cid);
+									}
+								});
+							}
 						} else if (rec != undefined) {
 						
 							if (rec[cItem.data.name]!="" && cItem.data.mehrfachauswahl_convert==1) {
@@ -278,12 +300,19 @@ Ext.define('myapp.controller.Funktionen', {
 					
 					case 'checkbox':
 					
+						let checkboxLabel = (cItem.data.name === 'visible') ? 'visible' : ((cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel);
+						let checkedValue;
+						if (cItem.data.name === 'visible') {
+							checkedValue = (rec != undefined && rec[cItem.data.name]==1) ? true : false;
+						} else {
+							checkedValue = ((rec != undefined && rec[cItem.data.name]==1) || (rec == undefined && cItem.data.value==1)) ? true : false;
+						}
 						myFields.push({
 							xtype: cItem.data.xtype,
-							fieldLabel: (cItem.data.mandatory==1) ? cItem.data.fieldlabel+'*' : cItem.data.fieldlabel,
+							fieldLabel: checkboxLabel,
 							name:cItem.data.name,
 							value: 1,
-							checked: ((rec != undefined && rec[cItem.data.name]==1) || (rec == undefined && cItem.data.value==1)) ? true : false,
+							checked: checkedValue,
 							agPflichtfeld: ( cItem.data.mandatory == 1 && rec == "" || (rec != "" && cItem.data.mandatory == 1 && cItem.data.name.indexOf('passwor') == -1)) ? true : false,
 							readOnly: (cItem.data.readonly==1 || modus=='read' || (rec == undefined  && cItem.data.flags != null &&  cItem.data.flags.indexOf("readonlyineditmodus")!=-1)) ? true : false,
 							margin: '0 0 5 5',
@@ -736,6 +765,9 @@ Ext.define('myapp.controller.Funktionen', {
 				const index = field_names.indexOf(field.name)
 				// found element
 				if (index >= 0) {
+					if (field.name === 'visible' && (!record || !record.data || typeof record.data.visible === 'undefined' || record.data.visible === null)) {
+						field.checked = false;
+					}
 					if (first_occurrence === -1) {
 						field.margin = '0 0 0 140px'
 						first_occurrence = i
@@ -993,8 +1025,9 @@ Ext.define('myapp.controller.Funktionen', {
 			})
 			// Bilder [Tab]
 			myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').add( {
-				disabled: myWindow.title === "Neue Veranstaltung",
+				// Tab is disabled until event is created
 				xtype: 'fieldcontainer',
+				disabled: !(record && record.data && record.data.recordid),
 				layout: 'hbox',
 				margin: '0 0 0 5',
 				title: 'Bilder',
@@ -1018,6 +1051,7 @@ Ext.define('myapp.controller.Funktionen', {
 					viewConfig: {
 						enableTextSelection: false,
 					},
+					disabled: false, // Always activate grid by default
 					columns: [
 						{
 							text: 'Vorschau', dataIndex: 'vorschaubild', align: 'center', width: 118,
@@ -1088,7 +1122,7 @@ Ext.define('myapp.controller.Funktionen', {
 					margin: '0 0 0 0',
 					padding: '0 0 0 0',
 					width: "20%",
-					html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="100%" height="100%"></iframe>'
+					html: '<iframe src="/modules/multiupload.cfm?typ=bilder&bereich=veranstaltung" width="100%" height="100%" onload="if(window.reloadImageGrid)window.reloadImageGrid();"></iframe>'
 				}]
 
 			})
@@ -1301,7 +1335,7 @@ Ext.define('myapp.controller.Funktionen', {
 							// additional behavior (handle images differently)
 							if (myGrid.name=="Bilder") {
 								const imageID = record && record.data ? record.data.recordid : null
-								const url = `${env_live_url}/modules/common/veranstaltungen.cfc?method=deleteImage&imageID=${imageID}`
+								const url = `${env_test_url}/modules/common/veranstaltungen.cfc?method=deleteImage&imageID=${imageID}`
 								const serverResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
 								const responseData = await serverResponse.json()
 								
@@ -1514,7 +1548,6 @@ Ext.define('myapp.controller.Funktionen', {
 					myMandatoryFields.push(element.fieldLabel);
 				}
 			}
-
 		});
 		
 		
@@ -1566,7 +1599,7 @@ Ext.define('myapp.controller.Funktionen', {
 				method: 'POST',
 				params: myParams,
 				success: function(form,action) {
-					var jsonParse = Ext.JSON.decode(action.response.responseText);
+					var serverResponse = Ext.JSON.decode(action.response.responseText);
 					// update separate "MainVeranstaltungen" store after successfully modifying some data
 					if (myParams.nodeType === 2102 || !myParams.parent_fk) {
 						const eventID = myParams.instance
@@ -1581,84 +1614,55 @@ Ext.define('myapp.controller.Funktionen', {
 						}
 					}
 
-					if (jsonParse.success) {
-						let vid = jsonParse.recordid
-						if(mySaveButton.createNewEntry){
-							record.data.recordid=vid
+					if (serverResponse.success) {
+						// get store
+						const eventStore = Ext.data.StoreManager.lookup('Veranstaltungen')
+						// created event
+						if (myParams.instance === 0) {
+							if (!record.data) {
+								record.data = {}
+							}
+							record.data.recordid = serverResponse.instanceid
+							// Force initialization and activation of grids in all tabs
+							var tabPanel = myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']');
+							if (tabPanel) {
+								tabPanel.items.items.forEach(function(tab){
+									tab.setDisabled(false);
+									// If grid does not exist, try to create or render it
+									if (!tab.down('grid') && tab.xtype === 'grid') {
+										tab.show();
+									}
+								});
+								tabPanel.setActiveTab(0);
+								tabPanel.updateLayout();
+							}
+							// Enable and activate all tabs
+							var tabPanel = myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']');
+							if (tabPanel) {
+								tabPanel.items.items.forEach(function(tab){
+									tab.setDisabled(false);
+								});
+								tabPanel.setActiveTab(0);
+								tabPanel.updateLayout();
+							}
 						}
-						if(vmode){
-						Ext.Ajax.request({
-							url: '/modules/common/create.cfc?method=addVeranstalterToVeranstaltung',
-							params: {
-								veranstaltung_fk: vid,
-								veranstalter_fk: myWindow.down("[xtype=hiddenfield]").getValue()
-							},
-							success: function(response) {
-								var jsonParse = Ext.JSON.decode(response.responseText);
-								if (!jsonParse['success']) {
-									Ext.Msg.alert('Systemnachricht','Bitte melden Sie sich an.');
-								} else {
-									myStore.load({
-										params: {
-											veranstaltung_fk:  me.cVeranstaltung,
-										}
-									});
-								}
-								el.previousSibling().setValue();
-							}
-						});
+						// modified event
+						else {
+							eventStore.reload()
+							myWindow.close()
+						}
 					}
-				}
-			
-						myReloadStore.reload({
-							callback: function(response) {
-							
-								if (mySaveButton.createNewEntry) {
-									myWindow.duplicate_fk=0
-									Ext.each(response, function(cRec,index) {
-										if (cRec.data.recordid == jsonParse['recordid']) {
-											myGrid.getView().select(index)
-											myRecord = cRec;
-										}
-									});
-									myWindow.setTitle("Duplikat von: "+record.data.name)
-									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
-								}
-								if (myWindow.title==="Neue Veranstaltung") {
-						
-									Ext.each(response, function(cRec,index) {
-										if (cRec.data.recordid == jsonParse['recordid']) {
-											myGrid.getView().select(index)
-											myRecord = cRec;
-											myWindow.setTitle("Veranstaltung bearbeiten")
-											console.log(myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').items.items)
-											myWindow.down('tabpanel[name=tabpanel_'+el.windowName+']').items.items.forEach(x=>x.enable())
-											
-										}
-									});
-									
-									//Ext.Msg.alert('Systemnachricht','Der Datensatz wurde erfolgreich dupliziert.');
-								}
-							}
-						});
-						if (!mySaveButton.createNewEntry) {
-							Ext.Msg.alert('Systemnachricht',jsonParse.message);
-							if(myWindow.title!=="Neue Veranstaltung"){
-							myWindow.close();
-							}
-							
-							
-						} 
-						
-					
-					myMask.hide();
+					else {
+						Ext.msg.alert('Systemnachricht', 'Das Event konnte nicht angelegt oder aktualisiert werden.')
+						myMask.hide()
+					}
 				},
 				failure: function(form, action) {
-					var jsonParse = Ext.JSON.decode(action.response.responseText);
-					Ext.Msg.alert('Systemnachricht',jsonParse.message);
-					myMask.hide();
+					var serverResponse = Ext.JSON.decode(action.response.responseText)
+					Ext.Msg.alert('Systemnachricht', serverResponse.message)
+					myMask.hide()
 				}
-			},this );
+			},this )
 
 		} else {
 			// text für nicht erfolgreichen pflichtfeld check erstellen

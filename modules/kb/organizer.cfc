@@ -120,4 +120,86 @@
 
     </cffunction>
 
+
+    <!--- ############################## --->
+    <!--- #   FETCH ORGANIZER DETAIL   # --->
+    <!--- ############################## --->
+
+    <cffunction name="fetchOrganizerDetail" access="remote" returnFormat="JSON">
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
+
+        <!--- init --->
+        <cfset var response = {}>
+        <cfset response['organizer'] = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cfquery name="organizerDetail" datasource="#getConfig('DSN')#">
+                SELECT 
+                    ku.id AS userID,
+                    ku.kb_username AS username,
+                    ku.kb_email AS email,
+                    ko.id AS organizerID,
+                    ko.name,
+                    ko.description,
+                    ko.address,
+                    ko.location_fk,
+                    ko.phone_number,
+                    ko.website,
+                    ko.images AS imgs,
+                    ko.uploads,
+                    ko.approved
+                FROM kb_organizer AS ko
+                JOIN kb_user AS ku
+                ON ko.user_fk = ku.id
+                WHERE ko.user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#">;
+            </cfquery>
+
+            <cfloop query="organizerDetail">
+                <cfset organizer = {}>
+                <cfset organizer['user_id'] = organizerDetail.userID>
+                <cfset organizer['username'] = organizerDetail.username>
+                <cfset organizer['email'] = organizerDetail.email>
+                <cfset organizer['organizer_id'] = organizerDetail.organizerID>
+                <cfset organizer['name'] = organizerDetail.name>
+                <cfset organizer['description'] = organizerDetail.description>
+                <cfset organizer['location'] = organizerDetail.location_fk>
+                <cfset organizer['address'] = organizerDetail.address>
+                <cfset organizer['phone'] = organizerDetail.phone_number>
+                <cfset organizer['email'] = organizerDetail.email>
+                <cfset organizer['link'] = organizerDetail.website>
+                <cfset organizer['imgs'] = organizerDetail.imgs>
+                <cfset organizer['approved'] = organizerDetail.approved>
+                <!--- evaluate images --->
+                <cfset organizer['images'] = []>
+                <cfif organizerDetail['imgs'] NEQ "">
+                    <cfset images = getStructuredContent(nodetype=1301, instanceids="#organizerDetail['imgs']#")>
+                    <cfloop query="images">
+                        <!--- construct individual images --->
+                        <cfset image = {}>
+                        <cfset image['id'] = images.id>
+                        <cfset image['path'] = href("instance:"&images.id)&"&dimensions=300x150&cropmode=cropcenter">
+                        <cfset image['filename'] = images.originalfilename>
+                        <cfset ArrayAppend(organizer['images'], image)>
+                    </cfloop>
+                </cfif>
+                <!--- --->
+                <cfset response['organizer'] = organizer>
+            </cfloop>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully fetched event details">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
+
+    </cffunction>
+
 </cfcomponent>

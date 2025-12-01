@@ -11,32 +11,6 @@
 
     <cffunction name="loginUser" access="remote" returnFormat="JSON">
 
-
-        <!--- init --->
-        <cfset var rawBody = getHttpRequestData().content>
-        <cfset var requestData = {}>
-        <cfset var response = {}>
-        <cfif len(trim(rawBody)) EQ 0>
-            <cfheader statuscode="400" statustext="Bad Request">
-            <cfset response.success = false>
-            <cfset response.message = "Request body is empty. Expected JSON.">
-            <cfreturn response>
-        </cfif>
-        <cftry>
-            <cfset requestData = deserializeJSON(rawBody)>
-            <cfif NOT isStruct(requestData)>
-                <cfset errorMsg = "Request body is not valid JSON object. Received: " & rawBody>
-                <cfthrow message="#errorMsg#">
-            </cfif>
-        <cfcatch>
-            <cfheader statuscode="400" statustext="Bad Request">
-            <cfset response.success = false>
-            <cfset response.message = "Request body is not valid JSON.">
-            <cfset response.errorDetail = rawBody>
-            <cfreturn response>
-        </cfcatch>
-        </cftry>
-
         <!--- handle CORS preflight --->
         <cfif lcase(cgi.request_method) EQ "options">
             <cfheader statuscode="200" statustext="OK">
@@ -52,6 +26,31 @@
         <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
         <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
 
+        <!--- init --->
+        <cfset var rawBody = getHttpRequestData().content>
+        <cfset var requestData = {}>
+        <cfset var response = {}>
+        <cfif len(trim(rawBody)) EQ 0>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Request body is empty. Expected JSON.">
+            <cfreturn response>
+        </cfif>
+        <cftry>
+            <cfset requestData = deserializeJSON(rawBody)>
+            <cfif NOT isStruct(requestData)>
+                <cfset errorMsg = "Request body is not valid JSON object. Received: " & rawBody>
+                <cfthrow message="#errorMsg#">
+            </cfif>
+        <cfcatch>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Request body is not valid JSON.">
+            <cfset response['errorDetail'] = rawBody>
+            <cfreturn response>
+        </cfcatch>
+        </cftry>
+
         <!--- authenticate user --->
         <cfset authInfo = authenticateUser(user=requestData)>
 
@@ -60,14 +59,15 @@
             <!--- send back to client --->
             <cfheader statuscode="200" statustext="OK">
             <!--- generate JWT --->
-            <cfset response.jwt = generateJWT(authInfo.user)>
-            <cfset response.success = true>
-            <cfset response.message = "Successfully logged in">
+            <cfset response['jwt'] = generateJWT(authInfo.user)>
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully logged in">
+            <cfset response['id'] = authInfo['user']['id']>
             <cfreturn response>
         <cfelse>
             <cfheader statuscode="500" statustext="Internal Server Error">
-            <cfset response.success = false>
-            <cfset response.message = "Invalid username or password">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Invalid username or password">
             <cfreturn response>
         </cfif>
 
@@ -75,9 +75,9 @@
 
 
 
-    <!--- ######################### --->
-    <!--- #   JWT VERIFY ENDPOINT # --->
-    <!--- ######################### --->
+    <!--- ########################### --->
+    <!--- #   JWT VERIFY ENDPOINT   # --->
+    <!--- ########################### --->
 
     <cffunction name="verifyJWTToken" access="remote" returnFormat="JSON">
         <!--- handle CORS preflight --->
@@ -142,8 +142,6 @@
 
         <cfreturn response>
     </cffunction>
-
-
 
 
     <!--- ######################### --->
@@ -234,11 +232,6 @@
     </cffunction>
 
 
-    <!--- ############################### --->
-    <!--- #   GENERATE JSON WEB TOKEN   # --->
-    <!--- ############################### --->
-
-
     <!--- helper for base64url encoding --->
     <cffunction name="base64UrlEncodeCF" access="private" returntype="string">
         <cfargument name="input" type="string" required="true">
@@ -248,6 +241,11 @@
         <cfset encoded = Replace(encoded, "=", "", "all")>
         <cfreturn encoded>
     </cffunction>
+
+
+    <!--- ############################### --->
+    <!--- #   GENERATE JSON WEB TOKEN   # --->
+    <!--- ############################### --->
 
     <cffunction name="generateJWT" access="private" returntype="string">
         <!--- user data to use for the payload --->
@@ -318,6 +316,170 @@
     </cffunction>
 
 
+    <!--- ################### --->
+    <!--- #   UPDATE USER   # --->
+    <!--- ################### --->
+
+    <cffunction name="updateUser" access="remote" returnFormat="JSON">
+
+        <!--- handle CORS preflight --->
+        <cfif lcase(cgi.request_method) EQ "options">
+            <cfheader statuscode="200" statustext="OK">
+            <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
+            <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
+            <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
+            <cfcontent type="application/json">
+            <cfexit method="exit">
+        </cfif>
+
+        <!--- set CORS headers before return --->
+        <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
+        <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
+        <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
+
+
+        <!--- init --->
+        <cfset var formData = formToStruct()>
+        <cfset var response = {}>
+        <cfset var info = {}>
+        <cfset var userInfo = {}>
+        <cfset var userDataInfo = {}>
+        <cfset info['baseUser'] = {}>
+        <cfset info['userData'] = {}>
+        <cfset info['userRole'] = "">
+        <cfset info['errors'] = []>
+        <cfset info['hasErrors'] = false>
+
+        <!--- [user_role] (mandatory) --->
+        <cfif (StructKeyExists(formData, 'user_role')) AND ((formData['user_role'] EQ 'artist') OR (formData['user_role'] EQ 'organizer'))>
+            <cfset info['userRole'] = formData['user_role']>
+            <cfset info['#info['userRole']#'] = {}>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Make sure to provide a 'user_role' field">
+            <cfreturn response>
+        </cfif>
+
+        <!--- create user object --->
+        <cfset userInfo = createUserObject(formData, false)>
+
+        <!--- create user details --->
+        <cfif info['userRole'] EQ 'artist'>
+            <cfset userDataInfo = createArtistObject(formData)>
+        <cfelseif info['userRole'] EQ 'organizer'>
+            <cfset userDataInfo = createOrganizerObject(formData)>
+        <cfelse>
+            <cfheader statuscode="500" statustext="Internal Server Error">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Fallback - No 'user_role' provided">
+            <cfreturn response>
+        </cfif>
+
+        <!--- validate --->
+        <cfif userInfo['hasErrors']>
+            <cfset info['hasErrors'] = true>
+            <cfset info['errors'] = ArrayMerge(info['errors'], userInfo['errors'])>
+        <cfelse>
+            <cfset info['baseUser'] = userInfo['user']>
+        </cfif>
+        <cfif userDataInfo['hasErrors']>
+            <cfset info['hasErrors'] = true>
+            <cfset info['errors'] = ArrayMerge(info['errors'], userDataInfo['errors'])>
+        <cfelse>
+            <cfset info['userData'] = userDataInfo['#info['userRole']#']>
+        </cfif>
+
+        <cfif info['hasErrors']>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = info['errors']>
+            <cfreturn response>
+        </cfif>
+
+        <!--- check for duplicate entries --->
+        <cfquery name="checkUsername" datasource="#getConfig('DSN')#">
+            SELECT * 
+            FROM kb_user
+            WHERE kb_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#info['baseUser']['username']#"> AND NOT id = <cfqueryparam cfsqltype="cf_sql_integer" value="#info['baseUser']['id']#">;
+        </cfquery>
+
+        <cfquery name="checkEmail" datasource="#getConfig('DSN')#">
+            SELECT * 
+            FROM kb_user
+            WHERE kb_email = <cfqueryparam cfsqltype="cf_sql_varchar" value="#info['baseUser']['email']#"> AND NOT id = <cfqueryparam cfsqltype="cf_sql_integer" value="#info['baseUser']['id']#">;
+        </cfquery>
+
+        <cfif checkUsername.recordCount GT 0>
+            <cfset info['hasErrors'] = true>
+            <cfset ArrayAppend(info['errors'], "Benutzername existiert bereits.")>
+        </cfif>
+        <cfif checkEmail.recordCount GT 0>
+            <cfset info['hasErrors'] = true>
+            <cfset ArrayAppend(info['errors'], "Email existiert bereits.")>
+        </cfif>
+
+        <cfif info['userRole'] EQ 'artist'>
+            <cfquery name="checkArtist" datasource="#getConfig('DSN')#">
+                SELECT * 
+                FROM kb_artist
+                WHERE name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#info['userData']['name']#"> AND NOT id = <cfqueryparam cfsqltype="cf_sql_integer" value="#info['userData']['id']#">;
+            </cfquery>
+            <!--- validate --->
+            <cfif checkArtist.recordCount GT 0>
+                <cfset info['hasErrors'] = true>
+                <cfset ArrayAppend(info['errors'], "Der Künstlername existiert bereits")>
+            </cfif>
+        <cfelseif info['userRole'] EQ 'organizer'>
+            <cfquery name="checkOrganizer" datasource="#getConfig('DSN')#">
+                SELECT * 
+                FROM kb_organizer
+                WHERE name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#info['userData']['name']#"> AND NOT id = <cfqueryparam cfsqltype="cf_sql_integer" value="#info['userData']['id']#">;
+            </cfquery>
+            <!--- validate --->
+            <cfif checkOrganizer.recordCount GT 0>
+                <cfset info['hasErrors'] = true>
+                <cfset ArrayAppend(info['errors'], "Der Veranstaltername existiert bereits")>
+            </cfif>
+        <cfelse>
+            <cfheader statuscode="500" statustext="Internal Server Error">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Fallback - No 'user_role' provided">
+            <cfreturn response>
+        </cfif>
+
+        <cfif info['hasErrors']>
+            <cfheader statuscode="500" statustext="Internal Server Error">
+            <cfset response['success'] = false>
+            <cfset response['message'] = info['errors']>
+            <cfreturn response>
+        </cfif>
+
+        <!--- update entries --->
+        <cfset updatedUser = updateUserEntity(info['baseUser'])>
+        
+        <cfif info['userRole'] EQ 'artist'>
+            <cfset updatedArtist = updateArtistEntity(info['userData'])>
+        <cfelseif infoStruct['userRole'] EQ 'organizer'>
+            <cfset updatedOrganizer = updateOrganizerEntity(info['userData'])>
+        <cfelse>
+            <cfheader statuscode="500" statustext="Internal Server Error">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Fallback - No 'user_role' provided">
+            <cfreturn response>
+        </cfif>
+
+        <!--- upload images --->
+        <cfset uploadInfo = uploadImages(formData=formData, userRole=info['userRole'], userDetailsID=info['userData']['id'])>
+
+        <cfheader statuscode="200" statustext="OK">
+        <cfset response['success'] = true>
+        <cfset response['message'] = "Successfully updated user">
+        <cfreturn response>
+
+    </cffunction>
+
+
     <!--- ################################# --->
     <!--- #   PREPARE REGISTRATION DATA   # --->
     <!--- ################################# --->
@@ -347,7 +509,7 @@
         </cfif>
 
         <!--- create user object --->
-        <cfset userInfo = createUserObject(formData)>
+        <cfset userInfo = createUserObject(formData, true)>
 
         <!--- create user details --->
         <cfif info['userRole'] EQ 'artist'>
@@ -597,6 +759,11 @@
             <cfset info['artist']['link'] = "">
         </cfif>
 
+        <!--- [id] (optional) --->
+        <cfif (StructKeyExists(formData, 'artist_id')) AND (formData['artist_id'] NEQ "")>
+            <cfset info['artist']['id'] = formData['artist_id']>
+        </cfif>
+
         <cfreturn info>
     </cffunction>
 
@@ -608,6 +775,7 @@
     <cffunction name="createUserObject" access="private" returnFormat="JSON">
         <!--- arguments --->
         <cfargument name="formData" type="struct" required="yes">
+        <cfargument name="checkForPassword" type="boolean" required="yes">
 
         <!--- init --->
         <cfset var info = {}>
@@ -633,13 +801,20 @@
             <cfset ArrayAppend(info['errors'], "Missing or invalid field 'email'.")>
         </cfif>
 
-        <!--- [password] (mandatory) --->
-        <cfif (StructKeyExists(formData, 'password')) AND (formData['password'] NEQ "")>
-            <cfset info['user']['password'] = formData['password']>
-        <cfelse>
-            <!--- append error --->
-            <cfset info['hasErrors'] = true>
-            <cfset ArrayAppend(info['errors'], "Missing or invalid field 'password'.")>
+        <cfif checkForPassword>
+            <!--- [password] (mandatory) --->
+            <cfif (StructKeyExists(formData, 'password')) AND (formData['password'] NEQ "")>
+                <cfset info['user']['password'] = formData['password']>
+            <cfelse>
+                <!--- append error --->
+                <cfset info['hasErrors'] = true>
+                <cfset ArrayAppend(info['errors'], "Missing or invalid field 'password'.")>
+            </cfif>
+        </cfif>
+
+        <!--- [id] (optional) --->
+        <cfif (StructKeyExists(formData, 'user_id')) AND (formData['user_id'] NEQ "")>
+            <cfset info['user']['id'] = formData['user_id']>
         </cfif>
 
         <cfreturn info>
@@ -711,6 +886,62 @@
         <cfset dbInfo['new_entries'] = dbResult.recordCount>
         <cfreturn dbInfo>
 
+    </cffunction>
+
+
+    <!--- ########################## --->
+    <!--- #   UPDATE USER ENTITY   # --->
+    <!--- ########################## --->
+
+    <cffunction name="updateUserEntity" access="private" returntype="boolean">
+        <!--- arguments --->
+        <cfargument name="user" type="struct" required="yes">
+
+        <cfquery name="updateUser" datasource="#getConfig('DSN')#" result="dbResult">
+            UPDATE kb_user 
+            SET 
+                kb_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#user['username']#">,
+                kb_email = <cfqueryparam cfsqltype="cf_sql_varchar" value="#user['email']#">
+            WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#user['id']#">;
+        </cfquery>
+
+        <cfreturn true>
+    </cffunction>
+
+
+    <!--- ############################ --->
+    <!--- #   UPDATE ARTIST ENTITY   # --->
+    <!--- ############################ --->
+
+    <cffunction name="updateArtistEntity" access="private" returntype="boolean">
+        <!--- arguments --->
+        <cfargument name="artist" type="struct" required="yes">
+
+        <cfquery name="updateArtist" datasource="#getConfig('DSN')#" result="dbResult">
+            UPDATE kb_artist
+            SET 
+                name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['name']#">,
+                description = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['description']#">,
+                phone_number = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['phone_number']#">,
+                contact_person = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['contact_person']#">,
+                website = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['link']#">,
+                address = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['address']#">,
+                location_fk = <cfqueryparam cfsqltype="cf_sql_varchar" value="#artist['location_fk']#">
+            WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#artist['id']#">;
+        </cfquery>
+
+        <cfreturn true>
+    </cffunction>
+
+    <!--- ############################### --->
+    <!--- #   UPDATE ORGANIZER ENTITY   # --->
+    <!--- ############################### --->
+
+    <cffunction name="updateOrganizerEntity" access="private" returntype="boolean">
+        <!--- arguments --->
+        <cfargument name="organizer" type="struct" required="yes">
+
+        <cfreturn organizer>
     </cffunction>
 
 

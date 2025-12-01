@@ -414,18 +414,17 @@
 		this.timerActive = false;
 		this.timerTyp = "";
 
-		// ==> Veranstalter, Künstler, Tags
-		//     el.activeTab.xtype = "grid"
+		// Always load the store for the active tab, including Bilder
 		if (el.activeTab.xtype == "grid") {
+			var store = el.activeTab.getStore();
 			if (this.cArtikel) {
-				el.activeTab.getStore().load({
+				store.load({
 					params: {
 						artikel_fk: this.cArtikel,
 					}
 				});
-			}
-			else {
-				el.activeTab.getStore().load({
+			} else {
+				store.load({
 					params: {
 						veranstaltung_fk: this.cVeranstaltung,
 						artist_fk: this.cArtist,
@@ -433,59 +432,25 @@
 					}
 				});
 			}
-		} 
-		// ==> Main (wirft einen Error, kann Store nicht loaden), Bilder, Downloads, Kontakte
-		//     el.activeTab.xtype = "fieldcontainer"
-		else {
-			myGrid = el.activeTab.down('grid')
-			myStore = myGrid.getStore()
-
-			if (myStore.storeId == "Bilder") {
-				me.timerActive = true;
-				me.timerTyp = 'bilder';
-			}
-
-			if (myStore.storeId == "Downloads") {
-				me.timerActive = true;
-				me.timerTyp = 'uploads';
-			}
-
-			if (this.cArtikel) {
-				myStore.load({
-					params: {
-						artikel_fk: this.cArtikel,
-
-					},
-					callback: function (response) {
-						/**
-						 * IRRELEVANT?
-						 * 
-						if (myGrid.name == "Bilder" || myGrid.name == "Downloads") {
-							console.log('IF ARTIKEL')
-							console.log(response)
+		} else {
+			var myGrid = el.activeTab.down('grid');
+			if (myGrid) {
+				var myStore = myGrid.getStore();
+				if (this.cArtikel) {
+					myStore.load({
+						params: {
+							artikel_fk: this.cArtikel,
 						}
-						*/
-					}, scope: this
-				});
-			}
-			else {
-				const params = {
-					veranstaltung_fk: this.cVeranstaltung,
-					artist_fk: this.cArtist,
-					veranstalter_fk: this.cVeranstalter
+					});
+				} else {
+					myStore.load({
+						params: {
+							veranstaltung_fk: this.cVeranstaltung,
+							artist_fk: this.cArtist,
+							veranstalter_fk: this.cVeranstalter
+						}
+					});
 				}
-				myStore.load({
-					params: params,
-					callback: function (response) {
-						/**
-						 * IRRELEVANT?
-						 *
-						console.log('ELSE ARTIKEL')
-						console.log(response)
-						*/
-					}, 
-					scope: this
-				});
 			}
 		}
 
@@ -632,9 +597,6 @@
 						myWindow.down('datefield[name=von]').setValue(myRecord.von);
 					}
 				}
-			}
-			if (el.nodeType == 2102) {
-				myWindow.down("checkbox[name='visible']").setValue(1)
 			}
 		}
 
