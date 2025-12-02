@@ -96,7 +96,6 @@
             </cfloop>
 
             <cfheader statuscode="200" statustext="OK">
-            <cfset response['uuid'] = createUUID()>
             <cfset response['success'] = true>
             <cfset response['message'] = "Successfully fetched event details">
             <cfreturn response>
@@ -106,6 +105,71 @@
             <cfset response['message'] = "Please provide an ID as a URL parameter.">
             <cfreturn response>
         </cfif>
+
+    </cffunction>
+
+
+    <cffunction name="fetchArtists" access="remote" returnFormat="JSON">
+
+        <!--- init --->
+        <cfset var response = {}>
+        <cfset response['artists'] = []>
+
+        <cfquery name="artists" datasource="#getConfig('DSN')#">
+            SELECT 
+                ku.id AS userID,
+                ka.id AS artistID, 
+                ka.name AS name, 
+                ka.description AS description, 
+                ka.approved AS approved
+            FROM kb_artist AS ka
+            JOIN kb_user AS ku
+            ON ka.user_fk = ku.id
+            WHERE ka.deactivated = 0;
+        </cfquery>
+
+        <cfloop query="artists">
+            <cfset artist = {}>
+            <cfset artist['user_id'] = artists.userID>
+            <cfset artist['artist_id'] = artists.artistID>
+            <cfset artist['name'] = artists.name>
+            <cfset artist['description'] = artists.description>
+            <cfset artist['approved'] = artists.approved>
+            <cfset ArrayAppend(response['artists'], artist)>
+        </cfloop>
+
+        <cfheader statuscode="200" statustext="OK">
+        <cfset response['success'] = true>
+        <cfset response['message'] = "Successfully fetched event details">
+        <cfreturn response>
+
+    </cffunction>
+
+
+    <cffunction name="approveArtist" access="remote" returnFormat="JSON">
+        <!--- argument --->
+        <cfargument name="id" type="numeric" required="no">
+
+        <!--- init --->
+        <cfset var response = {}>
+
+        <!--- check for correct call --->
+        <cfif StructKeyExists(arguments, 'id')>
+
+            <cfquery name="approvedArtist" datasource="#getConfig('DSN')#">
+            </cfquery>
+
+            <cfheader statuscode="200" statustext="OK">
+            <cfset response['success'] = true>
+            <cfset response['message'] = "Successfully approved artist.">
+            <cfreturn response>
+        <cfelse>
+            <cfheader statuscode="400" statustext="Bad Request">
+            <cfset response['success'] = false>
+            <cfset response['message'] = "Please provide an ID as a URL parameter.">
+            <cfreturn response>
+        </cfif>
+
 
     </cffunction>
 

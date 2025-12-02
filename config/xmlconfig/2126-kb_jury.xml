@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ameisen-node>
+<config>
+	<listtype>fieldorder</listtype>
+	<orderfields>name</orderfields>
+	<overview>name</overview>
+	<pagetitle>#name#</pagetitle>
+	<usehistory>no</usehistory>
+	<keytype>id</keytype>
+</config>
+<editfields> 
+	<field>
+		<name>user_fk</name>
+		<type>genericelement</type>
+		<element>kb_user</element>
+		<required>yes</required>
+		<multiple>no</multiple>
+	</field>
+	<field>
+		<name>first_name</name> 
+		<type>textshort</type>
+		<required>yes</required>
+	</field>
+	<field>
+		<name>last_name</name> 
+		<type>textshort</type>
+		<required>no</required>
+	</field>
+</editfields> 
+</ameisen-node>

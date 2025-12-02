@@ -209,6 +209,18 @@
                     <cfset info['authenticated'] = false>
                     <cfreturn info>
                 </cfif>
+            <cfelseif user['user_role'] EQ 'jury'>
+                <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
+                    SELECT *
+                    FROM kb_jury
+                    WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
+                </cfquery>
+                <cfif verifyRole.recordCount NEQ 1>
+                    <cfset ArrayAppend(info['errors'], "User exists but tried to login for wrong role.")>
+                    <cfset info['hasErrors'] = true>
+                    <cfset info['authenticated'] = false>
+                    <cfreturn info>
+                </cfif>
             <cfelse>
                 <cfset ArrayAppend(info['errors'], "Invalid user_role")>
                 <cfset info['hasErrors'] = true>
@@ -499,7 +511,7 @@
         <cfset info['hasErrors'] = false>
 
         <!--- [user_role] (mandatory) - but just used internally (if not provided -> frontend-error) --->
-        <cfif (StructKeyExists(formData, 'user_role')) AND ((formData['user_role'] EQ 'artist') OR (formData['user_role'] EQ 'organizer'))>
+        <cfif (StructKeyExists(formData, 'user_role')) AND ((formData['user_role'] EQ 'artist') OR (formData['user_role'] EQ 'organizer') OR (formData['user_role'] EQ 'jury'))>
             <cfset info['userRole'] = formData['user_role']>
             <cfset info['#info['userRole']#'] = {}>
         <cfelse>
@@ -516,6 +528,8 @@
             <cfset userDetailsInfo = createArtistObject(formData)>
         <cfelseif info['userRole'] EQ 'organizer'>
             <cfset userDetailsInfo = createOrganizerObject(formData)>
+        <cfelseif info['userRole'] EQ 'jury'>
+            <cfset userDetailsInfo = createJuryObject(formData)>
         <cfelse>
             <cfset info['hasErrors'] = true>
             <cfset ArrayAppend(info['errors'], "Internal Server Error")>
@@ -562,7 +576,7 @@
         <cfset info['userDetailsID'] = 0>
 
         <!--- base validation --->
-        <cfif (StructKeyExists(arguments, 'userRole')) AND ((arguments['userRole'] EQ 'artist') OR (arguments['userRole'] EQ 'organizer'))>
+        <cfif (StructKeyExists(arguments, 'userRole')) AND ((arguments['userRole'] EQ 'artist') OR (arguments['userRole'] EQ 'organizer') OR (arguments['userRole'] EQ 'jury'))>
             <!--- store user first --->
             <cfset userInsertInfo = storeUserEntity(arguments['user'])>
             <!--- validate --->
@@ -593,6 +607,17 @@
                     <cfreturn info>
                 </cfif>
                 <cfset info['userDetailsID'] = organizerInsertInfo['id']>
+                <!--- --->
+                <cfreturn info>
+            <cfelseif arguments['userRole'] EQ 'jury'>
+                <cfset juryInsertInfo = storeJuryEntity(arguments['userDetails'], info['userID'])>
+                <!--- validate --->
+                <cfif juryInsertInfo['new_entries'] NEQ 1>
+                    <cfset info['hasErrors'] = true>
+                    <cfset ArrayAppend(info['errors'], "Internal Server Error")>
+                    <cfreturn info>
+                </cfif>
+                <cfset info['userDetailsID'] = juryInsertInfo['id']>
                 <!--- --->
                 <cfreturn info>
             <cfelse>
@@ -768,10 +793,42 @@
     </cffunction>
 
 
+    <!--- ######################## --->
+    <!--- #   CREATE JURY OBJECT   # --->
+    <!--- ######################## --->
+
+    <cffunction name="createJuryObject" access="private" returntype="struct">
+        <!--- arguments --->
+        <cfargument name="formData" type="struct" required="yes">
+
+        <!--- init --->
+        <cfset var info = {}>
+        <cfset info['jury'] = {}>
+        <cfset info['errors'] = []>
+        <cfset info['hasErrors'] = false>
+
+        <!--- [first_name] (optional) --->
+        <cfif StructKeyExists(formData, 'first_name')>
+            <cfset info['jury']['first_name'] = formData['first_name']>
+        <cfelse>
+            <cfset info['jury']['first_name'] = "">
+        </cfif>
+
+        <!--- [last_name] (optional) --->
+        <cfif StructKeyExists(formData, 'last_name')>
+            <cfset info['jury']['last_name'] = formData['last_name']>
+        <cfelse>
+            <cfset info['jury']['last_name'] = "">
+        </cfif>
+
+        <cfreturn info>
+
+    </cffunction>
+
+
     <!--- ########################## --->
     <!--- #   CREATE USER OBJECT   # --->
     <!--- ########################## --->
-
     <cffunction name="createUserObject" access="private" returnFormat="JSON">
         <!--- arguments --->
         <cfargument name="formData" type="struct" required="yes">
@@ -1007,10 +1064,36 @@
     </cffunction>
 
 
+    <!--- ######################## --->
+    <!--- #   STORE JURY ENTITY   # --->
+    <!--- ######################## --->
+
+    <cffunction name="storeJuryEntity" access="private" returntype="struct">
+        <!--- arguments --->
+        <cfargument name="jury" type="struct" required="yes">
+        <cfargument name="user_fk" type="numeric" required="yes">
+
+        <cfquery name="insertJury" datasource="#getConfig('DSN')#" result="dbResult">
+            INSERT INTO kb_jury (user_fk, first_name, last_name)
+            VALUES(
+                <cfqueryparam cfsqltype="cf_sql_integer" value="#user_fk#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#jury['first_name']#">,
+                <cfqueryparam cfsqltype="cf_sql_varchar" value="#jury['last_name']#">
+            );
+        </cfquery>
+
+        <!--- return info --->
+        <cfset dbInfo = {}>
+        <cfset dbInfo['id'] = dbResult.generatedKey>
+        <cfset dbInfo['new_entries'] = dbResult.recordCount>
+        <cfreturn dbInfo>
+
+    </cffunction>
+
+
     <!--- ##################### --->
     <!--- #   REGISTER USER   # --->
     <!--- ##################### --->
-
     <cffunction name="registerUser" access="remote" returnFormat="JSON">
 
         <!--- handle CORS preflight --->
@@ -1159,13 +1242,20 @@
             <cfif (maOrganizerPath NEQ "") AND (pathExists(maOrganizerPath))>
                 <cfset info['ma'] = getNodeId(resolvePath(maOrganizerPath))>
             </cfif>
+        <!--- check for jury --->
+        <cfelseif userRole EQ 'jury'>
+            <cfset info['nt'] = 2126>
+            <cfset maJuryPath = getConfig('ma.jury')>
+            <cfif (maJuryPath NEQ "") AND (pathExists(maJuryPath))>
+                <cfset info['ma'] = getNodeId(resolvePath(maJuryPath))>
+            </cfif>
         </cfif>
 
         <!--- if no media archive was found, use fallback --->
         <cfif info['ma'] EQ 0>
             <cfset maFallbackPath = getConfig('ma.fallback')>
             <cfif (maFallbackPath NEQ "") AND (pathExists(maFallbackPath))>
-                <cfset info['ma'] = getNodeId(resolvePath(maOrganizerPath))>
+                <cfset info['ma'] = getNodeId(resolvePath(maFallbackPath))>
             </cfif>
         </cfif>
 
