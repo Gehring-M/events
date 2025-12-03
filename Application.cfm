@@ -3,7 +3,7 @@
     <cfset var origin = CGI.HTTP_ORIGIN>
     <cfset var whiteOrigins = "https://kulturbezirk-test.agindo-services.info">
     
-    <cfif ListFind(whiteOrigins, origin, ",") OR Find('.intern', origin) GT 0>
+    <cfif ListFind(whiteOrigins, origin, ",") OR Find('.intern', origin) GT 0 OR Find('localhost', origin) GT 0 OR Find('127.0.0.1', origin) GT 0>
         <cfheader name="Access-Control-Allow-Origin" value="#origin#">
         <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
         <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">

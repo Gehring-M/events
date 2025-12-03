@@ -160,11 +160,11 @@
             <cfset cultureSliderEvent['event_img'] = {}>
             <!------>
             <cfif cultureSliderEvents.bilder NEQ "">
-                <cfset image = getStructuredContent(nodetype=1301, instanceids="#cultureSliderEvents['bilder']#", orderclause="createdwhen DESC", maxrows=1)>
-                <!--- construct image object --->
-                <cfif image.recordCount EQ 1>
-                    <cfset cultureSliderEvent['event_img']['path'] = href("instance:" & image.id) & "&dimensions=300x150&cropmode=cropcenter">
-                    <cfset cultureSliderEvent['event_img']['name'] = image.originalfilename>
+                <!--- Get first image ID from comma-separated list --->
+                <cfset firstImgID = ListFirst(cultureSliderEvents['bilder'])>
+                <cfif len(firstImgID) GT 0>
+                    <cfset cultureSliderEvent['event_img']['path'] = href("instance:" & firstImgID) & "&dimensions=300x150&cropmode=cropcenter">
+                    <cfset cultureSliderEvent['event_img']['name'] = "image_" & firstImgID>
                 <!--- shouldn't happen bust just in case --->
                 <cfelse>
                     <cfset cultureSliderEvent['event_img']['path'] = NULL>
@@ -273,10 +273,11 @@
                 <!--- evaluate image --->
                 <cfset event['img'] = {}>
                 <cfif events.bilder NEQ "">
-                    <cfset image = getStructuredContent(nodetype=1301, instanceids="#events['bilder']#", orderclause="createdwhen DESC", maxrows=1)>
-                    <cfif image.recordCount EQ 1>
-                        <cfset event['img']['path'] = href("instance:" & image.id) & "&dimensions=300x150&cropmode=cropcenter">
-                        <cfset event['img']['name'] = image.originalfilename>
+                    <!--- Get first image ID from comma-separated list --->
+                    <cfset firstImgID = ListFirst(events['bilder'])>
+                    <cfif len(firstImgID) GT 0>
+                        <cfset event['img']['path'] = href("instance:" & firstImgID) & "&dimensions=300x150&cropmode=cropcenter">
+                        <cfset event['img']['name'] = "image_" & firstImgID>
                     <cfelse>
                         <cfset event['img']['path'] = NULL>
                         <cfset event['img']['name'] = "Fallback">
@@ -326,8 +327,8 @@
 
         <!--- retrieve artists from db --->
         <cfquery name="artists" datasource="#getConfig('DSN')#">
-            SELECT id, name, bilder 
-            FROM artist
+            SELECT id, name, images 
+            FROM kb_artist
             WHERE deactivated = 0 AND approved = 1
         </cfquery>
 
@@ -339,11 +340,12 @@
                 <cfset artist['name'] = artists.name>
                 <!--- evaluate image --->
                 <cfset artist['img'] = {}>
-                <cfif artists.bilder NEQ "">
-                    <cfset image = getStructuredContent(nodetype=1301, instanceids="#artists['bilder']#", orderclause="createdwhen DESC", maxrows=1)>
-                    <cfif image.recordCount EQ 1>
-                        <cfset artist['img']['path'] = href("instance:" & image.id) & "&dimensions=300x150&cropmode=cropcenter">
-                        <cfset artist['img']['name'] = image.originalfilename>
+                <cfif artists.images NEQ "">
+                    <!--- Get first image ID from comma-separated list --->
+                    <cfset firstImgID = ListFirst(artists['images'])>
+                    <cfif len(firstImgID) GT 0>
+                        <cfset artist['img']['path'] = href("instance:" & firstImgID) & "&dimensions=300x150&cropmode=cropcenter">
+                        <cfset artist['img']['name'] = "image_" & firstImgID>
                     <cfelse>
                         <cfset artist['img']['path'] = NULL>
                         <cfset artist['img']['name'] = "Fallback">
@@ -605,46 +607,46 @@
 
             <cfquery name="artistDetails" datasource="#getConfig('DSN')#">
                 SELECT 
-                    id,
-                    name,
-                    beschreibung,
-                    ansprechperson,
-                    ort,
-                    adresse,
-                    plz,
-                    telefon,
-                    email,
-                    web,
-                    link,
-                    bilder
-                FROM artist
-                WHERE id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#"> AND approved = 1;
+                    ka.id AS id,
+                    ka.name AS name,
+                    ka.description AS description,
+                    ka.address AS address,
+                    ka.location_fk AS location_fk,
+                    ka.phone_number AS phone_number,
+                    ka.contact_person AS contact_person,
+                    ka.website AS website,
+                    ka.images AS images,
+                    ku.kb_email AS email
+                FROM kb_artist AS ka
+                JOIN kb_user AS ku
+                ON ka.user_fk = ku.id
+                WHERE ka.id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments['id']#"> AND approved = 1;
             </cfquery>
 
             <cfloop query="artistDetails">
                 <cfset artist = {}>
                 <cfset artist['id'] = artistDetails.id>
                 <cfset artist['name'] = artistDetails.name>
-                <cfset artist['description'] = artistDetails.beschreibung>
-                <cfset artist['location'] = artistDetails.ort>
-                <cfset artist['address'] = artistDetails.adresse>
-                <cfset artist['postal_code'] = artistDetails.plz>
-                <cfset artist['phone'] = artistDetails.telefon>
+                <cfset artist['description'] = artistDetails.description>
+                <cfset artist['location'] = artistDetails.location_fk>
+                <cfset artist['address'] = artistDetails.address>
+                <cfset artist['phone'] = artistDetails.phone_number>
                 <cfset artist['email'] = artistDetails.email>
-                <cfset artist['web'] = artistDetails.web>
-                <cfset artist['link'] = artistDetails.link>
-                <cfset artist['images'] = artistDetails.bilder>
+                <cfset artist['web'] = artistDetails.website>
+                <cfset artist['images'] = artistDetails.images>
                 <!--- evaluate images --->
                 <cfset artist['images'] = []>
-                <cfif artistDetails['bilder'] NEQ "">
-                    <cfset images = getStructuredContent(nodetype=1301, instanceids="#artistDetails['bilder']#")>
-                    <cfloop query="images">
-                        <!--- construct individual images --->
-                        <cfset image = {}>
-                        <cfset image['id'] = images.id>
-                        <cfset image['path'] = href("instance:"&images.id)&"&dimensions=300x150&cropmode=cropcenter">
-                        <cfset image['filename'] = images.originalfilename>
-                        <cfset ArrayAppend(artist['images'], image)>
+                <cfif artistDetails['images'] NEQ "">
+                    <!--- Loop through comma-separated image IDs --->
+                    <cfloop list="#artistDetails['images']#" index="imgID">
+                        <cfset imgID = trim(imgID)>
+                        <cfif len(imgID) GT 0>
+                            <cfset image = {}>
+                            <cfset image['id'] = imgID>
+                            <cfset image['path'] = "https://events-test.agindo-services.info"&href("instance:"&imgID)&"&dimensions=300x150&cropmode=cropcenter">
+                            <cfset image['filename'] = "image_"&imgID>
+                            <cfset ArrayAppend(artist['images'], image)>
+                        </cfif>
                     </cfloop>
                 </cfif>
                 <!--- --->
@@ -652,7 +654,6 @@
             </cfloop>
 
             <cfheader statuscode="200" statustext="OK">
-            <cfset response['uuid'] = createUUID()>
             <cfset response['success'] = true>
             <cfset response['message'] = "Successfully fetched event details">
             <cfreturn response>
