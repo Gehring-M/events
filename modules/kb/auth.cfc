@@ -796,6 +796,20 @@
             <cfset info['artist']['id'] = formData['artist_id']>
         </cfif>
 
+        <!--- [categories] (optional) --->
+        <cfif StructKeyExists(formData, 'categories')>
+            <!--- Handle both array and JSON string --->
+            <cfif isArray(formData['categories'])>
+                <cfset info['artist']['categories'] = formData['categories']>
+            <cfelseif isJSON(formData['categories'])>
+                <cfset info['artist']['categories'] = deserializeJSON(formData['categories'])>
+            <cfelse>
+                <cfset info['artist']['categories'] = []>
+            </cfif>
+        <cfelse>
+            <cfset info['artist']['categories'] = []>
+        </cfif>
+
         <cfreturn info>
     </cffunction>
 
@@ -1031,9 +1045,28 @@
             );
         </cfquery>
 
+        <!--- Get the newly created artist ID --->
+        <cfset var artistID = dbResult.generatedKey>
+
+        <!--- Store artist categories if provided --->
+        <cfif StructKeyExists(artist, 'categories') AND isArray(artist['categories']) AND ArrayLen(artist['categories']) GT 0>
+            <cfloop array="#artist['categories']#" index="categoryID">
+                <cfif isNumeric(categoryID) AND categoryID GT 0>
+                    <cfquery datasource="#getConfig('DSN')#">
+                        INSERT INTO kb_artist_has_subcategory (artist_id, subcategory_id)
+                        VALUES(
+                            <cfqueryparam cfsqltype="cf_sql_integer" value="#artistID#">,
+                            <cfqueryparam cfsqltype="cf_sql_integer" value="#categoryID#">
+                        )
+                        ON DUPLICATE KEY UPDATE added_at = NOW()
+                    </cfquery>
+                </cfif>
+            </cfloop>
+        </cfif>
+
         <!--- return info --->
         <cfset dbInfo = {}>
-        <cfset dbInfo['id'] = dbResult.generatedKey>
+        <cfset dbInfo['id'] = artistID>
         <cfset dbInfo['new_entries'] = dbResult.recordCount>
         <cfreturn dbInfo>
 
