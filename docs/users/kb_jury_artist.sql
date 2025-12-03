@@ -7,6 +7,7 @@ CREATE TABLE kb_jury_artist (
     need_action TINYINT(1) DEFAULT 0,
     INDEX idx_jury_fk (jury_fk),
     INDEX idx_artist_fk (artist_fk),
+    UNIQUE KEY unique_jury_artist (jury_fk, artist_fk),
     FOREIGN KEY (jury_fk) REFERENCES kb_jury(id),
     FOREIGN KEY (artist_fk) REFERENCES kb_artist(id)
 );
