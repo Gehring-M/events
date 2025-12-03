@@ -9,58 +9,36 @@ Ext.define('myapp.store.ArtistRegistrierungen', {
         startParam: false,
         limitParam: false,
         noCache: true,
-        url: 'modules/common/retrieve.cfc?method=getArtistRegistrierungen',
+        url: 'modules/kb/artists.cfc?method=fetchArtistsPublic',
         reader: {
-            type: 'json'
+            type: 'json',
+            root: 'artists'
         }
     },
 
     fields: 
     [
         {
-            name: 'id'
+            name: 'artist_id',
+            type: 'int'
         },{
-            name: 'user_fk'
+            name: 'user_id',
+            type: 'int'
         },{
-            name: 'name'
+            name: 'name',
+            type: 'string'
         },{
-            name: 'ansprechperson'
+            name: 'description',
+            type: 'string'
         },{
-            name: 'adresse'
+            name: 'approved',
+            type: 'int'
         },{
-            name: 'plz'
+            name: 'rejected',
+            type: 'int'
         },{
-            name: 'ort'
-        },{
-            name: 'ort_fk'
-        },{
-            name: 'latitude'
-        },{
-            name: 'longitude'
-        },{
-            name: 'telefon'
-        },{
-            name: 'email'
-        },{
-            name: 'web'
-        },{
-            name: 'link'
-        },{
-            name: 'beschreibung'
-        },{
-            name: 'bilder'
-        },{
-            name: 'uploads'
-        },{
-            name: 'geprueft'
-        },{
-            name: 'vorname'
-        },{
-            name: 'approved'
-        },{
-            name: 'approvedwhen'
-        },{
-            name: 'createdwhen'
+            name: 'need_action',
+            type: 'int'
         }
     ]
 });

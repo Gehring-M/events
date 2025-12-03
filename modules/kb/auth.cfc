@@ -63,6 +63,7 @@
             <cfset response['success'] = true>
             <cfset response['message'] = "Successfully logged in">
             <cfset response['id'] = authInfo['user']['id']>
+            <cfset response['entity_id'] = authInfo['user']['entity_id']>
             <cfreturn response>
         <cfelse>
             <cfheader statuscode="500" statustext="Internal Server Error">
@@ -184,10 +185,12 @@
                 <cfreturn info>
             </cfif>
 
+            <cfset entityID = 0>
+
             <!--- verify role --->
             <cfif user['user_role'] EQ 'artist'>
                 <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT *
+                    SELECT id
                     FROM kb_artist
                     WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
                 </cfquery>
@@ -197,9 +200,10 @@
                     <cfset info['authenticated'] = false>
                     <cfreturn info>
                 </cfif>
+                <cfset entityID = verifyRole.id>
             <cfelseif user['user_role'] EQ 'organizer'>
                 <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT *
+                    SELECT id
                     FROM kb_organizer
                     WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
                 </cfquery>
@@ -209,9 +213,10 @@
                     <cfset info['authenticated'] = false>
                     <cfreturn info>
                 </cfif>
+                <cfset entityID = verifyRole.id>
             <cfelseif user['user_role'] EQ 'jury'>
                 <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT *
+                    SELECT id
                     FROM kb_jury
                     WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
                 </cfquery>
@@ -221,6 +226,7 @@
                     <cfset info['authenticated'] = false>
                     <cfreturn info>
                 </cfif>
+                <cfset entityID = verifyRole.id>
             <cfelse>
                 <cfset ArrayAppend(info['errors'], "Invalid user_role")>
                 <cfset info['hasErrors'] = true>
@@ -229,6 +235,7 @@
             </cfif>
 
             <!--- construct user --->
+            <cfset info['user']['entity_id'] = entityID>
             <cfset info['user']['id'] = selectUser.id>
             <cfset info['user']['username'] = selectUser.username>
             <cfset info['user']['email'] = selectUser.email>
