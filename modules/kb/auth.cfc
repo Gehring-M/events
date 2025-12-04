@@ -1188,6 +1188,11 @@
             <cfreturn response>
         </cfif>
 
+        <!--- Send email notification to jurors if a new artist registered --->
+        <cfif registrationData['userRole'] EQ 'artist'>
+            <cfset notifyJurorsOfNewArtist(artistName=registrationData['artist']['name'], artistEmail=registrationData['user']['email'], userID=insertInfo['userID'])>
+        </cfif>
+
         <!--- upload images --->
         <cfset uploadInfo = uploadImages(formData=formStruct, userRole=registrationData['userRole'], userDetailsID=insertInfo['userDetailsID'])>
 
@@ -1302,5 +1307,64 @@
         <cfreturn info>
     </cffunction>
 
+
+    <!--- ############################################ --->
+    <!--- #   NOTIFY JURORS OF NEW ARTIST         # --->
+    <!--- ############################################ --->
+
+    <cffunction name="notifyJurorsOfNewArtist" access="private" returntype="void">
+        <!--- arguments --->
+        <cfargument name="artistName" type="string" required="true">
+        <cfargument name="artistEmail" type="string" required="true">
+        <cfargument name="userID" type="numeric" required="true">
+
+        <!--- init --->
+        <cfset var dsn = getConfig('DSN')>
+
+        <cftry>
+            <!--- Fetch all jurors with their email addresses --->
+            <cfquery name="jurors" datasource="#dsn#">
+                SELECT 
+                    ku.kb_email AS email,
+                    kj.first_name AS firstName,
+                    kj.last_name AS lastName
+                FROM kb_jury AS kj
+                JOIN kb_user AS ku
+                ON kj.user_fk = ku.id
+                WHERE ku.active = 1
+                ORDER BY kj.first_name ASC
+            </cfquery>
+
+            <!--- Send email to each juror --->
+            <cfloop query="jurors">
+                <cfmail to="#jurors.email#" from="#getConfig('mail.from')#" subject="Neue Künstlerregistrierung - Abstimmung erforderlich" type="html" charset="utf-8">
+                    <html>
+                        <head>
+                            <meta charset="utf-8">
+                        </head>
+                        <body>
+                            <h2>Hallo <cfif len(jurors.firstName)>#jurors.firstName#<cfelse>Jurymitglied</cfif>,</h2>
+                            <p>Ein neuer Künstler hat sich auf <a href="https://kulturbezirk-schwaz.tirol">kulturbezirk-schwaz.tirol</a> registriert und wartet auf Ihre Abstimmung:</p>
+                            <p>
+                                <strong>Name:</strong> #arguments.artistName#<br>
+                                <strong>Email:</strong> #arguments.artistEmail#
+                            </p>
+                            <p>Bitte loggen Sie sich in Ihr Jury-Dashboard ein und stimmen Sie ab, ob Sie dieser Künstler-Registrierung zustimmen.</p>
+                            <p>
+                                Mit freundlichen Grüßen,<br>
+                                Das Team von kulturbezirk-schwaz.tirol
+                            </p>
+                        </body>
+                    </html>
+                </cfmail>
+            </cfloop>
+
+            <cfcatch type="any">
+                <!--- Log error but don't fail registration --->
+                <cflog file="jury_notification_error" type="error" text="Failed to notify jurors for new artist #arguments.artistName#: #cfcatch.message#">
+            </cfcatch>
+        </cftry>
+
+    </cffunction>
 
 </cfcomponent>

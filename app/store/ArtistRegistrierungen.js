@@ -39,6 +39,9 @@ Ext.define('myapp.store.ArtistRegistrierungen', {
         },{
             name: 'need_action',
             type: 'int'
+        },{
+            name: 'categories',
+            type: 'auto'
         }
     ]
 });
