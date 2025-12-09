@@ -32,6 +32,12 @@
     <!--- ##################################### --->
 
     <cffunction name="fetchArtistCategories" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
+
         <!--- init --->
         <cfset var response = {}>
         <cfset var dsn = getConfig('DSN')>
@@ -98,6 +104,12 @@
     <!--- ########################### --->
 
     <cffunction name="fetchArtistDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 
@@ -210,6 +222,12 @@
 
 
     <cffunction name="fetchArtists" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
+
         <!--- argument --->
         <cfargument name="juryId" type="numeric" required="no">
 
@@ -270,6 +288,12 @@
 
 
     <cffunction name="fetchArtistsPublic" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
+
         <!--- Returns artists with status flags and their selected categories --->
 
         <!--- init --->
@@ -354,6 +378,12 @@
 
 
     <cffunction name="approveArtist" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 

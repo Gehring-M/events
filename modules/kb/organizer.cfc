@@ -32,6 +32,11 @@
     <!--- ########################## --->
 
     <cffunction name="registerOrganizer" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var formStruct = formToStruct()>
@@ -126,6 +131,8 @@
     <!--- ############################## --->
 
     <cffunction name="fetchOrganizerDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 

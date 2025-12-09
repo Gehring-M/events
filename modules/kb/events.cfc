@@ -32,6 +32,11 @@
     <!--- ############################# --->
 
     <cffunction name="fetchUpcomingEvents" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var response = {}>
@@ -116,6 +121,11 @@
     <!--- ################################## --->
 
     <cffunction name="fetchCultureSliderItems" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var response = {}>
@@ -194,6 +204,11 @@
     <!--- ########################## --->
 
     <cffunction name="fetchEventFilter" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var response = {}>
@@ -229,6 +244,11 @@
     <!--- #################### --->
 
     <cffunction name="fetchEvents" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var response = {}>
@@ -312,6 +332,11 @@
     <!--- ################################## --->
 
     <cffunction name="fetchArticleSliderItems" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->
+        <cfif uCase(cgi.request_method) EQ "OPTIONS">
+            <cfheader statuscode="200" statustext="OK">
+            <cfabort>
+        </cfif>
 
         <!--- init --->
         <cfset var response = {}>
@@ -486,6 +511,7 @@
     <!--- ########################### --->
 
     <cffunction name="fetchEventDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
 
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
@@ -595,6 +621,8 @@
     <!--- ########################### --->
 
     <cffunction name="fetchArtistDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 
@@ -672,6 +700,8 @@
     <!--- ############################# --->
 
     <cffunction name="fetchLocationDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 
@@ -748,6 +778,8 @@
     <!--- ############################ --->
 
     <cffunction name="fetchArticleDetail" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
+
         <!--- argument --->
         <cfargument name="id" type="numeric" required="no">
 
@@ -843,6 +875,7 @@
     <!--- ############################# --->
 
     <cffunction name="createEventExternal" access="remote" returnFormat="JSON">
+        <!--- Handle OPTIONS preflight requests --->\n        <cfif uCase(cgi.request_method) EQ "OPTIONS">\n            <cfheader statuscode="200" statustext="OK">\n            <cfabort>\n        </cfif>
 
         <!--- init --->
         <cfset var formStruct = formToStruct()>

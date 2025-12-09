@@ -11,66 +11,71 @@
 
     <cffunction name="loginUser" access="remote" returnFormat="JSON">
 
-        <!--- handle CORS preflight --->
+        <!--- handle OPTIONS preflight (shouldn't reach here due to Application.cfm, but just in case) --->
         <cfif lcase(cgi.request_method) EQ "options">
             <cfheader statuscode="200" statustext="OK">
-            <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-            <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-            <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-            <cfcontent type="application/json">
-            <cfexit method="exit">
+            <cfabort>
         </cfif>
 
-        <!--- set CORS headers before return --->
-        <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-        <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-        <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-
-        <!--- init --->
-        <cfset var rawBody = getHttpRequestData().content>
-        <cfset var requestData = {}>
-        <cfset var response = {}>
-        <cfif len(trim(rawBody)) EQ 0>
-            <cfheader statuscode="400" statustext="Bad Request">
-            <cfset response['success'] = false>
-            <cfset response['message'] = "Request body is empty. Expected JSON.">
-            <cfreturn response>
-        </cfif>
         <cftry>
-            <cfset requestData = deserializeJSON(rawBody)>
-            <cfif NOT isStruct(requestData)>
-                <cfset errorMsg = "Request body is not valid JSON object. Received: " & rawBody>
-                <cfthrow message="#errorMsg#">
+            <!--- init --->
+            <cfset var rawBody = getHttpRequestData().content>
+            <cfset var requestData = {}>
+            <cfset var response = {}>
+
+            <!--- check for payload --->
+            <cfif len(trim(rawBody)) EQ 0>
+                <cfheader statuscode="400" statustext="Bad Request">
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Request body is empty. Expected JSON.">
+                <cfreturn response>
             </cfif>
-        <cfcatch>
-            <cfheader statuscode="400" statustext="Bad Request">
+
+            <!--- verify JSON --->
+            <cftry>
+                <cfset requestData = deserializeJSON(rawBody)>
+                <cfif NOT isStruct(requestData)>
+                    <cfset errorMsg = "Request body is not valid JSON object. Received: " & rawBody>
+                    <cfthrow message="#errorMsg#">
+                </cfif>
+            <cfcatch>
+                <cfheader statuscode="400" statustext="Bad Request">
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Request body is not valid JSON.">
+                <cfset response['errorDetail'] = rawBody>
+                <cfreturn response>
+            </cfcatch>
+            </cftry>
+
+            <!--- authenticate user --->
+            <cfset authInfo = authenticateUser(user=requestData)>
+
+            <!--- validate --->
+            <cfif authInfo.authenticated>
+                <!--- send back to client --->
+                <cfheader statuscode="200" statustext="OK">
+                <!--- generate JWT --->
+                <cfset response['jwt'] = generateJWT(authInfo.user)>
+                <cfset response['success'] = true>
+                <cfset response['message'] = "Successfully logged in">
+                <cfset response['id'] = authInfo['user']['id']>
+                <cfset response['user_role'] = authInfo['user']['role']>
+                <cfset response['entity_id'] = authInfo['user']['entity_id']>
+                <cfreturn response>
+            <cfelse>
+                <cfheader statuscode="500" statustext="Internal Server Error">
+                <cfset response['success'] = false>
+                <cfset response['message'] = "Invalid username or password">
+                <cfreturn response>
+            </cfif>
+
+        <cfcatch type="any">
+            <cfheader statuscode="500" statustext="Internal Server Error">
             <cfset response['success'] = false>
-            <cfset response['message'] = "Request body is not valid JSON.">
-            <cfset response['errorDetail'] = rawBody>
+            <cfset response['message'] = "Server error: " & cfcatch.message>
             <cfreturn response>
         </cfcatch>
         </cftry>
-
-        <!--- authenticate user --->
-        <cfset authInfo = authenticateUser(user=requestData)>
-
-        <!--- validate --->
-        <cfif authInfo.authenticated>
-            <!--- send back to client --->
-            <cfheader statuscode="200" statustext="OK">
-            <!--- generate JWT --->
-            <cfset response['jwt'] = generateJWT(authInfo.user)>
-            <cfset response['success'] = true>
-            <cfset response['message'] = "Successfully logged in">
-            <cfset response['id'] = authInfo['user']['id']>
-            <cfset response['entity_id'] = authInfo['user']['entity_id']>
-            <cfreturn response>
-        <cfelse>
-            <cfheader statuscode="500" statustext="Internal Server Error">
-            <cfset response['success'] = false>
-            <cfset response['message'] = "Invalid username or password">
-            <cfreturn response>
-        </cfif>
 
     </cffunction>
 
@@ -81,20 +86,11 @@
     <!--- ########################### --->
 
     <cffunction name="verifyJWTToken" access="remote" returnFormat="JSON">
-        <!--- handle CORS preflight --->
+        <!--- handle OPTIONS preflight (shouldn't reach here due to Application.cfm, but just in case) --->
         <cfif lcase(cgi.request_method) EQ "options">
             <cfheader statuscode="200" statustext="OK">
-            <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-            <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-            <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-            <cfcontent type="application/json">
-            <cfexit method="exit">
+            <cfabort>
         </cfif>
-
-        <!--- set CORS headers before return --->
-        <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-        <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-        <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
 
         <!--- get JWT from Authorization header or request body --->
         <cfset var response = {}>
@@ -161,16 +157,16 @@
         <cfset info['authenticated'] = false>
 
         <!--- validate data --->
-        <cfif StructKeyExists(user, 'identifier') AND StructKeyExists(user, 'password') AND StructKeyExists(user, 'user_role')>
+        <cfif StructKeyExists(user, 'identifier') AND StructKeyExists(user, 'password')>
             <!--- fetch corresponding user --->
-            <cfquery name="selectUser" datasource="#getConfig('DSN')#">
+            <cfquery name="selectedUser" datasource="#getConfig('DSN')#">
                 SELECT id, kb_username AS username, kb_email AS email, kb_password AS password
                 FROM kb_user
                 WHERE kb_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#user['identifier']#"> OR kb_email = <cfqueryparam cfsqltype="cf_sql_varchar" value="#user['identifier']#">;
             </cfquery>
 
             <!--- check for user --->
-            <cfif selectUser.recordCount NEQ 1>
+            <cfif selectedUser.recordCount NEQ 1>
                 <cfset ArrayAppend(info['errors'], "User does not exist.")>
                 <cfset info['hasErrors'] = true>
                 <cfset info['authenticated'] = false>
@@ -178,7 +174,7 @@
             </cfif>
 
             <!--- verify password --->
-            <cfif selectUser.password NEQ user['password']>
+            <cfif selectedUser.password NEQ user['password']>
                 <cfset ArrayAppend(info['errors'], "Incorrect password.")>
                 <cfset info['hasErrors'] = true>
                 <cfset info['authenticated'] = false>
@@ -186,49 +182,37 @@
             </cfif>
 
             <cfset entityID = 0>
+            <cfset userRole = ''>
 
-            <!--- verify role --->
-            <cfif user['user_role'] EQ 'artist'>
-                <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT id
-                    FROM kb_artist
-                    WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
+            <!--- we need the correct entity ID as well here (artist, organizer, jury) --->
+            <!--- if login gets slow, this is likely the reason because does scale badly, maybe add some additional field to kb_user as a hotfix --->
+            <cfquery name="isArtist" datasource="#getConfig('DSN')#">
+                SELECT id FROM kb_artist WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectedUser['id']#">;
+            </cfquery>
+            <cfif isArtist.recordCount NEQ 0>
+                <cfset entityID = isArtist.id>
+                <cfset userRole = 'artist'>
+            </cfif>
+            <cfif entityID EQ 0>
+                <cfquery name="isOrganizer" datasource="#getConfig('DSN')#">
+                    SELECT id FROM kb_organizer WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectedUser['id']#">;
                 </cfquery>
-                <cfif verifyRole.recordCount NEQ 1>
-                    <cfset ArrayAppend(info['errors'], "User exists but tried to login for wrong role.")>
-                    <cfset info['hasErrors'] = true>
-                    <cfset info['authenticated'] = false>
-                    <cfreturn info>
+                <cfif isOrganizer.recordCount NEQ 0>
+                    <cfset entityID = isOrganizer.id>
+                    <cfset userRole = 'organizer'>
                 </cfif>
-                <cfset entityID = verifyRole.id>
-            <cfelseif user['user_role'] EQ 'organizer'>
-                <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT id
-                    FROM kb_organizer
-                    WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
+            </cfif>
+            <cfif entityID EQ 0>
+                <cfquery name="isJury" datasource="#getConfig('DSN')#">
+                    SELECT id FROM kb_jury WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectedUser['id']#">;
                 </cfquery>
-                <cfif verifyRole.recordCount NEQ 1>
-                    <cfset ArrayAppend(info['errors'], "User exists but tried to login for wrong role.")>
-                    <cfset info['hasErrors'] = true>
-                    <cfset info['authenticated'] = false>
-                    <cfreturn info>
+                <cfif isJury.recordCount NEQ 0>
+                    <cfset entityID = isJury.id>
+                    <cfset userRole = 'juror'>
                 </cfif>
-                <cfset entityID = verifyRole.id>
-            <cfelseif user['user_role'] EQ 'jury'>
-                <cfquery name="verifyRole" datasource="#getConfig('DSN')#">
-                    SELECT id
-                    FROM kb_jury
-                    WHERE user_fk = <cfqueryparam cfsqltype="cf_sql_integer" value="#selectUser['id']#">
-                </cfquery>
-                <cfif verifyRole.recordCount NEQ 1>
-                    <cfset ArrayAppend(info['errors'], "User exists but tried to login for wrong role.")>
-                    <cfset info['hasErrors'] = true>
-                    <cfset info['authenticated'] = false>
-                    <cfreturn info>
-                </cfif>
-                <cfset entityID = verifyRole.id>
-            <cfelse>
-                <cfset ArrayAppend(info['errors'], "Invalid user_role")>
+            </cfif>
+            <cfif entityID EQ 0>
+                <cfset ArrayAppend(info['errors'], "Internal Server Error (data inconsistency).")>
                 <cfset info['hasErrors'] = true>
                 <cfset info['authenticated'] = false>
                 <cfreturn info>
@@ -236,9 +220,10 @@
 
             <!--- construct user --->
             <cfset info['user']['entity_id'] = entityID>
-            <cfset info['user']['id'] = selectUser.id>
-            <cfset info['user']['username'] = selectUser.username>
-            <cfset info['user']['email'] = selectUser.email>
+            <cfset info['user']['role'] = userRole>
+            <cfset info['user']['id'] = selectedUser.id>
+            <cfset info['user']['username'] = selectedUser.username>
+            <cfset info['user']['email'] = selectedUser.email>
             <cfset info['authenticated'] = true>
             <cfreturn info>
         <cfelse>
@@ -341,21 +326,11 @@
 
     <cffunction name="updateUser" access="remote" returnFormat="JSON">
 
-        <!--- handle CORS preflight --->
+        <!--- handle OPTIONS preflight (shouldn't reach here due to Application.cfm, but just in case) --->
         <cfif lcase(cgi.request_method) EQ "options">
             <cfheader statuscode="200" statustext="OK">
-            <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-            <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-            <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-            <cfcontent type="application/json">
-            <cfexit method="exit">
+            <cfabort>
         </cfif>
-
-        <!--- set CORS headers before return --->
-        <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-        <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-        <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-
 
         <!--- init --->
         <cfset var formData = formToStruct()>
@@ -1136,20 +1111,11 @@
     <!--- ##################### --->
     <cffunction name="registerUser" access="remote" returnFormat="JSON">
 
-        <!--- handle CORS preflight --->
+        <!--- handle OPTIONS preflight (shouldn't reach here due to Application.cfm, but just in case) --->
         <cfif lcase(cgi.request_method) EQ "options">
             <cfheader statuscode="200" statustext="OK">
-            <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-            <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-            <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
-            <cfcontent type="application/json">
-            <cfexit method="exit">
+            <cfabort>
         </cfif>
-
-        <!--- set CORS headers before return --->
-        <cfheader name="Access-Control-Allow-Origin" value="https://kulturbezirk-test.agindo-services.info">
-        <cfheader name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE, OPTIONS">
-        <cfheader name="Access-Control-Allow-Headers" value="Content-Type, Authorization, X-Requested-With, Accept">
 
         <!--- init --->
         <cfset var formStruct = formToStruct()>
